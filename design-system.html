@@ -1,0 +1,578 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Dither Wizard Design System</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=block" />
+    <link rel="stylesheet" href="styles.css?v=20260504-figma-logotype-canonical" />
+    <link rel="stylesheet" href="sprite-texture-dev.css?v=20260504-pixel-textures" />
+  </head>
+  <body class="system-doc-body" data-logo-variant="figma-lockup">
+    <div class="matrix-field" aria-hidden="true"></div>
+    <div class="system-shell">
+      <div data-site-header></div>
+
+      <main class="system-page">
+        <div class="system-docs-layout">
+          <aside class="system-side-nav" data-system-left-nav aria-label="Design system sections"></aside>
+          <div class="system-docs-content">
+            <div class="system-inner">
+              <section class="system-hero" aria-labelledby="system-title">
+                <div>
+                  <p class="system-kicker">source of truth: DESIGN_SYSTEM.md</p>
+                  <h2 class="system-title" id="system-title">Dither Wizard system</h2>
+                </div>
+                <div class="system-toc" aria-label="Design system sections">
+                  <a class="system-pill" href="#color">Color</a>
+                  <a class="system-pill" href="#type">Type</a>
+                  <a class="system-pill" href="#space">Space</a>
+                  <a class="system-pill" href="#brand">Brand</a>
+                  <a class="system-pill" href="#icons">Icons</a>
+                  <a class="system-pill" href="#workflows">Workflows</a>
+                  <a class="system-pill" href="#components">Components</a>
+                  <a class="system-pill" href="#states">States</a>
+                  <a class="system-pill" href="#motion">Motion</a>
+                  <a class="system-pill" href="#access">Access</a>
+                  <a class="system-pill" href="#qa">QA</a>
+                  <a class="system-pill" href="#governance">Governance</a>
+                </div>
+              </section>
+
+              <section class="system-section" id="color" aria-labelledby="color-title">
+                <p class="system-label">01 / foundation</p>
+                <h2 id="color-title">Color roles</h2>
+                <p>The role names anchor the surface map. Dither Wizard maps them into live cinematic surfaces and lets uploaded or edited artwork seed Material 3-style runtime roles.</p>
+                <div class="color-role-overview" aria-label="Color role overview">
+                  <article class="color-role-intro">
+                    <span class="token-name">role model</span>
+                    <h3>Seeded roles, not loose swatches</h3>
+                    <p>The section starts with the live product roles, then shows the generated Material-style implementation below. Baseline neutrals are preserved as ancestry, but the active site color comes from the current primary tonal palette.</p>
+                    <div class="color-role-flow" aria-label="Color role flow">
+                      <span>seed</span>
+                      <span>tones</span>
+                      <span>roles</span>
+                      <span>tokens</span>
+                      <span>interface</span>
+                    </div>
+                  </article>
+                  <article class="color-surface-panel">
+                    <span class="token-name">live surfaces</span>
+                    <div class="tone-strip" aria-hidden="true">
+                      <span class="tone" style="background: var(--bg)"></span>
+                      <span class="tone" style="background: var(--bg-2)"></span>
+                      <span class="tone" style="background: var(--panel)"></span>
+                      <span class="tone" style="background: var(--panel-2)"></span>
+                      <span class="tone" style="background: var(--green)"></span>
+                      <span class="tone" style="background: var(--amber)"></span>
+                      <span class="tone" style="background: var(--red)"></span>
+                    </div>
+                    <dl class="role-list">
+                      <div class="role-row"><dt class="token-name">page background</dt><dd>primary tone 10</dd></div>
+                      <div class="role-row"><dt class="token-name">surface containers</dt><dd>panes and controls</dd></div>
+                      <div class="role-row"><dt class="token-name">primary role</dt><dd>active and focus</dd></div>
+                      <div class="role-row"><dt class="token-name">semantic roles</dt><dd>state labels</dd></div>
+                    </dl>
+                  </article>
+                </div>
+                <div class="color-role-map" aria-label="Dither Wizard color role families">
+                  <article style="--role-swatch-a: var(--green); --role-swatch-b: color-mix(in oklch, var(--green), var(--panel) 62%);">
+                    <span class="token-name">primary</span>
+                    <strong>active image operation</strong>
+                    <p>Selected algorithm, focus ring, primary command, and seeded action.</p>
+                  </article>
+                  <article style="--role-swatch-a: var(--panel); --role-swatch-b: var(--bg-2);">
+                    <span class="token-name">surface</span>
+                    <strong>document and workbench depth</strong>
+                    <p>Page base, panel layers, controls, rules, and text pairings.</p>
+                  </article>
+                  <article style="--role-swatch-a: var(--cyan); --role-swatch-b: color-mix(in oklch, var(--magenta), var(--panel) 64%);">
+                    <span class="token-name">secondary / tertiary</span>
+                    <strong>supporting signal channels</strong>
+                    <p>Preview metadata, palette extraction, and alternate effect states.</p>
+                  </article>
+                  <article style="--role-swatch-a: var(--amber); --role-swatch-b: color-mix(in oklch, var(--red), var(--panel) 70%);">
+                    <span class="token-name">semantic</span>
+                    <strong>status with labels</strong>
+                    <p>Recording, recoverable failure, export risk, and completion feedback.</p>
+                  </article>
+                </div>
+                <details class="color-baseline-details">
+                  <summary>Baseline and seed survival checks</summary>
+                  <div class="color-baseline-grid">
+                    <div>
+                      <span class="token-name">baseline neutral ramp</span>
+                      <div class="tone-strip" aria-hidden="true">
+                        <span class="tone" style="background: #0c0d10"></span>
+                        <span class="tone" style="background: #15161a"></span>
+                        <span class="tone" style="background: #2a2c30"></span>
+                        <span class="tone" style="background: #5a5d64"></span>
+                        <span class="tone" style="background: #8d9098"></span>
+                        <span class="tone" style="background: #dbdde1"></span>
+                        <span class="tone" style="background: #f6f7f8"></span>
+                      </div>
+                    </div>
+                    <div class="seed-board" aria-label="Dynamic seed proof">
+                      <span class="token-name">seed survival checks</span>
+                      <div class="seed-strip seed-red"><span></span><span></span><span></span><span></span></div>
+                      <div class="seed-strip seed-blue"><span></span><span></span><span></span><span></span></div>
+                      <div class="seed-strip seed-gold"><span></span><span></span><span></span><span></span></div>
+                      <div class="seed-strip seed-violet"><span></span><span></span><span></span><span></span></div>
+                    </div>
+                  </div>
+                </details>
+                <div class="dynamic-color-lab" id="dynamicColorLab" aria-label="Dynamic color laboratory">
+                  <div class="dynamic-lab-head">
+                    <div>
+                      <span class="token-name">material dynamic color / local implementation</span>
+                      <h3>Seed to tonal palettes to site roles</h3>
+                      <p>Material's free model gives the system a repeatable path: derive tonal palettes from a seed, assign tones to semantic roles, expose those roles as CSS custom properties, then map product components to the roles instead of hard-coded colors.</p>
+                    </div>
+                    <div class="seed-control-stack">
+                      <span class="token-name">local implementation examples</span>
+                      <div class="seed-controls" id="dynamicSeedControls" aria-label="Local implementation theme examples"></div>
+                    </div>
+                  </div>
+                  <div class="dynamic-lab-primary">
+                    <div class="dynamic-flow" aria-label="Dynamic color pipeline">
+                      <article><span class="token-name">01 source</span><strong>Image or brand seed</strong><p>Upload source, rendered output, or chosen preset.</p></article>
+                      <article><span class="token-name">02 palettes</span><strong>13-tone ladders</strong><p>Primary, secondary, tertiary, error, neutral, neutral variant.</p></article>
+                      <article><span class="token-name">03 roles</span><strong>Light and dark schemes</strong><p>Primary, on-primary, containers, surface, outline, inverse.</p></article>
+                      <article><span class="token-name">04 product</span><strong>Dither Wizard tokens</strong><p>Canvas glow, pane material, focus, controls, sprite pixels.</p></article>
+                    </div>
+                    <div class="dynamic-site-preview" id="dynamicSitePreview" aria-label="Website dynamic color preview">
+                      <div class="preview-topbar">
+                        <span>Dither Wizard</span>
+                        <button type="button">Primary action</button>
+                      </div>
+                      <div class="preview-workbench">
+                        <aside>
+                          <span class="token-name">control pane</span>
+                          <label class="field-group">
+                            <span class="field-label">Algorithm</span>
+                            <select aria-label="Preview select">
+                              <option>Floyd Steinberg</option>
+                              <option>Atkinson</option>
+                            </select>
+                          </label>
+                          <span class="preview-chip">selected</span>
+                        </aside>
+                        <main>
+                          <span class="token-name">preview stage</span>
+                          <div class="preview-canvas"><span>seeded canvas glow</span></div>
+                        </main>
+                        <aside>
+                          <span class="token-name">export state</span>
+                          <strong>PNG to WebM</strong>
+                          <span class="preview-warning">recording</span>
+                          <span class="preview-error">budget risk</span>
+                        </aside>
+                      </div>
+                    </div>
+                  </div>
+                  <details class="dynamic-lab-details" open>
+                    <summary>Tonal palette matrix</summary>
+                    <div class="tonal-palette-matrix" id="tonalPaletteMatrix" aria-label="Generated tonal palettes"></div>
+                  </details>
+                  <details class="dynamic-lab-details">
+                    <summary>Generated role cards</summary>
+                    <div class="dynamic-role-board" id="dynamicRoleBoard" aria-label="Generated role mapping"></div>
+                  </details>
+                  <details class="dynamic-lab-details">
+                    <summary>Product token map</summary>
+                    <div class="site-token-map" id="siteTokenMap" aria-label="Material role to Dither token map"></div>
+                  </details>
+                </div>
+              </section>
+
+              <section class="system-section" id="type" aria-labelledby="type-title">
+                <p class="system-label">02 / mono primary</p>
+                <h2 id="type-title">Typography</h2>
+                <p>GT Standard Mono is the primary product voice. The system uses width, case, tracking, and tabular readouts to create range inside the same face, while GT Standard remains reserved for long-form reading.</p>
+                <div class="system-panel">
+                  <div class="type-sample"><span class="token-name">Display / GT Standard Mono caps</span><strong class="type-display">Signal made visible</strong></div>
+                  <div class="type-sample"><span class="token-name">Extended caps / limited use</span><strong class="type-extended-demo">Phase index / wide signal field</strong></div>
+                  <div class="type-sample"><span class="token-name">H3 / GT Standard Mono caps</span><strong class="type-h3">A controlled product surface</strong></div>
+                  <div class="type-sample"><span class="token-name">Reading body / GT Standard</span><p class="type-body-demo">The proportional GT Standard face remains available for system documentation, long-form rules, and future editorial surfaces. Dither Wizard keeps controls compact so the image remains the primary object.</p></div>
+                  <div class="type-sample"><span class="token-name">Meta / GT Standard Mono</span><strong class="type-mono-demo">ALG 63 / WX FOG / SOURCE LOCAL</strong></div>
+                  <div class="type-sample"><span class="token-name">Data / tabular readout</span><strong class="type-data-demo">FRAME 0007 / 1024x0640 / 016 MS</strong></div>
+                </div>
+                <div class="type-role-grid">
+                  <article><span class="token-name">display caps</span><strong>System title</strong><p>Rare, large, uppercase Mono with modest tracking.</p></article>
+                  <article><span class="token-name">extended caps</span><strong>Signal statement</strong><p>Widened all-caps treatment for specimens, brand proof, and major system moments only.</p></article>
+                  <article><span class="token-name">section label</span><strong>Pane and rail titles</strong><p>Small uppercase Mono with wider tracking and light width expansion.</p></article>
+                  <article><span class="token-name">command</span><strong>Buttons and tabs</strong><p>All-caps command labels with enough tracking to stay legible in dense controls.</p></article>
+                  <article><span class="token-name">body</span><strong>Product copy</strong><p>Dense controls stay in Mono; longer prose switches to GT Standard.</p></article>
+                  <article><span class="token-name">data</span><strong>Readouts</strong><p>Tabular Mono for file size, dimensions, frame, seed, and export values.</p></article>
+                </div>
+              </section>
+
+              <section class="system-section" id="space" aria-labelledby="space-title">
+                <p class="system-label">03 / grid</p>
+                <h2 id="space-title">Spacing and grid</h2>
+                <p>The copied 4px scale and 12-column grid govern documentation and footer layout. The studio keeps a task-specific three-zone workbench, while the system page uses open cinematic alignment instead of stacked containers.</p>
+                <div class="system-grid">
+                  <article class="system-panel">
+                    <h3>Space ramp</h3>
+                    <div class="spacing-ramp">
+                      <div class="spacing-row"><span class="token-name">space-2</span><span class="spacing-bar" style="width: 8px"></span><span>8</span></div>
+                      <div class="spacing-row"><span class="token-name">space-4</span><span class="spacing-bar" style="width: 16px"></span><span>16</span></div>
+                      <div class="spacing-row"><span class="token-name">space-6</span><span class="spacing-bar" style="width: 32px"></span><span>32</span></div>
+                      <div class="spacing-row"><span class="token-name">space-8</span><span class="spacing-bar" style="width: 64px"></span><span>64</span></div>
+                      <div class="spacing-row"><span class="token-name">space-10</span><span class="spacing-bar" style="width: 128px"></span><span>128</span></div>
+                    </div>
+                  </article>
+                  <article class="system-panel">
+                    <h3>Layout tokens</h3>
+                    <dl class="token-list">
+                      <div class="token-row"><dt class="token-name">--layout-content-max</dt><dd>1248px</dd></div>
+                      <div class="token-row"><dt class="token-name">--layout-col-count</dt><dd>12</dd></div>
+                      <div class="token-row"><dt class="token-name">--layout-col-width</dt><dd>82px</dd></div>
+                      <div class="token-row"><dt class="token-name">--layout-gutter</dt><dd>24px</dd></div>
+                      <div class="token-row"><dt class="token-name">--layout-baseline</dt><dd>4px</dd></div>
+                    </dl>
+                  </article>
+                </div>
+              </section>
+
+              <section class="system-section brand-section" id="brand" aria-labelledby="brand-title">
+                <p class="system-label">04 / brand system</p>
+                <h2 id="brand-title">Brand</h2>
+                <p>The brand system sits between the foundational tokens and the style library. It defines the two identity primitives that appear in product chrome: the animated pixel mark and the logo type.</p>
+
+                <div class="brand-overview-grid" aria-label="Dither Wizard brand primitives">
+                  <article>
+                    <span class="token-name">01 primitive</span>
+                    <strong>Animated pixel mark</strong>
+                    <p>Tokenized SVG character, theme-reactive at the pixel level, driven by walk and spell-cast animation states.</p>
+                  </article>
+                  <article>
+                    <span class="token-name">02 primitive</span>
+                    <strong>Logo type</strong>
+                    <p>Compact GT Standard Mono wordmark with signal rails, a divider glyph, and the DTR/WZD support code.</p>
+                  </article>
+                  <article>
+                    <span class="token-name">shared rule</span>
+                    <strong>Unboxed identity</strong>
+                    <p>The mark and wordmark sit directly in the interface. Do not wrap them in badges, chips, frames, or decorative logo cards.</p>
+                  </article>
+                </div>
+
+                <section class="brand-subsection" id="brand-pixel-mark" aria-labelledby="brand-pixel-title">
+                  <span class="token-name">brand subsection / animated pixel mark</span>
+                  <h3 id="brand-pixel-title">Animated pixel mark</h3>
+                  <p>The Dither Wizard mark is not a raster logo and not a smooth-vector mascot. It is an SVG pixel sprite generated from approved directional PNG anchors, rendered as individual rectangle cells, and recolored through the same dynamic roles as the product interface.</p>
+
+                  <div class="brand-mark-layout">
+                    <article class="brand-character-specimen">
+                      <span class="token-name">header sequence</span>
+                      <div class="brand-character-stage" aria-hidden="true">
+                        <span class="wizard-vector-sprite" data-wizard-vector data-wizard-state="header" aria-hidden="true"></span>
+                      </div>
+                      <strong>Live header mark</strong>
+                      <p>Cycles through right, up, left, and down walk states, then plays orb and burst casts. Hover or focus triggers cast-orb; click triggers cast-burst.</p>
+                    </article>
+                    <div class="brand-detail-grid" aria-label="Animated pixel mark contract">
+                      <article class="brand-detail-card">
+                        <span class="token-name">source anchors</span>
+                        <strong>South, north, east, west PNGs</strong>
+                        <p>Approved directional art in <code>assets/images</code> locks the hood, robe volume, staff placement, face void, hand reads, and direction-specific silhouettes.</p>
+                      </article>
+                      <article class="brand-detail-card">
+                        <span class="token-name">logical grid</span>
+                        <strong>48 by 56 cells</strong>
+                        <p>The encoder crops each anchor, fits it into the logical frame, quantizes the palette, and emits compact character rows.</p>
+                      </article>
+                      <article class="brand-detail-card">
+                        <span class="token-name">renderer</span>
+                        <strong>SVG rect pixels</strong>
+                        <p><code>dither-wizard-vector.js</code> converts every nontransparent cell to a <code>rect</code>, applies a <code>wizard-px-*</code> class, and animates by offsetting pixels.</p>
+                      </article>
+                      <article class="brand-detail-card">
+                        <span class="token-name">motion contract</span>
+                        <strong>Stepped personality only</strong>
+                        <p>Idle and walk states use low-amplitude bob and stride offsets. Spell states add generated orb or burst pixels without changing the approved base silhouette.</p>
+                      </article>
+                    </div>
+                  </div>
+
+                  <aside class="sprite-aura-dev-panel" data-sprite-aura-dev aria-label="Sprite pixel texture options">
+                    <div class="sprite-aura-dev-head">
+                      <span>Sprite texture</span>
+                    </div>
+                    <div class="sprite-aura-dev-body" role="radiogroup" aria-label="Choose sprite pixel texture">
+                      <input class="sprite-texture-radio" type="radio" name="spriteTexture" id="sprite-texture-no-aura" checked />
+                      <label class="sprite-aura-option" for="sprite-texture-no-aura"><span>01</span><strong>No Aura</strong><small>bare sprite</small></label>
+                      <input class="sprite-texture-radio" type="radio" name="spriteTexture" id="sprite-texture-pixel-dust" />
+                      <label class="sprite-aura-option" for="sprite-texture-pixel-dust"><span>02</span><strong>Pixel Dust</strong><small>1-bit drift</small></label>
+                      <input class="sprite-texture-radio" type="radio" name="spriteTexture" id="sprite-texture-checker-breath" />
+                      <label class="sprite-aura-option" for="sprite-texture-checker-breath"><span>03</span><strong>Checker Breath</strong><small>bayer pulse</small></label>
+                      <input class="sprite-texture-radio" type="radio" name="spriteTexture" id="sprite-texture-scan-stitch" />
+                      <label class="sprite-aura-option" for="sprite-texture-scan-stitch"><span>04</span><strong>Scan Stitch</strong><small>row crawl</small></label>
+                      <input class="sprite-texture-radio" type="radio" name="spriteTexture" id="sprite-texture-rune-pixels" />
+                      <label class="sprite-aura-option" for="sprite-texture-rune-pixels"><span>05</span><strong>Rune Pixels</strong><small>symbol ticks</small></label>
+                      <input class="sprite-texture-radio" type="radio" name="spriteTexture" id="sprite-texture-bit-motes" />
+                      <label class="sprite-aura-option" for="sprite-texture-bit-motes"><span>06</span><strong>Bit Motes</strong><small>square motes</small></label>
+                      <input class="sprite-texture-radio" type="radio" name="spriteTexture" id="sprite-texture-column-rain" />
+                      <label class="sprite-aura-option" for="sprite-texture-column-rain"><span>07</span><strong>Column Rain</strong><small>thin columns</small></label>
+                      <input class="sprite-texture-radio" type="radio" name="spriteTexture" id="sprite-texture-broken-ring" />
+                      <label class="sprite-aura-option" for="sprite-texture-broken-ring"><span>08</span><strong>Broken Ring</strong><small>tile orbit</small></label>
+                      <input class="sprite-texture-radio" type="radio" name="spriteTexture" id="sprite-texture-offset-static" />
+                      <label class="sprite-aura-option" for="sprite-texture-offset-static"><span>09</span><strong>Offset Static</strong><small>signal blocks</small></label>
+                      <input class="sprite-texture-radio" type="radio" name="spriteTexture" id="sprite-texture-blue-noise-pixels" />
+                      <label class="sprite-aura-option" for="sprite-texture-blue-noise-pixels"><span>10</span><strong>Blue Noise Pixels</strong><small>dither field</small></label>
+                    </div>
+                  </aside>
+
+                  <div class="sprite-state-grid" aria-label="Dither Wizard live pixel mark states">
+                    <article class="sprite-state-card"><div class="sprite-character-frame"><span class="wizard-vector-sprite" data-wizard-vector data-wizard-state="walk-down" aria-hidden="true"></span></div><span class="token-name">walk-down / 7fps</span><strong>South / front</strong></article>
+                    <article class="sprite-state-card"><div class="sprite-character-frame"><span class="wizard-vector-sprite" data-wizard-vector data-wizard-state="walk-up" aria-hidden="true"></span></div><span class="token-name">walk-up / 7fps</span><strong>North / back</strong></article>
+                    <article class="sprite-state-card"><div class="sprite-character-frame"><span class="wizard-vector-sprite" data-wizard-vector data-wizard-state="walk-left" aria-hidden="true"></span></div><span class="token-name">walk-left / 7fps</span><strong>West / screen left</strong></article>
+                    <article class="sprite-state-card"><div class="sprite-character-frame"><span class="wizard-vector-sprite" data-wizard-vector data-wizard-state="walk-right" aria-hidden="true"></span></div><span class="token-name">walk-right / 7fps</span><strong>East / screen right</strong></article>
+                    <article class="sprite-state-card"><div class="sprite-character-frame"><span class="wizard-vector-sprite" data-wizard-vector data-wizard-state="cast-orb" aria-hidden="true"></span></div><span class="token-name">cast-orb / 8fps</span><strong>Hover and focus</strong></article>
+                    <article class="sprite-state-card"><div class="sprite-character-frame"><span class="wizard-vector-sprite" data-wizard-vector data-wizard-state="cast-burst" aria-hidden="true"></span></div><span class="token-name">cast-burst / 10fps</span><strong>Click and busy</strong></article>
+                  </div>
+
+                  <div class="sprite-build-grid">
+                    <article class="sprite-build-step"><span class="token-name">01 anchors</span><strong>Approved PNG identity sources</strong><p>South, north, east, and west anchors are the canonical sources for silhouette, robe palette, staff placement, and direction-specific reads.</p></article>
+                    <article class="sprite-build-step"><span class="token-name">02 encoder</span><strong>Raster to logical pixel rows</strong><p><code>tools/build-wizard-vector-data.py</code> crops each anchor, fits it into a 48 by 56 frame, quantizes colors to the sprite palette, and writes compact rows.</p></article>
+                    <article class="sprite-build-step"><span class="token-name">03 data</span><strong>Tokenized frame source</strong><p><code>assets/sprites/dither-wizard-vector-data.js</code> stores base frames, palette ids, animation names, frame rates, and the header sequence.</p></article>
+                    <article class="sprite-build-step"><span class="token-name">04 renderer</span><strong>SVG rect pixels</strong><p><code>assets/sprites/dither-wizard-vector.js</code> renders cells, offsets walk and cast frames, observes busy state, and respects reduced motion.</p></article>
+                  </div>
+
+                  <div class="sprite-token-board" aria-label="Animated pixel mark token mapping">
+                    <article style="--sprite-token-swatch: var(--wizard-px-robe-dark)"><span></span><strong>robe-dark</strong><code>primary + scrim</code></article>
+                    <article style="--sprite-token-swatch: var(--wizard-px-robe-mid)"><span></span><strong>robe-mid</strong><code>primary + secondary</code></article>
+                    <article style="--sprite-token-swatch: var(--wizard-px-gold)"><span></span><strong>gold trim</strong><code>warning role</code></article>
+                    <article style="--sprite-token-swatch: var(--wizard-px-purple)"><span></span><strong>hands / crystal</strong><code>tertiary role</code></article>
+                    <article style="--sprite-token-swatch: var(--wizard-px-spell)"><span></span><strong>spell pixels</strong><code>tertiary role</code></article>
+                    <article style="--sprite-token-swatch: var(--wizard-px-void)"><span></span><strong>face void</strong><code>surface + scrim</code></article>
+                  </div>
+
+                  <div class="brand-mapping-grid" aria-label="Animated pixel mark implementation mapping">
+                    <article><span class="token-name">robe ramp</span><p><code>--wizard-px-robe-shadow</code>, <code>--wizard-px-robe-dark</code>, <code>--wizard-px-robe-mid</code>, and <code>--wizard-px-robe-light</code> derive from primary, secondary, and scrim roles.</p></article>
+                    <article><span class="token-name">trim and staff</span><p><code>--wizard-px-gold</code>, <code>--wizard-px-staff-mid</code>, and <code>--wizard-px-staff-gold</code> derive from warning roles so the trim stays readable in light and dark themes.</p></article>
+                    <article><span class="token-name">magic channel</span><p><code>--wizard-px-purple</code>, <code>--wizard-px-spell</code>, and <code>--wizard-px-spell-core</code> derive from tertiary roles and generated effect pixels.</p></article>
+                    <article><span class="token-name">access</span><p>Reduced motion freezes the sprite at the idle-down frame. The mark remains decorative in the header and specimens so assistive tech reads the product name once.</p></article>
+                  </div>
+
+                  <div class="system-note">
+                    To change the mark safely: edit or replace an approved directional anchor, rerun the encoder, inspect every state here, then tune only the <code>--wizard-px-*</code> role mappings or animation offsets. Do not redraw the header mark independently from this pipeline.
+                  </div>
+                </section>
+
+                <section class="brand-subsection" id="brand-logotype" aria-labelledby="brand-logotype-title">
+                  <span class="token-name">brand subsection / logo type</span>
+                  <h3 id="brand-logotype-title">Logo type</h3>
+                  <p>The logo type is a stacked typographic lockup derived from the Figma source: two equal-width GT Standard Mono Expanded Heavy lines, tight leading, no divider, and no support code inside the mark.</p>
+
+                  <div class="brand-foundation-board" aria-label="Dither Wizard logo type construction">
+                    <article class="brand-logotype-specimen">
+                      <span class="token-name">production wordmark</span>
+                      <div class="brand-type-lockup">
+                        <div class="brand-logotype brand-logotype-display" role="img" aria-label="Dither Wizard">
+                          <span class="brand-logo-main" aria-hidden="true">
+                            <span class="logo-word logo-word-dither" data-word="DITHER">
+                              <span class="logo-letter" data-letter="D">D</span>
+                              <span class="logo-letter" data-letter="I">I</span>
+                              <span class="logo-letter" data-letter="T">T</span>
+                              <span class="logo-letter" data-letter="H">H</span>
+                              <span class="logo-letter" data-letter="E">E</span>
+                              <span class="logo-letter" data-letter="R">R</span>
+                            </span>
+                            <span class="logo-space" aria-hidden="true"></span>
+                            <span class="logo-word logo-word-wizard" data-word="WIZARD">
+                              <span class="logo-letter" data-letter="W">W</span>
+                              <span class="logo-letter" data-letter="I">I</span>
+                              <span class="logo-letter" data-letter="Z">Z</span>
+                              <span class="logo-letter" data-letter="A">A</span>
+                              <span class="logo-letter" data-letter="R">R</span>
+                              <span class="logo-letter" data-letter="D">D</span>
+                            </span>
+                          </span>
+                        </div>
+                      </div>
+                      <div class="brand-type-details" aria-label="Logo type layout notes">
+                        <div><span class="token-name">wordmark</span><strong>DITHER / WIZARD</strong></div>
+                        <div><span class="token-name">structure</span><strong>stacked lockup</strong></div>
+                        <div><span class="token-name">source</span><strong>Figma 0:3 / 0:4</strong></div>
+                      </div>
+                    </article>
+                    <div class="brand-detail-grid" aria-label="Logo type rules">
+                      <article class="brand-detail-card"><span class="token-name">type voice</span><strong>GT Standard Mono</strong><p>The header wordmark stays technical and compact. It should read as product instrumentation, not editorial display type.</p></article>
+                      <article class="brand-detail-card"><span class="token-name">structure</span><strong>Text first</strong><p>The words remain selectable text in the DOM, stacked as two equal-width rows with no decorative divider.</p></article>
+                      <article class="brand-detail-card"><span class="token-name">color mapping</span><strong>Single role</strong><p>The lockup uses one foreground role so the form reads as a single typographic object beside the pixel wizard mark.</p></article>
+                      <article class="brand-detail-card"><span class="token-name">responsive fit</span><strong>No wrapping in chrome</strong><p>The header constrains width and scale so the full wordmark fits without colliding with navigation or controls.</p></article>
+                    </div>
+                  </div>
+
+                  <div class="brand-logotype-rule-grid" aria-label="Logo type implementation contract">
+                    <article><span class="token-name">container</span><p><code>.brand-logotype</code> sets width, sizing, family, and construction pseudo-elements.</p></article>
+                    <article><span class="token-name">main words</span><p><code>.brand-logo-main</code> stacks <code>.logo-word-dither</code> and <code>.logo-word-wizard</code> using letter-level spans.</p></article>
+                    <article><span class="token-name">variant lab</span><p>The temporary context lab writes <code>data-logo-variant</code> to test logo direction without changing the shared header markup.</p></article>
+                    <article><span class="token-name">usage rule</span><p>Use the full wordmark in global chrome and documentation specimens. Use text-only labels in dense controls and export surfaces.</p></article>
+                  </div>
+                </section>
+              </section>
+
+              <section class="system-section" id="icons" aria-labelledby="icons-title">
+                <p class="system-label">05 / installed pixelarticons</p>
+                <h2 id="icons-title">Icon system</h2>
+                <p>The icon system now uses the real Pixelarticons package directly. The installed MIT npm set provides handmade 24x24 currentColor SVGs, so the design system no longer approximates the pixel language with generated geometry.</p>
+                <div class="icon-system-meta">
+                  <span>pixelarticons@1.8.1</span>
+                  <span>MIT package</span>
+                  <span>24x24 grid</span>
+                  <span>currentColor SVG</span>
+                  <span>crisp 24/48/72/96</span>
+                  <span id="iconLibraryCount">0 library icons</span>
+                  <span id="iconFoundationCount">0 installed glyphs</span>
+                  <span id="iconCategoryCount">0 categories</span>
+                  <span id="iconCount">0 glyphs</span>
+                </div>
+                <div class="icon-grid-guide" id="iconGridGuide" aria-label="Installed Pixelarticons grid formula"></div>
+                <div class="icon-library-brief" aria-label="Icon library design language">
+                  <article><span class="token-name">installed</span><strong>486 icons</strong><p>The free MIT npm package is vendored locally from Pixelarticons.</p></article>
+                  <article><span class="token-name">full set</span><strong>4052 Pro icons</strong><p>The full website library is paid and can be swapped in when licensed assets are available.</p></article>
+                  <article><span class="token-name">source</span><strong>Handmade SVG</strong><p>The glyph artwork comes from Pixelarticons instead of generated Dither geometry.</p></article>
+                  <article><span class="token-name">display</span><strong>Dense disclosure</strong><p>Search, category tabs, and 192-icon batches keep the installed set fast to browse.</p></article>
+                </div>
+                <div class="icon-library-explorer" id="iconLibraryExplorer" aria-label="Dither Wizard icon library explorer">
+                  <div class="icon-library-toolbar">
+                    <label class="field-group icon-search" for="iconSearchInput">
+                      <span class="field-label">Search</span>
+                      <input id="iconSearchInput" class="text-input" type="search" autocomplete="off" spellcheck="false" placeholder="image, wave, star, export">
+                    </label>
+                    <div>
+                      <span class="token-name">Style</span>
+                      <div class="icon-tab-row" id="iconStyleTabs" role="tablist" aria-label="Icon style"></div>
+                    </div>
+                  </div>
+                  <div class="icon-category-tabs" id="iconCategoryTabs" aria-label="Icon categories"></div>
+                  <div class="icon-library-status">
+                    <span id="iconResultCount">0 shown</span>
+                    <button class="text-button" id="iconLoadMoreButton" type="button">Show more</button>
+                  </div>
+                  <div class="icon-library-grid" id="iconLibraryGrid" aria-label="Filtered icon library"></div>
+                </div>
+                <div class="system-note">
+                  The package installed here is the public MIT npm package. It is not the paid 4052-icon Pro asset bundle from pixelarticons.com.
+                </div>
+              </section>
+
+              <section class="system-section" id="workflows" aria-labelledby="workflows-title">
+                <p class="system-label">06 / use cases</p>
+                <h2 id="workflows-title">Workflow patterns</h2>
+                <p>The system maps directly to the jobs users bring to the editor. Every component exists inside one of these workflows, and every workflow must show loading, success, error, and recovery.</p>
+                <div class="workflow-map">
+                  <article><span class="token-name">upload</span><strong>source acquisition</strong><p>Empty, dragging, loading, accepted, rejected.</p></article>
+                  <article><span class="token-name">edit</span><strong>repeatable look</strong><p>Inspector values, seed shift, preset dirty, reset.</p></article>
+                  <article><span class="token-name">compare</span><strong>source/output trust</strong><p>Split view, zoom, fit, labels, synchronized frame.</p></article>
+                  <article><span class="token-name">animate</span><strong>motion dither</strong><p>Timeline, play, record, speed, reduced motion.</p></article>
+                  <article><span class="token-name">batch</span><strong>queue reliability</strong><p>Queued, processing, selected, failed, complete.</p></article>
+                  <article><span class="token-name">export</span><strong>production output</strong><p>PNG, SVG, palette JSON, WebM, file budget.</p></article>
+                </div>
+              </section>
+
+              <section class="system-section" id="components" aria-labelledby="components-title">
+                <p class="system-label">07 / product primitives</p>
+                <h2 id="components-title">Components</h2>
+                <p>Components stay familiar, dense, and operational. The desktop workbench is viewport-first: side panes scroll independently, the preview column keeps the timeline in reach, the animated brand sprite stays unboxed, and nested material prefers open rows, hairline rules, meters, and token color over extra boxes.</p>
+                <div class="component-catalog" data-component-catalog aria-live="polite"></div>
+              </section>
+
+              <section class="system-section" id="states" aria-labelledby="states-title">
+                <p class="system-label">08 / behavior</p>
+                <h2 id="states-title">State contract</h2>
+                <p>Every interactive primitive should share one vocabulary for feedback. The styling can feel cinematic, but the behavior must remain familiar.</p>
+                <div class="state-matrix">
+                  <article class="state-row"><span class="token-name">default</span><button type="button">Button</button><p>Neutral fill, clear outline, no decorative accent.</p></article>
+                  <article class="state-row"><span class="token-name">selected</span><span class="state-chip is-selected">selected</span><p>Primary role plus label or glyph, never color alone.</p></article>
+                  <article class="state-row"><span class="token-name">loading</span><span class="state-chip is-loading">scanning</span><p>Stable layout with scan, meter, or skeleton feedback.</p></article>
+                  <article class="state-row"><span class="token-name">warning</span><span class="state-chip is-warning">unsaved</span><p>Warns without blocking; action remains available.</p></article>
+                  <article class="state-row"><span class="token-name">error</span><span class="state-chip is-error">export risk</span><p>Semantic color plus human-readable label.</p></article>
+                </div>
+              </section>
+
+              <section class="system-section" id="motion" aria-labelledby="motion-title">
+                <p class="system-label">09 / motion</p>
+                <h2 id="motion-title">Motion grammar</h2>
+                <p>Motion should feel like calibrated instrumentation: sweep, scan, lock, compile, cast. Loops stay subtle and reduced motion disables nonessential movement.</p>
+                <div class="motion-board">
+                  <article><span class="token-name">sweep</span><strong>attention</strong><p>Used for scanning diagnostics and dynamic-color proof only.</p></article>
+                  <article><span class="token-name">scan</span><strong>processing</strong><p>Progress, loading, and export estimation can scan while layout stays fixed.</p></article>
+                  <article><span class="token-name">cast</span><strong>brand reaction</strong><p>The wizard mark reacts on hover, focus, click, and busy state.</p></article>
+                </div>
+                <div class="nav-motion-lab" data-nav-motion-lab></div>
+              </section>
+
+              <section class="system-section" id="access" aria-labelledby="access-title">
+                <p class="system-label">10 / access</p>
+                <h2 id="access-title">Accessibility</h2>
+                <p>Contrast, keyboard focus, reduced motion, and color-independent status are product requirements, not polish passes.</p>
+                <div class="access-grid">
+                  <article class="access-row"><span class="token-name">contrast</span><p>Text and state labels must meet WCAG contrast in light, dark, and seeded schemes.</p></article>
+                  <article class="access-row"><span class="token-name">keyboard</span><p>Topbar, upload, presets, controls, timeline, export, footer, and system links remain reachable.</p></article>
+                  <article class="access-row"><span class="token-name">motion</span><p>Reduced motion disables sprite loops, scan sweeps, and decorative reveal movement.</p></article>
+                  <article class="access-row"><span class="token-name">status</span><p>Every warning, error, selected, or success state has a label, not only color.</p></article>
+                </div>
+              </section>
+
+              <section class="system-section" id="qa" aria-labelledby="qa-title">
+                <p class="system-label">11 / verification</p>
+                <h2 id="qa-title">QA gates</h2>
+                <p>Changes should prove both product behavior and visual contracts.</p>
+                <div class="qa-grid">
+                  <article><span class="token-name">render</span><strong>Preview output</strong><p>Upload, sample reset, controls, effects, and export still render.</p></article>
+                  <article><span class="token-name">responsive</span><strong>Layout survival</strong><p>Desktop, tablet, and mobile keep text readable and controls reachable.</p></article>
+                  <article><span class="token-name">brand</span><strong>Identity proof</strong><p>Sprite animation, token retinting, and logo type fit are inspected together.</p></article>
+                  <article><span class="token-name">access</span><strong>Keyboard and motion</strong><p>Focus order and reduced-motion behavior remain intact.</p></article>
+                </div>
+              </section>
+
+              <section class="system-section" id="governance" aria-labelledby="governance-title">
+                <p class="system-label">12 / sync</p>
+                <h2 id="governance-title">Governance</h2>
+                <p>The source files are intentionally small and explicit. Token changes belong in source data and docs before they appear as one-off page styling.</p>
+                <div class="qa-grid">
+                  <article><span class="token-name">source</span><strong>DESIGN_SYSTEM.md</strong><p>Rules, rationale, acceptance checks, and change constraints.</p></article>
+                  <article><span class="token-name">tokens</span><strong>design-tokens.json</strong><p>Machine-readable color, type, state, icon, and workflow contracts.</p></article>
+                  <article><span class="token-name">implementation</span><strong>styles.css</strong><p>CSS roles, component treatments, themes, and responsive behavior.</p></article>
+                  <article><span class="token-name">proof</span><strong>design-system.html</strong><p>Visual specimens for roles, states, icons, typography, workflows, and brand.</p></article>
+                </div>
+              </section>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <footer class="site-footer" id="siteFooter">
+        <div class="site-footer-inner">
+          <div class="footer-brand" aria-label="Dither Wizard">
+            <strong>Dither Wizard</strong>
+            <span>Local browser dither studio</span>
+          </div>
+          <nav class="footer-section" aria-labelledby="footer-links-title">
+            <h2 id="footer-links-title">Links</h2>
+            <ul class="footer-link-list">
+              <li><a class="footer-link" href="index.html">Home</a></li>
+              <li><a class="footer-link" href="design-system.html">Design System</a></li>
+              <li><a class="footer-link" href="mailto:hello@coreykoberna.com">Contact</a></li>
+              <li><a class="footer-link" href="https://github.com/coreykoberna/26_Dither" target="_blank" rel="noreferrer">GitHub Repo</a></li>
+            </ul>
+          </nav>
+        </div>
+      </footer>
+    </div>
+
+    <script src="assets/sprites/dither-wizard-vector-data.js?v=20260504-pixelarticons-explorer-only"></script>
+    <script src="site-header.js?v=20260504-figma-logotype-canonical"></script>
+    <script src="assets/sprites/dither-wizard-vector.js?v=20260504-pixelarticons-explorer-only"></script>
+    <script src="assets/vendor/pixelarticons/pixelarticons-data.js?v=20260504-pixelarticons-explorer-only"></script>
+    <script src="system.js?v=20260504-icon-dense-explorer"></script>
+    <script src="design-system-components.js?v=20260504-component-catalog-content"></script>
+    <script src="design-system-nav.js?v=20260504-component-catalog-content"></script>
+    <script src="design-system-nav-motion.js?v=20260504-nav-motion-lab"></script>
+    <script src="footer.js?v=20260504-pixelarticons-explorer-only"></script>
+  </body>
+</html>

@@ -1,0 +1,139 @@
+{
+  "$schema": "https://www.designtokens.org/tr/drafts/format/",
+  "name": "Dither Wizard",
+  "description": "Machine-readable design-system subset for the Dither Wizard local image-processing studio.",
+  "color": {
+    "model": {
+      "reference": "Material 3 dynamic color operating model, implemented locally with CSS custom properties and OKLCH approximations.",
+      "source": "A seed color generates tonal palettes, tone selections become system roles, system roles map to Dither Wizard component tokens.",
+      "freeToolchain": ["Material Theme Builder", "material-color-utilities", "Material Web CSS custom properties"]
+    },
+    "tonalPalettes": {
+      "tones": [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 95, 99, 100],
+      "families": ["primary", "secondary", "tertiary", "error", "neutral", "neutral-variant"],
+      "seedMapping": {
+        "primary": "seed hue and strongest usable chroma",
+        "secondary": "nearby hue with reduced chroma for supporting controls",
+        "tertiary": "shifted hue for contrasting palette and effect channels",
+        "error": "stable semantic red family",
+        "neutral": "seed-influenced low-chroma surface family",
+        "neutral-variant": "seed-influenced outline and surface-variant family"
+      }
+    },
+    "families": {
+      "primary": ["primary", "on-primary", "primary-container", "on-primary-container"],
+      "secondary": ["secondary", "on-secondary", "secondary-container", "on-secondary-container"],
+      "tertiary": ["tertiary", "on-tertiary", "tertiary-container", "on-tertiary-container"],
+      "error": ["error", "on-error", "error-container", "on-error-container"],
+      "semantic": ["error", "warning", "success", "info"],
+      "surface": ["background", "on-background", "surface", "on-surface", "surface-dim", "surface-bright", "surface-variant", "on-surface-variant"],
+      "containers": ["surface-container-lowest", "surface-container-low", "surface-container", "surface-container-high", "surface-container-highest"],
+      "utility": ["outline", "outline-variant", "inverse-surface", "inverse-on-surface", "scrim", "shadow"]
+    },
+    "roleToneMap": {
+      "light": {
+        "primary": 40,
+        "on-primary": 100,
+        "primary-container": 90,
+        "on-primary-container": 10,
+        "surface": 99,
+        "on-surface": 10,
+        "surface-container": 94,
+        "outline": 50
+      },
+      "dark": {
+        "primary": 80,
+        "on-primary": 20,
+        "primary-container": 30,
+        "on-primary-container": 90,
+        "surface": 6,
+        "on-surface": 90,
+        "surface-container": 12,
+        "outline": 60
+      }
+    },
+    "cssAliases": {
+      "materialWebPrefix": "--md-sys-color-*",
+      "runtimePrefix": "--m3-*",
+      "productPrefix": "--green, --bg, --panel, --line, --text, --muted"
+    },
+    "seedBehavior": {
+      "upload": "source image seeds roles",
+      "edit": "rendered output canvas becomes active seed",
+      "newMedia": "new media resets edit seed",
+      "designSystemPage": "local implementation examples apply the chosen seed to the documentation shell; the base background is primary tone 10",
+      "guardrail": "semantic roles keep meaning after tinting"
+    }
+  },
+  "typography": {
+    "fontPrimary": "GT Standard Mono",
+    "fontReading": "GT Standard",
+    "monoFeatures": ["case-sensitive punctuation where supported", "slashed zero where supported", "tabular numeric rhythm"],
+    "expressionRules": {
+      "primaryVoice": "GT Standard Mono remains the default product, display, UI, label, command, and data face.",
+      "extendedCaps": "Use widened all-caps Mono only for rare display specimens, brand proof, pane section labels, and major operational readouts.",
+      "readingFallback": "Switch to GT Standard only for long-form copy around 45-72 characters per line."
+    },
+    "roles": {
+      "displayLarge": { "size": "120px", "lineHeight": "124px", "family": "GT Standard Mono", "tracking": "0.015em", "case": "uppercase", "usage": "system title" },
+      "displayExtended": { "size": "46px", "lineHeight": "47px", "family": "GT Standard Mono", "tracking": "0.11em", "case": "uppercase", "scaleX": "1.08", "usage": "rare extended all-caps signal statements" },
+      "displayMedium": { "size": "72px", "lineHeight": "76px", "family": "GT Standard Mono", "tracking": "0.01em", "case": "uppercase", "usage": "major documentation heading" },
+      "displaySmall": { "size": "52px", "lineHeight": "60px", "family": "GT Standard Mono", "tracking": "0.012em", "case": "uppercase", "usage": "system section heading" },
+      "headlineMedium": { "size": "32px", "lineHeight": "40px", "family": "GT Standard Mono", "tracking": "0.018em", "case": "uppercase", "usage": "subsection heading" },
+      "titleMedium": { "size": "20px", "lineHeight": "20px", "family": "GT Standard Mono", "tracking": "0.02em", "usage": "wordmark and dense section title" },
+      "bodyLarge": { "size": "17px", "lineHeight": "28px", "family": "GT Standard", "usage": "long-form documentation" },
+      "bodyMedium": { "size": "15px", "lineHeight": "20px", "family": "GT Standard Mono", "tracking": "0.005em", "usage": "product controls" },
+      "bodySmall": { "size": "13px", "lineHeight": "20px", "family": "GT Standard Mono", "tracking": "0.01em", "usage": "dense helper copy" },
+      "labelLarge": { "size": "15px", "lineHeight": "20px", "family": "GT Standard Mono", "tracking": "0.04em", "case": "uppercase", "usage": "navigation and command labels" },
+      "labelMedium": { "size": "13px", "lineHeight": "20px", "family": "GT Standard Mono", "tracking": "0.035em", "case": "uppercase", "usage": "captions and token details" },
+      "labelSmall": { "size": "12px", "lineHeight": "16px", "family": "GT Standard Mono", "tracking": "0.08em", "case": "uppercase", "usage": "algorithm IDs and status tags" },
+      "sectionLabel": { "size": "11px", "lineHeight": "16px", "family": "GT Standard Mono", "tracking": "0.095em", "case": "uppercase", "scaleX": "1.045", "usage": "pane headings, timeline headings, compact section titles" },
+      "controlLabel": { "size": "10px", "lineHeight": "14px", "family": "GT Standard Mono", "tracking": "0.065em", "case": "uppercase", "usage": "field labels, slider labels, compact row labels" },
+      "commandLabel": { "size": "12px", "lineHeight": "16px", "family": "GT Standard Mono", "tracking": "0.055em", "case": "uppercase", "usage": "buttons, segmented tabs, command controls" },
+      "dataReadout": { "size": "11px", "lineHeight": "14px", "family": "GT Standard Mono", "tracking": "0.035em", "numeric": "tabular slashed-zero", "usage": "meters, dimensions, frame time, file size, export telemetry" }
+    }
+  },
+  "states": {
+    "required": ["default", "hover", "focus-visible", "pressed", "selected", "disabled", "loading", "success", "warning", "error", "empty", "read-only"],
+    "rules": {
+      "focus-visible": "visible primary focus treatment, always legible against dynamic seed colors",
+      "loading": "stable layout with scanline, meter, or skeleton",
+      "error": "error role plus text and next action",
+      "disabled": "noninteractive with readable label"
+    }
+  },
+  "components": {
+    "forms": {
+      "fieldHeight": "34px",
+      "denseMenuRow": "30px",
+      "labelRole": "labelSmall",
+      "valueRole": "bodySmall",
+      "focusTreatment": "primary border plus soft primary halo",
+      "requiredSpecimens": ["search input", "single select", "dense menu", "selected option", "group label"]
+    }
+  },
+  "icons": {
+    "grid": "24x24",
+    "sourcePackage": "pixelarticons",
+    "sourceVersion": "1.8.1",
+    "sourceLicense": "MIT",
+    "sourcePath": "assets/vendor/pixelarticons",
+    "installedCount": 486,
+    "websiteProCount": 4052,
+    "websiteProBundled": false,
+    "unit": "installed Pixelarticons 24x24 currentColor SVG",
+    "formula": "load vendored Pixelarticons SVG bodies; resolve Dither control aliases to package slugs; render as currentColor SVG at 24px multiples",
+    "styles": ["Base"],
+    "display": "style tab, category tabs, search, 96-icon pages, collapsed installed inventory",
+    "requiredMetadata": ["name", "category", "tags", "slug", "body", "source"],
+    "aliasPolicy": "map existing product names to installed Pixelarticons slugs; do not redraw installed glyphs",
+    "categories": ["Navigation", "Action", "Media", "File", "Communication", "Hardware", "Maps", "Time", "Data", "Text Formatting", "Weather", "General"]
+  },
+  "workflows": {
+    "upload": ["empty source", "dragging", "loading", "accepted", "error"],
+    "edit": ["preview", "inspector", "dynamic theme", "preset dirty", "undo"],
+    "animate": ["timeline", "frame count", "speed", "recording", "reduced motion"],
+    "batch": ["queued", "processing", "complete", "failed", "selected"],
+    "export": ["format", "dimensions", "file size", "saved bytes", "over-budget", "complete"]
+  }
+}
