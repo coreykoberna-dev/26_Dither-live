@@ -3,27 +3,26 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Dither Wizard Design System</title>
+    <title>Wizardly Design System</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=block" />
-    <link rel="stylesheet" href="styles.css?v=20260504-figma-logotype-canonical" />
-    <link rel="stylesheet" href="sprite-texture-dev.css?v=20260504-pixel-textures" />
+    <link rel="stylesheet" href="styles.css?v=20260505-ghost-stars-final" />
   </head>
-  <body class="system-doc-body" data-logo-variant="figma-lockup">
+  <body class="system-doc-body" data-logo-variant="figma-lockup" data-system-monitor="ghost-stars">
     <div class="matrix-field" aria-hidden="true"></div>
     <div class="system-shell">
       <div data-site-header></div>
 
       <main class="system-page">
         <div class="system-docs-layout">
-          <aside class="system-side-nav" data-system-left-nav aria-label="Design system sections"></aside>
+          <aside class="system-side-nav" data-system-left-nav aria-label="Wizardly Design System sections"></aside>
           <div class="system-docs-content">
             <div class="system-inner">
               <section class="system-hero" aria-labelledby="system-title">
                 <div>
                   <p class="system-kicker">source of truth: DESIGN_SYSTEM.md</p>
-                  <h2 class="system-title" id="system-title">Dither Wizard system</h2>
+                  <h2 class="system-title" id="system-title">Wizardly Design System</h2>
                 </div>
-                <div class="system-toc" aria-label="Design system sections">
+                <div class="system-toc" aria-label="Wizardly Design System sections">
                   <a class="system-pill" href="#color">Color</a>
                   <a class="system-pill" href="#type">Type</a>
                   <a class="system-pill" href="#space">Space</a>
@@ -68,7 +67,7 @@
                       <span class="tone" style="background: var(--red)"></span>
                     </div>
                     <dl class="role-list">
-                      <div class="role-row"><dt class="token-name">page background</dt><dd>primary tone 10</dd></div>
+                      <div class="role-row"><dt class="token-name">page background</dt><dd>seeded role base</dd></div>
                       <div class="role-row"><dt class="token-name">surface containers</dt><dd>panes and controls</dd></div>
                       <div class="role-row"><dt class="token-name">primary role</dt><dd>active and focus</dd></div>
                       <div class="role-row"><dt class="token-name">semantic roles</dt><dd>state labels</dd></div>
@@ -270,7 +269,7 @@
                         <span class="wizard-vector-sprite" data-wizard-vector data-wizard-state="header" aria-hidden="true"></span>
                       </div>
                       <strong>Live header mark</strong>
-                      <p>Cycles through right, up, left, and down walk states, then plays orb and burst casts. Hover or focus triggers cast-orb; click triggers cast-burst.</p>
+                      <p>Cycles through right, up, left, and down walk states, then plays orb and burst casts. Hover or focus cycles through orb, burst, fire, earth, water, and electric spell casts.</p>
                     </article>
                     <div class="brand-detail-grid" aria-label="Animated pixel mark contract">
                       <article class="brand-detail-card">
@@ -296,34 +295,6 @@
                     </div>
                   </div>
 
-                  <aside class="sprite-aura-dev-panel" data-sprite-aura-dev aria-label="Sprite pixel texture options">
-                    <div class="sprite-aura-dev-head">
-                      <span>Sprite texture</span>
-                    </div>
-                    <div class="sprite-aura-dev-body" role="radiogroup" aria-label="Choose sprite pixel texture">
-                      <input class="sprite-texture-radio" type="radio" name="spriteTexture" id="sprite-texture-no-aura" checked />
-                      <label class="sprite-aura-option" for="sprite-texture-no-aura"><span>01</span><strong>No Aura</strong><small>bare sprite</small></label>
-                      <input class="sprite-texture-radio" type="radio" name="spriteTexture" id="sprite-texture-pixel-dust" />
-                      <label class="sprite-aura-option" for="sprite-texture-pixel-dust"><span>02</span><strong>Pixel Dust</strong><small>1-bit drift</small></label>
-                      <input class="sprite-texture-radio" type="radio" name="spriteTexture" id="sprite-texture-checker-breath" />
-                      <label class="sprite-aura-option" for="sprite-texture-checker-breath"><span>03</span><strong>Checker Breath</strong><small>bayer pulse</small></label>
-                      <input class="sprite-texture-radio" type="radio" name="spriteTexture" id="sprite-texture-scan-stitch" />
-                      <label class="sprite-aura-option" for="sprite-texture-scan-stitch"><span>04</span><strong>Scan Stitch</strong><small>row crawl</small></label>
-                      <input class="sprite-texture-radio" type="radio" name="spriteTexture" id="sprite-texture-rune-pixels" />
-                      <label class="sprite-aura-option" for="sprite-texture-rune-pixels"><span>05</span><strong>Rune Pixels</strong><small>symbol ticks</small></label>
-                      <input class="sprite-texture-radio" type="radio" name="spriteTexture" id="sprite-texture-bit-motes" />
-                      <label class="sprite-aura-option" for="sprite-texture-bit-motes"><span>06</span><strong>Bit Motes</strong><small>square motes</small></label>
-                      <input class="sprite-texture-radio" type="radio" name="spriteTexture" id="sprite-texture-column-rain" />
-                      <label class="sprite-aura-option" for="sprite-texture-column-rain"><span>07</span><strong>Column Rain</strong><small>thin columns</small></label>
-                      <input class="sprite-texture-radio" type="radio" name="spriteTexture" id="sprite-texture-broken-ring" />
-                      <label class="sprite-aura-option" for="sprite-texture-broken-ring"><span>08</span><strong>Broken Ring</strong><small>tile orbit</small></label>
-                      <input class="sprite-texture-radio" type="radio" name="spriteTexture" id="sprite-texture-offset-static" />
-                      <label class="sprite-aura-option" for="sprite-texture-offset-static"><span>09</span><strong>Offset Static</strong><small>signal blocks</small></label>
-                      <input class="sprite-texture-radio" type="radio" name="spriteTexture" id="sprite-texture-blue-noise-pixels" />
-                      <label class="sprite-aura-option" for="sprite-texture-blue-noise-pixels"><span>10</span><strong>Blue Noise Pixels</strong><small>dither field</small></label>
-                    </div>
-                  </aside>
-
                   <div class="sprite-state-grid" aria-label="Dither Wizard live pixel mark states">
                     <article class="sprite-state-card"><div class="sprite-character-frame"><span class="wizard-vector-sprite" data-wizard-vector data-wizard-state="walk-down" aria-hidden="true"></span></div><span class="token-name">walk-down / 7fps</span><strong>South / front</strong></article>
                     <article class="sprite-state-card"><div class="sprite-character-frame"><span class="wizard-vector-sprite" data-wizard-vector data-wizard-state="walk-up" aria-hidden="true"></span></div><span class="token-name">walk-up / 7fps</span><strong>North / back</strong></article>
@@ -331,6 +302,69 @@
                     <article class="sprite-state-card"><div class="sprite-character-frame"><span class="wizard-vector-sprite" data-wizard-vector data-wizard-state="walk-right" aria-hidden="true"></span></div><span class="token-name">walk-right / 7fps</span><strong>East / screen right</strong></article>
                     <article class="sprite-state-card"><div class="sprite-character-frame"><span class="wizard-vector-sprite" data-wizard-vector data-wizard-state="cast-orb" aria-hidden="true"></span></div><span class="token-name">cast-orb / 8fps</span><strong>Hover and focus</strong></article>
                     <article class="sprite-state-card"><div class="sprite-character-frame"><span class="wizard-vector-sprite" data-wizard-vector data-wizard-state="cast-burst" aria-hidden="true"></span></div><span class="token-name">cast-burst / 10fps</span><strong>Click and busy</strong></article>
+                  </div>
+
+                  <div class="sprite-spell-rows" aria-label="Directional elemental spell casts">
+                    <article class="sprite-spell-row">
+                      <div class="sprite-spell-copy">
+                        <span class="token-name">south / fire / 8fps</span>
+                        <strong>Fire gutter</strong>
+                        <p>Front-facing flame clusters step down from the robe line with hot core pixels and darker edge blocks.</p>
+                      </div>
+                      <div class="sprite-spell-frame" aria-hidden="true">
+                        <span class="wizard-vector-sprite" data-wizard-vector data-wizard-state="cast-fire-south" aria-hidden="true"></span>
+                      </div>
+                      <div class="sprite-spell-palette" aria-label="Fire spell pixel tokens">
+                        <span style="--spell-swatch: var(--wizard-px-fire-shadow)"></span>
+                        <span style="--spell-swatch: var(--wizard-px-fire)"></span>
+                        <span style="--spell-swatch: var(--wizard-px-fire-core)"></span>
+                      </div>
+                    </article>
+                    <article class="sprite-spell-row">
+                      <div class="sprite-spell-copy">
+                        <span class="token-name">north / earth / 7fps</span>
+                        <strong>Earth lift</strong>
+                        <p>Back-facing stone pixels rise above the hood as compact plates, preserving the north silhouette.</p>
+                      </div>
+                      <div class="sprite-spell-frame" aria-hidden="true">
+                        <span class="wizard-vector-sprite" data-wizard-vector data-wizard-state="cast-earth-north" aria-hidden="true"></span>
+                      </div>
+                      <div class="sprite-spell-palette" aria-label="Earth spell pixel tokens">
+                        <span style="--spell-swatch: var(--wizard-px-earth-shadow)"></span>
+                        <span style="--spell-swatch: var(--wizard-px-earth)"></span>
+                        <span style="--spell-swatch: var(--wizard-px-earth-core)"></span>
+                      </div>
+                    </article>
+                    <article class="sprite-spell-row">
+                      <div class="sprite-spell-copy">
+                        <span class="token-name">east / water / 8fps</span>
+                        <strong>Water arc</strong>
+                        <p>A stepped wave travels screen-right with a hard cyan edge and a narrow bright crest.</p>
+                      </div>
+                      <div class="sprite-spell-frame" aria-hidden="true">
+                        <span class="wizard-vector-sprite" data-wizard-vector data-wizard-state="cast-water-east" aria-hidden="true"></span>
+                      </div>
+                      <div class="sprite-spell-palette" aria-label="Water spell pixel tokens">
+                        <span style="--spell-swatch: var(--wizard-px-water-shadow)"></span>
+                        <span style="--spell-swatch: var(--wizard-px-water)"></span>
+                        <span style="--spell-swatch: var(--wizard-px-water-core)"></span>
+                      </div>
+                    </article>
+                    <article class="sprite-spell-row">
+                      <div class="sprite-spell-copy">
+                        <span class="token-name">west / electric / 10fps</span>
+                        <strong>Electric split</strong>
+                        <p>A jagged bolt snaps screen-left in one-pixel segments with a small jitter pass each frame.</p>
+                      </div>
+                      <div class="sprite-spell-frame" aria-hidden="true">
+                        <span class="wizard-vector-sprite" data-wizard-vector data-wizard-state="cast-electric-west" aria-hidden="true"></span>
+                      </div>
+                      <div class="sprite-spell-palette" aria-label="Electric spell pixel tokens">
+                        <span style="--spell-swatch: var(--wizard-px-electric-shadow)"></span>
+                        <span style="--spell-swatch: var(--wizard-px-electric)"></span>
+                        <span style="--spell-swatch: var(--wizard-px-electric-core)"></span>
+                      </div>
+                    </article>
                   </div>
 
                   <div class="sprite-build-grid">
@@ -346,6 +380,10 @@
                     <article style="--sprite-token-swatch: var(--wizard-px-gold)"><span></span><strong>gold trim</strong><code>warning role</code></article>
                     <article style="--sprite-token-swatch: var(--wizard-px-purple)"><span></span><strong>hands / crystal</strong><code>tertiary role</code></article>
                     <article style="--sprite-token-swatch: var(--wizard-px-spell)"><span></span><strong>spell pixels</strong><code>tertiary role</code></article>
+                    <article style="--sprite-token-swatch: var(--wizard-px-fire)"><span></span><strong>fire pixels</strong><code>error + warning</code></article>
+                    <article style="--sprite-token-swatch: var(--wizard-px-earth)"><span></span><strong>earth pixels</strong><code>primary + warning</code></article>
+                    <article style="--sprite-token-swatch: var(--wizard-px-water)"><span></span><strong>water pixels</strong><code>secondary role</code></article>
+                    <article style="--sprite-token-swatch: var(--wizard-px-electric)"><span></span><strong>electric pixels</strong><code>secondary + warning</code></article>
                     <article style="--sprite-token-swatch: var(--wizard-px-void)"><span></span><strong>face void</strong><code>surface + scrim</code></article>
                   </div>
 
@@ -353,6 +391,7 @@
                     <article><span class="token-name">robe ramp</span><p><code>--wizard-px-robe-shadow</code>, <code>--wizard-px-robe-dark</code>, <code>--wizard-px-robe-mid</code>, and <code>--wizard-px-robe-light</code> derive from primary, secondary, and scrim roles.</p></article>
                     <article><span class="token-name">trim and staff</span><p><code>--wizard-px-gold</code>, <code>--wizard-px-staff-mid</code>, and <code>--wizard-px-staff-gold</code> derive from warning roles so the trim stays readable in light and dark themes.</p></article>
                     <article><span class="token-name">magic channel</span><p><code>--wizard-px-purple</code>, <code>--wizard-px-spell</code>, and <code>--wizard-px-spell-core</code> derive from tertiary roles and generated effect pixels.</p></article>
+                    <article><span class="token-name">elemental channel</span><p>Directional spell rows use <code>fire</code>, <code>earth</code>, <code>water</code>, and <code>electric</code> token ramps so each effect remains vector-pixel and theme-aware.</p></article>
                     <article><span class="token-name">access</span><p>Reduced motion freezes the sprite at the idle-down frame. The mark remains decorative in the header and specimens so assistive tech reads the product name once.</p></article>
                   </div>
 
@@ -364,7 +403,7 @@
                 <section class="brand-subsection" id="brand-logotype" aria-labelledby="brand-logotype-title">
                   <span class="token-name">brand subsection / logo type</span>
                   <h3 id="brand-logotype-title">Logo type</h3>
-                  <p>The logo type is a stacked typographic lockup derived from the Figma source: two equal-width GT Standard Mono Expanded Heavy lines, tight leading, no divider, and no support code inside the mark.</p>
+                  <p>The final logo type is the Figma Stack lockup: DITHER over WIZARD, built as two equal-width GT Standard Mono rows with tight leading, no divider, no tagline, and no support code inside the mark.</p>
 
                   <div class="brand-foundation-board" aria-label="Dither Wizard logo type construction">
                     <article class="brand-logotype-specimen">
@@ -393,24 +432,76 @@
                         </div>
                       </div>
                       <div class="brand-type-details" aria-label="Logo type layout notes">
-                        <div><span class="token-name">wordmark</span><strong>DITHER / WIZARD</strong></div>
-                        <div><span class="token-name">structure</span><strong>stacked lockup</strong></div>
                         <div><span class="token-name">source</span><strong>Figma 0:3 / 0:4</strong></div>
+                        <div><span class="token-name">source size</span><strong>231 x 55</strong></div>
+                        <div><span class="token-name">production name</span><strong>Figma Stack</strong></div>
                       </div>
                     </article>
                     <div class="brand-detail-grid" aria-label="Logo type rules">
-                      <article class="brand-detail-card"><span class="token-name">type voice</span><strong>GT Standard Mono</strong><p>The header wordmark stays technical and compact. It should read as product instrumentation, not editorial display type.</p></article>
-                      <article class="brand-detail-card"><span class="token-name">structure</span><strong>Text first</strong><p>The words remain selectable text in the DOM, stacked as two equal-width rows with no decorative divider.</p></article>
-                      <article class="brand-detail-card"><span class="token-name">color mapping</span><strong>Single role</strong><p>The lockup uses one foreground role so the form reads as a single typographic object beside the pixel wizard mark.</p></article>
-                      <article class="brand-detail-card"><span class="token-name">responsive fit</span><strong>No wrapping in chrome</strong><p>The header constrains width and scale so the full wordmark fits without colliding with navigation or controls.</p></article>
+                      <article class="brand-detail-card"><span class="token-name">type construction</span><strong>GT Standard Mono</strong><p>The web build uses GT Standard Mono as text, then synthetically expands and weights the rows to match the Figma Expanded Heavy source.</p></article>
+                      <article class="brand-detail-card"><span class="token-name">geometry</span><strong>231 x 55 source</strong><p>Both words share the same row width. The rows use near-solid leading with WIZARD pulled up slightly so the lockup reads as one compact object.</p></article>
+                      <article class="brand-detail-card"><span class="token-name">lockup relationship</span><strong>Mark plus type</strong><p>The Pixel Wizard remains the only mark. The wordmark sits to its right without dividers, icons, subtitles, or secondary labels inside the logo type.</p></article>
+                      <article class="brand-detail-card"><span class="token-name">color mapping</span><strong>Single role</strong><p>The logotype uses one foreground color so it reads as typography, not decoration. Theme changes only remap that foreground role.</p></article>
+                    </div>
+                  </div>
+
+                  <div class="brand-logotype-grid-study" aria-label="Logo type grid construction">
+                    <div class="brand-logotype-grid-stage">
+                      <div class="brand-grid-ruler brand-grid-ruler-top" aria-hidden="true"><span>0</span><span>231</span></div>
+                      <div class="brand-grid-ruler brand-grid-ruler-side" aria-hidden="true"><span>0</span><span>55</span></div>
+                      <div class="brand-logo-grid-artboard">
+                        <div class="brand-logo-grid-frame">
+                          <span class="brand-grid-line brand-grid-line-cap" aria-hidden="true"></span>
+                          <span class="brand-grid-line brand-grid-line-mid" aria-hidden="true"></span>
+                          <span class="brand-grid-line brand-grid-line-base" aria-hidden="true"></span>
+                          <div class="brand-logotype brand-logotype-display brand-logotype-grid-mark" role="img" aria-label="Dither Wizard grid construction">
+                            <span class="brand-logo-main" aria-hidden="true">
+                              <span class="logo-word logo-word-dither" data-word="DITHER">
+                                <span class="logo-letter" data-letter="D">D</span>
+                                <span class="logo-letter" data-letter="I">I</span>
+                                <span class="logo-letter" data-letter="T">T</span>
+                                <span class="logo-letter" data-letter="H">H</span>
+                                <span class="logo-letter" data-letter="E">E</span>
+                                <span class="logo-letter" data-letter="R">R</span>
+                              </span>
+                              <span class="logo-space" aria-hidden="true"></span>
+                              <span class="logo-word logo-word-wizard" data-word="WIZARD">
+                                <span class="logo-letter" data-letter="W">W</span>
+                                <span class="logo-letter" data-letter="I">I</span>
+                                <span class="logo-letter" data-letter="Z">Z</span>
+                                <span class="logo-letter" data-letter="A">A</span>
+                                <span class="logo-letter" data-letter="R">R</span>
+                                <span class="logo-letter" data-letter="D">D</span>
+                              </span>
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="brand-grid-measurements" aria-label="Logo type measurements">
+                        <span><strong>6</strong> equal character cells</span>
+                        <span><strong>2</strong> stacked rows</span>
+                        <span><strong>231:55</strong> source ratio</span>
+                        <span><strong>1.86x</strong> row expansion</span>
+                      </div>
+                    </div>
+                    <div class="brand-logotype-grid-copy">
+                      <span class="token-name">grid system</span>
+                      <h4>Equal rows, compressed leading, measured clearspace</h4>
+                      <p>Brand-book usage treats the lockup as a measured typographic object: DITHER and WIZARD sit on the same six-cell row grid, share one optical width, and lock together with near-solid leading.</p>
+                      <dl class="brand-logotype-metric-list">
+                        <div><dt>Word grid</dt><dd>6 mono cells per row</dd></div>
+                        <div><dt>Row fit</dt><dd>same width, stacked alignment</dd></div>
+                        <div><dt>Leading</dt><dd>WIZARD pulled up 0.013em</dd></div>
+                        <div><dt>Clearspace</dt><dd>one character cell minimum</dd></div>
+                      </dl>
                     </div>
                   </div>
 
                   <div class="brand-logotype-rule-grid" aria-label="Logo type implementation contract">
-                    <article><span class="token-name">container</span><p><code>.brand-logotype</code> sets width, sizing, family, and construction pseudo-elements.</p></article>
-                    <article><span class="token-name">main words</span><p><code>.brand-logo-main</code> stacks <code>.logo-word-dither</code> and <code>.logo-word-wizard</code> using letter-level spans.</p></article>
-                    <article><span class="token-name">variant lab</span><p>The temporary context lab writes <code>data-logo-variant</code> to test logo direction without changing the shared header markup.</p></article>
-                    <article><span class="token-name">usage rule</span><p>Use the full wordmark in global chrome and documentation specimens. Use text-only labels in dense controls and export surfaces.</p></article>
+                    <article><span class="token-name">container</span><p><code>.brand-logotype</code> owns the source width, type size, and accessible product name.</p></article>
+                    <article><span class="token-name">main words</span><p><code>.brand-logo-main</code> stacks <code>.logo-word-dither</code> and <code>.logo-word-wizard</code>; each word stays real text through letter-level spans.</p></article>
+                    <article><span class="token-name">variant</span><p><code>data-logo-variant="figma-lockup"</code> is the production value. Other explorations are not exposed in the interface.</p></article>
+                    <article><span class="token-name">usage rule</span><p>Use the full mark-plus-logotype in global chrome and documentation specimens. Use plain text labels in dense controls and export surfaces.</p></article>
                   </div>
                 </section>
               </section>
@@ -497,13 +588,12 @@
               <section class="system-section" id="motion" aria-labelledby="motion-title">
                 <p class="system-label">09 / motion</p>
                 <h2 id="motion-title">Motion grammar</h2>
-                <p>Motion should feel like calibrated instrumentation: sweep, scan, lock, compile, cast. Loops stay subtle and reduced motion disables nonessential movement.</p>
+                <p>Motion should feel like calibrated instrumentation: sweep, scan, lock, compile, cast. Hover and focus respond immediately, loops stay subtle, and reduced motion disables nonessential movement.</p>
                 <div class="motion-board">
                   <article><span class="token-name">sweep</span><strong>attention</strong><p>Used for scanning diagnostics and dynamic-color proof only.</p></article>
-                  <article><span class="token-name">scan</span><strong>processing</strong><p>Progress, loading, and export estimation can scan while layout stays fixed.</p></article>
+                  <article><span class="token-name">scan</span><strong>processing</strong><p>Progress, loading, hover feedback, and export estimation can scan while layout stays fixed.</p></article>
                   <article><span class="token-name">cast</span><strong>brand reaction</strong><p>The wizard mark reacts on hover, focus, click, and busy state.</p></article>
                 </div>
-                <div class="nav-motion-lab" data-nav-motion-lab></div>
               </section>
 
               <section class="system-section" id="access" aria-labelledby="access-title">
@@ -556,8 +646,8 @@
             <h2 id="footer-links-title">Links</h2>
             <ul class="footer-link-list">
               <li><a class="footer-link" href="index.html">Home</a></li>
-              <li><a class="footer-link" href="design-system.html">Design System</a></li>
-              <li><a class="footer-link" href="mailto:hello@coreykoberna.com">Contact</a></li>
+              <li><a class="footer-link" href="design-system.html">Wizardry</a></li>
+              <li><a class="footer-link" href="contact.html">Contact</a></li>
               <li><a class="footer-link" href="https://github.com/coreykoberna/26_Dither" target="_blank" rel="noreferrer">GitHub Repo</a></li>
             </ul>
           </nav>
@@ -565,14 +655,13 @@
       </footer>
     </div>
 
-    <script src="assets/sprites/dither-wizard-vector-data.js?v=20260504-pixelarticons-explorer-only"></script>
+    <script src="assets/sprites/dither-wizard-vector-data.js?v=20260505-elemental-spell-rows"></script>
     <script src="site-header.js?v=20260504-figma-logotype-canonical"></script>
-    <script src="assets/sprites/dither-wizard-vector.js?v=20260504-pixelarticons-explorer-only"></script>
+    <script src="assets/sprites/dither-wizard-vector.js?v=20260505-elemental-spell-rows-2"></script>
     <script src="assets/vendor/pixelarticons/pixelarticons-data.js?v=20260504-pixelarticons-explorer-only"></script>
-    <script src="system.js?v=20260504-icon-dense-explorer"></script>
+    <script src="system.js?v=20260505-ghost-stars-final"></script>
     <script src="design-system-components.js?v=20260504-component-catalog-content"></script>
-    <script src="design-system-nav.js?v=20260504-component-catalog-content"></script>
-    <script src="design-system-nav-motion.js?v=20260504-nav-motion-lab"></script>
+    <script src="design-system-nav.js?v=20260505-bare-index-canonical"></script>
     <script src="footer.js?v=20260504-pixelarticons-explorer-only"></script>
   </body>
 </html>

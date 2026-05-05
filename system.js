@@ -1,5 +1,8 @@
 const SYSTEM_THEME_KEY = "dither-wizard-theme";
 const SYSTEM_COLOR_SEED_KEY = "dither-wizard-system-seed";
+const SYSTEM_MONITOR_CASCADE_OVERSCAN_COLS = 4;
+const SYSTEM_MONITOR_CASCADE_OVERSCAN_ROWS = 8;
+const SYSTEM_MONITOR_CASCADE_RESIZE_DELAY = 180;
 const SVG_NS = "http://www.w3.org/2000/svg";
 const MATERIAL_PIXEL_GRID = Object.freeze({
   sourceSize: 24,
@@ -21,11 +24,19 @@ const DYNAMIC_ROLE_TONES = [4, 6, 12, 15, 17, 22, 24, 87, 92, 94, 96, 98];
 const ALL_DYNAMIC_COLOR_TONES = [...new Set([...DYNAMIC_COLOR_TONES, ...DYNAMIC_ROLE_TONES])].sort((a, b) => a - b);
 const DYNAMIC_COLOR_SEEDS = [
   { id: "phosphor", name: "Phosphor", hue: 148, saturation: 0.78, color: "oklch(78% 0.21 148)" },
+  { id: "viridian", name: "Viridian", hue: 168, saturation: 0.62, color: "oklch(72% 0.14 168)" },
   { id: "cyan", name: "Cyan Scan", hue: 205, saturation: 0.72, color: "oklch(78% 0.14 205)" },
+  { id: "blueprint", name: "Blueprint", hue: 238, saturation: 0.68, color: "oklch(67% 0.16 238)" },
+  { id: "ultraviolet", name: "Ultraviolet", hue: 282, saturation: 0.76, color: "oklch(66% 0.18 282)" },
   { id: "magenta", name: "Magenta Noise", hue: 328, saturation: 0.74, color: "oklch(70% 0.17 328)" },
-  { id: "gold", name: "Gold Heat", hue: 82, saturation: 0.68, color: "oklch(80% 0.16 82)" },
+  { id: "rose", name: "Rose Pulse", hue: 352, saturation: 0.7, color: "oklch(68% 0.19 352)" },
   { id: "signal-red", name: "Signal Red", hue: 28, saturation: 0.72, color: "oklch(65% 0.20 28)" },
+  { id: "ember", name: "Ember Core", hue: 52, saturation: 0.72, color: "oklch(73% 0.17 52)" },
+  { id: "gold", name: "Gold Heat", hue: 82, saturation: 0.68, color: "oklch(80% 0.16 82)" },
+  { id: "acid-lime", name: "Acid Lime", hue: 124, saturation: 0.74, color: "oklch(82% 0.18 124)" },
+  { id: "oxide", name: "Oxide", hue: 16, saturation: 0.56, color: "oklch(58% 0.13 16)" },
 ];
+const SYSTEM_MONITOR_OPTIONS = ["ghost-stars"];
 const TONAL_PALETTE_DEFS = [
   ["primary", 0, 1],
   ["secondary", 22, 0.42],
@@ -64,6 +75,11 @@ const SITE_TOKEN_MAP = [
 ];
 
 let activeDynamicSeed = DYNAMIC_COLOR_SEEDS[0];
+let systemMonitorResizeTimer = 0;
+let systemMonitorResizeBound = false;
+let systemMonitorAnimationFrame = 0;
+let systemMonitorCanvasState = null;
+let systemMonitorLastFrameAt = 0;
 
 const PIXEL_ICONS = [
   { category: "Navigation", name: "Home", tags: "route start footer", rects: [[4, 12, 2, 8], [6, 10, 2, 2], [8, 8, 2, 2], [10, 6, 4, 2], [14, 8, 2, 2], [16, 10, 2, 2], [18, 12, 2, 8], [8, 15, 8, 5]] },
@@ -1880,6 +1896,7 @@ const PIXELARTICON_NAME_ALIASES = new Map([
   ["reset", "reload"],
   ["randomize", "shuffle"],
   ["palette", "colors-swatch"],
+  ["send", "mail-arrow-right"],
   ["expand-all", "expand"],
   ["skip-back", "prev"],
   ["skip-forward", "next"],
@@ -2093,21 +2110,21 @@ function buildDynamicRoles(seed, mode) {
         "on-error": ["error", 100],
         "error-container": ["error", 90],
         "on-error-container": ["error", 10],
-        background: ["neutral", 99],
+        background: ["neutral", 96],
         "on-background": ["neutral", 10],
-        surface: ["neutral", 99],
+        surface: ["neutral", 96],
         "on-surface": ["neutral", 10],
-        "surface-dim": ["neutral", 87],
-        "surface-bright": ["neutral", 98],
-        "surface-variant": ["neutral-variant", 90],
+        "surface-dim": ["neutral", 84],
+        "surface-bright": ["neutral", 96],
+        "surface-variant": ["neutral-variant", 87],
         "on-surface-variant": ["neutral-variant", 30],
-        "surface-container-lowest": ["neutral", 100],
-        "surface-container-low": ["neutral", 96],
-        "surface-container": ["neutral", 94],
-        "surface-container-high": ["neutral", 92],
-        "surface-container-highest": ["neutral", 90],
+        "surface-container-lowest": ["neutral", 98],
+        "surface-container-low": ["neutral", 94],
+        "surface-container": ["neutral", 92],
+        "surface-container-high": ["neutral", 90],
+        "surface-container-highest": ["neutral", 87],
         outline: ["neutral-variant", 50],
-        "outline-variant": ["neutral-variant", 80],
+        "outline-variant": ["neutral-variant", 73],
         "inverse-surface": ["neutral", 20],
         "inverse-on-surface": ["neutral", 95],
         "inverse-primary": ["primary", 80],
@@ -2146,11 +2163,12 @@ function saveDynamicSeed(seed) {
   }
 }
 
-function applyDynamicSystemPageTheme(seed, palettes) {
+function applyDynamicSystemPageTheme(seed, palettes, roles, mode) {
   const page = document.body;
   if (!page?.classList.contains("system-doc-body")) return;
   const targets = [document.documentElement, page].filter((target) => target?.style);
-  const { roles: pageRoles } = buildDynamicRoles(seed, "dark");
+  const pageRoles = roles || buildDynamicRoles(seed, mode).roles;
+  const light = mode === "light";
   const primaryTone10 = palettes.primary[10];
   const primaryTone12 = palettes.primary[12];
   const primaryTone15 = palettes.primary[15];
@@ -2158,61 +2176,104 @@ function applyDynamicSystemPageTheme(seed, palettes) {
   const primaryTone24 = palettes.primary[24];
   const primaryTone40 = palettes.primary[40];
   const primaryTone80 = palettes.primary[80];
+  const pageBase = light ? pageRoles.background : primaryTone10;
+  const pageBase2 = light ? pageRoles["surface-container-low"] : primaryTone12;
+  const panel = light
+    ? `color-mix(in oklch, ${pageRoles["surface-container-low"]}, ${pageRoles["primary-container"]} 18%)`
+    : `color-mix(in oklch, ${pageRoles["surface-container-high"]}, ${primaryTone10} 52%)`;
+  const panel2 = light
+    ? `color-mix(in oklch, ${pageRoles["surface-container"]}, ${pageRoles["primary-container"]} 22%)`
+    : `color-mix(in oklch, ${primaryTone20}, ${pageRoles["surface-container-high"]} 24%)`;
+  const line = light
+    ? `color-mix(in oklch, ${pageRoles.outline}, ${pageRoles.primary} 18%)`
+    : `color-mix(in oklch, ${pageRoles.outline}, ${primaryTone40} 18%)`;
+  const lineDim = light
+    ? `color-mix(in oklch, ${pageRoles["outline-variant"]}, ${pageRoles.primary} 8%)`
+    : `color-mix(in oklch, ${pageRoles["outline-variant"]}, transparent 12%)`;
+  const controlBg = light ? pageRoles["surface-container-low"] : primaryTone12;
+  const controlHoverBg = light ? pageRoles["primary-container"] : primaryTone20;
+  const fieldBg = light
+    ? `color-mix(in oklch, ${controlBg}, ${pageRoles.background} 24%)`
+    : `color-mix(in oklch, ${primaryTone12}, ${pageRoles["surface-container-high"]} 24%)`;
+  const fieldHoverBg = light
+    ? `color-mix(in oklch, ${controlHoverBg}, ${controlBg} 74%)`
+    : `color-mix(in oklch, ${primaryTone20}, ${pageRoles["surface-container-high"]} 18%)`;
+  const bodyBg = `linear-gradient(${pageBase}, ${pageBase})`;
+  const topbarBg = light
+    ? `linear-gradient(90deg, ${dynamicAlpha(pageRoles["surface-container-low"], 0.98)}, ${dynamicAlpha(pageRoles["surface-container"], 0.96)})`
+    : `linear-gradient(90deg, ${dynamicAlpha(primaryTone15, 0.96)}, ${dynamicAlpha(primaryTone10, 0.94)})`;
+  const surfaceShadow = light
+    ? `0 16px 50px ${dynamicAlpha(pageRoles.shadow, 0.16)}`
+    : `0 16px 60px ${dynamicAlpha(pageRoles.shadow, 0.44)}`;
+  const matrixCol = light ? dynamicAlpha(primaryTone40, 0.08) : dynamicAlpha(primaryTone40, 0.11);
+  const matrixRow = light ? dynamicAlpha(primaryTone40, 0.045) : dynamicAlpha(primaryTone80, 0.048);
   const variables = {
-    "--system-primary-tone-10": primaryTone10,
-    "--bg": primaryTone10,
-    "--bg-2": primaryTone12,
-    "--panel": `color-mix(in oklch, ${pageRoles["surface-container-high"]}, ${primaryTone10} 52%)`,
-    "--panel-2": `color-mix(in oklch, ${primaryTone20}, ${pageRoles["surface-container-high"]} 24%)`,
-    "--line": `color-mix(in oklch, ${pageRoles.outline}, ${primaryTone40} 18%)`,
-    "--line-dim": `color-mix(in oklch, ${pageRoles["outline-variant"]}, transparent 12%)`,
+    "--system-primary-tone-10": pageBase,
+    "--bg": pageBase,
+    "--bg-2": pageBase2,
+    "--panel": panel,
+    "--panel-2": panel2,
+    "--line": line,
+    "--line-dim": lineDim,
     "--text": pageRoles["on-surface"],
     "--muted": pageRoles["on-surface-variant"],
-    "--faint": `color-mix(in oklch, ${pageRoles["on-surface-variant"]}, ${primaryTone40} 44%)`,
+    "--faint": `color-mix(in oklch, ${pageRoles["on-surface-variant"]}, ${pageRoles.primary} ${light ? "24%" : "44%"})`,
     "--green": pageRoles.primary,
     "--green-strong": pageRoles["on-primary-container"],
     "--amber": pageRoles.warning,
     "--red": pageRoles.error,
     "--cyan": pageRoles.info,
     "--magenta": pageRoles.tertiary,
-    "--control-bg": primaryTone12,
-    "--control-hover-bg": primaryTone20,
-    "--field-bg": `color-mix(in oklch, ${primaryTone12}, ${pageRoles["surface-container-high"]} 24%)`,
-    "--field-hover-bg": `color-mix(in oklch, ${primaryTone20}, ${pageRoles["surface-container-high"]} 18%)`,
-    "--field-focus-fill": `color-mix(in oklch, ${primaryTone12}, ${pageRoles.primary} 8%)`,
-    "--field-focus-ring": `color-mix(in oklch, ${pageRoles.primary}, transparent 76%)`,
-    "--chip-bg": dynamicAlpha(primaryTone10, 0.76),
-    "--quiet-bg": primaryTone12,
-    "--segment-bg": primaryTone12,
-    "--segment-active-bg": primaryTone24,
-    "--canvas-ring": dynamicAlpha(primaryTone80, 0.05),
-    "--canvas-glow": dynamicAlpha(primaryTone80, 0.06),
-    "--accent-glow": dynamicAlpha(primaryTone80, 0.38),
-    "--scanline": dynamicAlpha(primaryTone80, 0.045),
-    "--matrix-col": dynamicAlpha(primaryTone40, 0.11),
-    "--matrix-row": dynamicAlpha(primaryTone80, 0.048),
-    "--surface-shadow": `0 16px 60px ${dynamicAlpha(pageRoles.shadow, 0.44)}`,
-    "--body-bg": `linear-gradient(${primaryTone10}, ${primaryTone10})`,
-    "--topbar-bg": `linear-gradient(90deg, ${dynamicAlpha(primaryTone15, 0.96)}, ${dynamicAlpha(primaryTone10, 0.94)})`,
-    "--wizard-px-outline": `color-mix(in oklch, ${pageRoles.scrim}, ${pageRoles.primary} 10%)`,
-    "--wizard-px-void": `color-mix(in oklch, ${pageRoles.scrim}, ${pageRoles.surface} 6%)`,
-    "--wizard-px-robe-shadow": `color-mix(in oklch, ${pageRoles["primary-container"]}, ${pageRoles.scrim} 64%)`,
-    "--wizard-px-robe-dark": `color-mix(in oklch, ${pageRoles["primary-container"]}, ${pageRoles.scrim} 42%)`,
-    "--wizard-px-robe-mid": `color-mix(in oklch, ${pageRoles.primary}, ${pageRoles["secondary-container"]} 44%)`,
-    "--wizard-px-robe-light": `color-mix(in oklch, ${pageRoles["on-primary-container"]}, ${pageRoles.secondary} 34%)`,
-    "--wizard-px-gold-shadow": `color-mix(in oklch, ${pageRoles.warning}, ${pageRoles.scrim} 48%)`,
+    "--control-bg": controlBg,
+    "--control-hover-bg": controlHoverBg,
+    "--field-bg": fieldBg,
+    "--field-hover-bg": fieldHoverBg,
+    "--field-focus-fill": `color-mix(in oklch, ${controlBg}, ${pageRoles.primary} ${light ? "5%" : "8%"})`,
+    "--field-focus-ring": `color-mix(in oklch, ${pageRoles.primary}, transparent ${light ? "82%" : "76%"})`,
+    "--chip-bg": dynamicAlpha(light ? pageRoles["surface-container-low"] : primaryTone10, light ? 0.84 : 0.76),
+    "--quiet-bg": light ? pageRoles["surface-container-low"] : primaryTone12,
+    "--segment-bg": light ? pageRoles["surface-container-low"] : primaryTone12,
+    "--segment-active-bg": light ? pageRoles["primary-container"] : primaryTone24,
+    "--canvas-ring": dynamicAlpha(light ? primaryTone40 : primaryTone80, light ? 0.1 : 0.05),
+    "--canvas-glow": dynamicAlpha(light ? primaryTone40 : primaryTone80, light ? 0.13 : 0.06),
+    "--accent-glow": dynamicAlpha(light ? primaryTone40 : primaryTone80, light ? 0.3 : 0.38),
+    "--scanline": dynamicAlpha(light ? primaryTone40 : primaryTone80, light ? 0.055 : 0.045),
+    "--matrix-col": matrixCol,
+    "--matrix-row": matrixRow,
+    "--surface-shadow": surfaceShadow,
+    "--body-bg": bodyBg,
+    "--topbar-bg": topbarBg,
+    "--wizard-px-outline": `color-mix(in oklch, ${pageRoles.scrim}, ${pageRoles.primary} ${light ? "14%" : "10%"})`,
+    "--wizard-px-void": `color-mix(in oklch, ${pageRoles.scrim}, ${pageRoles.surface} ${light ? "4%" : "6%"})`,
+    "--wizard-px-robe-shadow": light
+      ? `color-mix(in oklch, ${pageRoles.primary}, ${pageRoles.scrim} 46%)`
+      : `color-mix(in oklch, ${pageRoles["primary-container"]}, ${pageRoles.scrim} 64%)`,
+    "--wizard-px-robe-dark": light
+      ? `color-mix(in oklch, ${pageRoles.primary}, ${pageRoles.scrim} 24%)`
+      : `color-mix(in oklch, ${pageRoles["primary-container"]}, ${pageRoles.scrim} 42%)`,
+    "--wizard-px-robe-mid": light
+      ? `color-mix(in oklch, ${pageRoles.primary}, ${pageRoles.secondary} 28%)`
+      : `color-mix(in oklch, ${pageRoles.primary}, ${pageRoles["secondary-container"]} 44%)`,
+    "--wizard-px-robe-light": light
+      ? `color-mix(in oklch, ${pageRoles["primary-container"]}, ${pageRoles.primary} 46%)`
+      : `color-mix(in oklch, ${pageRoles["on-primary-container"]}, ${pageRoles.secondary} 34%)`,
+    "--wizard-px-gold-shadow": `color-mix(in oklch, ${pageRoles.warning}, ${pageRoles.scrim} ${light ? "38%" : "48%"})`,
     "--wizard-px-gold": pageRoles.warning,
-    "--wizard-px-gold-light": `color-mix(in oklch, ${pageRoles["on-warning"]}, ${pageRoles.warning} 45%)`,
-    "--wizard-px-purple-shadow": `color-mix(in oklch, ${pageRoles["tertiary-container"]}, ${pageRoles.scrim} 42%)`,
+    "--wizard-px-gold-light": light
+      ? `color-mix(in oklch, ${pageRoles.warning}, ${pageRoles["on-warning"]} 28%)`
+      : `color-mix(in oklch, ${pageRoles["on-warning"]}, ${pageRoles.warning} 45%)`,
+    "--wizard-px-purple-shadow": `color-mix(in oklch, ${light ? pageRoles.tertiary : pageRoles["tertiary-container"]}, ${pageRoles.scrim} ${light ? "38%" : "42%"})`,
     "--wizard-px-purple": pageRoles.tertiary,
-    "--wizard-px-purple-light": `color-mix(in oklch, ${pageRoles["on-tertiary-container"]}, ${pageRoles.tertiary} 42%)`,
-    "--wizard-px-staff-dark": `color-mix(in oklch, ${pageRoles.warning}, ${pageRoles.scrim} 70%)`,
-    "--wizard-px-staff-mid": `color-mix(in oklch, ${pageRoles.warning}, ${pageRoles.surface} 18%)`,
+    "--wizard-px-purple-light": light
+      ? `color-mix(in oklch, ${pageRoles["tertiary-container"]}, ${pageRoles.tertiary} 38%)`
+      : `color-mix(in oklch, ${pageRoles["on-tertiary-container"]}, ${pageRoles.tertiary} 42%)`,
+    "--wizard-px-staff-dark": `color-mix(in oklch, ${pageRoles.warning}, ${pageRoles.scrim} ${light ? "58%" : "70%"})`,
+    "--wizard-px-staff-mid": `color-mix(in oklch, ${pageRoles.warning}, ${pageRoles.surface} ${light ? "28%" : "18%"})`,
     "--wizard-px-staff-gold": pageRoles.warning,
-    "--wizard-px-highlight": `color-mix(in oklch, ${pageRoles["on-surface"]}, ${pageRoles.primary} 12%)`,
-    "--wizard-px-spell-shadow": `color-mix(in oklch, ${pageRoles["tertiary-container"]}, ${pageRoles.scrim} 34%)`,
+    "--wizard-px-highlight": `color-mix(in oklch, ${pageRoles["on-surface"]}, ${light ? "white" : pageRoles.primary} ${light ? "36%" : "12%"})`,
+    "--wizard-px-spell-shadow": `color-mix(in oklch, ${light ? pageRoles.tertiary : pageRoles["tertiary-container"]}, ${pageRoles.scrim} 34%)`,
     "--wizard-px-spell": pageRoles.tertiary,
-    "--wizard-px-spell-core": `color-mix(in oklch, ${pageRoles["on-tertiary-container"]}, white 28%)`,
+    "--wizard-px-spell-core": `color-mix(in oklch, ${light ? pageRoles["tertiary-container"] : pageRoles["on-tertiary-container"]}, white 28%)`,
   };
 
   Object.entries(pageRoles).forEach(([role, value]) => {
@@ -2348,7 +2409,7 @@ function renderDynamicColorLab(seedId = activeDynamicSeed.id) {
   activeDynamicSeed = nextSeed;
   const mode = document.documentElement.dataset.theme === "light" ? "light" : "dark";
   const { palettes, roles } = buildDynamicRoles(nextSeed, mode);
-  applyDynamicSystemPageTheme(nextSeed, palettes);
+  applyDynamicSystemPageTheme(nextSeed, palettes, roles, mode);
   saveDynamicSeed(nextSeed);
   applyDynamicPreviewVariables(roles);
   renderSeedControls(nextSeed);
@@ -2393,15 +2454,278 @@ function setSystemTheme(theme) {
   if (document.getElementById("dynamicColorLab")) renderDynamicColorLab(activeDynamicSeed.id);
 }
 
-function initSystemPage() {
-  const hasSystemPageIcons = document.getElementById("iconGridGuide") || document.getElementById("iconLibraryExplorer");
-  if (!hasSystemPageIcons) return;
+function initSystemThemeToggle() {
+  if (!document.querySelector(".system-shell")) return;
 
   activeDynamicSeed = getSavedDynamicSeed();
   setSystemTheme(getSystemTheme());
-  document.getElementById("themeToggle")?.addEventListener("click", () => {
+
+  const toggle = document.getElementById("themeToggle");
+  if (!toggle || toggle.dataset.systemThemeBound === "true") return;
+
+  toggle.dataset.systemThemeBound = "true";
+  toggle.addEventListener("click", () => {
     setSystemTheme(document.documentElement.dataset.theme === "dark" ? "light" : "dark");
   });
+}
+
+function getDefaultSystemMonitorEffect() {
+  const pageDefault = document.body?.dataset.systemMonitor;
+  if (SYSTEM_MONITOR_OPTIONS.includes(pageDefault)) return pageDefault;
+  return SYSTEM_MONITOR_OPTIONS[0];
+}
+
+function initSystemMonitorCascadeField() {
+  const field = document.querySelector(".system-doc-body .matrix-field");
+  if (!field) return;
+  renderSystemMonitorCascadeField();
+  if (systemMonitorResizeBound) return;
+
+  systemMonitorResizeBound = true;
+  window.addEventListener("resize", () => {
+    window.clearTimeout(systemMonitorResizeTimer);
+    systemMonitorResizeTimer = window.setTimeout(() => renderSystemMonitorCascadeField(true), SYSTEM_MONITOR_CASCADE_RESIZE_DELAY);
+  });
+}
+
+function parseSystemMonitorCssNumber(value, fallback) {
+  const parsed = Number.parseFloat(value);
+  return Number.isFinite(parsed) ? parsed : fallback;
+}
+
+function parseSystemMonitorCssTime(value, fallback) {
+  const raw = value.trim();
+  if (!raw) return fallback;
+  if (raw.endsWith("ms")) {
+    const parsed = Number.parseFloat(raw);
+    return Number.isFinite(parsed) ? parsed / 1000 : fallback;
+  }
+  const parsed = Number.parseFloat(raw);
+  return Number.isFinite(parsed) ? parsed : fallback;
+}
+
+function clampSystemMonitorValue(value, min, max) {
+  return Math.min(max, Math.max(min, value));
+}
+
+function getSystemMonitorNoise(column, row, salt = 0) {
+  let hash = Math.imul(column + 1, 374761393) ^ Math.imul(row + 1, 668265263) ^ Math.imul(salt + 1, 2246822519);
+  hash ^= hash >>> 13;
+  hash = Math.imul(hash, 1274126177);
+  hash ^= hash >>> 16;
+  return (hash >>> 0) / 4294967295;
+}
+
+function getSystemMonitorCanvasColor(property, fallback) {
+  const probe = document.createElement("span");
+  const testCanvas = document.createElement("canvas");
+  const testContext = testCanvas.getContext("2d");
+  if (!testContext) return fallback;
+
+  probe.style.color = `var(${property})`;
+  document.body.append(probe);
+  const resolved = getComputedStyle(probe).color;
+  probe.remove();
+  testContext.fillStyle = fallback;
+  testContext.fillStyle = resolved;
+  return testContext.fillStyle || fallback;
+}
+
+function renderSystemMonitorCascadeField(force = false) {
+  const field = document.querySelector(".system-doc-body .matrix-field");
+  if (!field) return;
+
+  const monitorStyle = getComputedStyle(document.body);
+  const gridX = Math.max(8, parseSystemMonitorCssNumber(monitorStyle.getPropertyValue("--system-monitor-grid-x"), 18));
+  const gridY = Math.max(8, parseSystemMonitorCssNumber(monitorStyle.getPropertyValue("--system-monitor-grid-y"), 14));
+  const gapX = clampSystemMonitorValue(parseSystemMonitorCssNumber(monitorStyle.getPropertyValue("--system-monitor-cascade-gap-x"), 3), 1, gridX - 1);
+  const gapY = clampSystemMonitorValue(parseSystemMonitorCssNumber(monitorStyle.getPropertyValue("--system-monitor-cascade-gap-y"), 2), 1, gridY - 1);
+  const baseDuration = parseSystemMonitorCssTime(monitorStyle.getPropertyValue("--system-monitor-cascade-duration"), 18);
+  const rowStep = parseSystemMonitorCssTime(monitorStyle.getPropertyValue("--system-monitor-cell-step"), 0.24);
+  const wave = parseSystemMonitorCssTime(monitorStyle.getPropertyValue("--system-monitor-cell-wave"), 1.7);
+  const durationVariance = parseSystemMonitorCssTime(monitorStyle.getPropertyValue("--system-monitor-cell-duration-variance"), 2.4);
+  const density = clampSystemMonitorValue(parseSystemMonitorCssNumber(monitorStyle.getPropertyValue("--system-monitor-cell-density"), 0.78), 0.2, 1);
+  const baseOpacity = clampSystemMonitorValue(parseSystemMonitorCssNumber(monitorStyle.getPropertyValue("--system-monitor-cell-opacity"), 0.2), 0.04, 0.42);
+  const frameRate = clampSystemMonitorValue(parseSystemMonitorCssNumber(monitorStyle.getPropertyValue("--system-monitor-cell-fps"), 22), 12, 30);
+  const starDensity = clampSystemMonitorValue(parseSystemMonitorCssNumber(monitorStyle.getPropertyValue("--system-monitor-star-density"), 0.035), 0, 0.16);
+  const starOpacity = clampSystemMonitorValue(parseSystemMonitorCssNumber(monitorStyle.getPropertyValue("--system-monitor-star-opacity"), 0.3), 0, 0.7);
+  const starSpan = clampSystemMonitorValue(parseSystemMonitorCssNumber(monitorStyle.getPropertyValue("--system-monitor-star-span"), 2), 0.6, 4);
+  const trailMin = Math.round(clampSystemMonitorValue(parseSystemMonitorCssNumber(monitorStyle.getPropertyValue("--system-monitor-trail-min"), 4), 2, 18));
+  const trailMax = Math.round(clampSystemMonitorValue(parseSystemMonitorCssNumber(monitorStyle.getPropertyValue("--system-monitor-trail-max"), 13), trailMin, 24));
+  const quietCenter = clampSystemMonitorValue(parseSystemMonitorCssNumber(monitorStyle.getPropertyValue("--system-monitor-content-quiet-center"), 0.5), 0, 1);
+  const quietWidth = clampSystemMonitorValue(parseSystemMonitorCssNumber(monitorStyle.getPropertyValue("--system-monitor-content-quiet-width"), 0), 0, 1);
+  const quietStrength = clampSystemMonitorValue(parseSystemMonitorCssNumber(monitorStyle.getPropertyValue("--system-monitor-content-quiet-strength"), 0), 0, 0.92);
+  const starQuietStrength = clampSystemMonitorValue(parseSystemMonitorCssNumber(monitorStyle.getPropertyValue("--system-monitor-star-quiet-strength"), 0), 0, 1);
+  const columns = Math.ceil(window.innerWidth / gridX) + SYSTEM_MONITOR_CASCADE_OVERSCAN_COLS;
+  const rows = Math.ceil(window.innerHeight / gridY) + SYSTEM_MONITOR_CASCADE_OVERSCAN_ROWS;
+  const variant = document.body.dataset.systemMonitor || getDefaultSystemMonitorEffect();
+  const signature = `${variant}:${window.innerWidth}:${window.innerHeight}:${gridX}:${gridY}:${gapX}:${gapY}:${density.toFixed(3)}:${starDensity.toFixed(3)}:${starOpacity.toFixed(3)}:${starSpan.toFixed(2)}:${trailMin}:${trailMax}:${quietCenter.toFixed(2)}:${quietWidth.toFixed(2)}:${quietStrength.toFixed(2)}:${starQuietStrength.toFixed(2)}`;
+
+  if (!force && field.dataset.cascadeSignature === signature) return;
+
+  field.dataset.cascadeReady = "true";
+  field.dataset.cascadeSignature = signature;
+  const canvas = field.querySelector("canvas.matrix-cascade-canvas") || document.createElement("canvas");
+  const context = canvas.getContext("2d", { alpha: true });
+  if (!context) return;
+
+  canvas.className = "matrix-cascade-canvas";
+  canvas.setAttribute("aria-hidden", "true");
+  if (!canvas.parentElement) field.replaceChildren(canvas);
+
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  const width = Math.max(1, window.innerWidth);
+  const height = Math.max(1, window.innerHeight);
+  canvas.width = Math.ceil(width * dpr);
+  canvas.height = Math.ceil(height * dpr);
+  canvas.style.width = `${width}px`;
+  canvas.style.height = `${height}px`;
+  context.setTransform(dpr, 0, 0, dpr, 0, 0);
+  context.clearRect(0, 0, width, height);
+
+  const colors = {
+    hot: getSystemMonitorCanvasColor("--system-monitor-cell-hot", "rgb(134 221 172)"),
+    mid: getSystemMonitorCanvasColor("--system-monitor-cell-mid", "rgb(42 136 88)"),
+    star: getSystemMonitorCanvasColor("--system-monitor-star-hot", "rgb(180 240 202)"),
+    tail: getSystemMonitorCanvasColor("--system-monitor-cell-tail", "rgb(30 88 58)"),
+    secondary: getSystemMonitorCanvasColor("--system-monitor-secondary", "rgb(58 188 197)"),
+  };
+  const streams = [];
+  const trailRange = Math.max(0, trailMax - trailMin);
+  const quietHalfWidth = quietWidth * 0.5;
+
+  for (let columnIndex = 0; columnIndex < columns; columnIndex += 1) {
+    const columnCenter = (columnIndex * gridX + gridX * 0.5) / width;
+    const quietDistance = Math.abs(columnCenter - quietCenter);
+    const quietRamp = quietHalfWidth > 0 ? clampSystemMonitorValue((quietHalfWidth - quietDistance) / Math.max(0.001, quietHalfWidth), 0, 1) : 0;
+    const quietMask = quietRamp * quietRamp * (3 - 2 * quietRamp);
+    const columnDensity = density * (1 - quietStrength * quietMask);
+    if (getSystemMonitorNoise(columnIndex, 0, 47) > columnDensity) continue;
+
+    const columnNoise = getSystemMonitorNoise(columnIndex, 0, 11);
+    const starNoise = getSystemMonitorNoise(columnIndex, 0, 67);
+    const columnStarDensity = starDensity * (1 - starQuietStrength * quietMask);
+    const columnOpacity = 1 - quietStrength * 0.62 * quietMask;
+    const duration = Math.max(10, baseDuration + (columnNoise - 0.5) * durationVariance);
+    const cycleRows = rows + 24;
+    const step = Math.max(rowStep, duration / cycleRows) * (0.9 + getSystemMonitorNoise(columnIndex, 0, 17) * 0.22);
+    const waveRows = (Math.sin(columnIndex * 0.18) * wave + Math.sin(columnIndex * 0.41 + 1.8) * wave * 0.42) / Math.max(0.08, step);
+
+    streams.push({
+      column: columnIndex,
+      cycleRows,
+      headOffset: getSystemMonitorNoise(columnIndex, 0, 19) * cycleRows + waveRows,
+      opacity: clampSystemMonitorValue(baseOpacity * (0.72 + getSystemMonitorNoise(columnIndex, 0, 31) * 0.54) * columnOpacity, 0.025, 0.48),
+      pulse: 0.85 + getSystemMonitorNoise(columnIndex, 0, 37) * 0.75,
+      star: starNoise < columnStarDensity,
+      starBlink: 2.6 + getSystemMonitorNoise(columnIndex, 0, 71) * 4.6,
+      starOpacity,
+      starPhase: getSystemMonitorNoise(columnIndex, 0, 73) * Math.PI * 2,
+      starSpan,
+      step,
+      trail: trailMin + Math.round(getSystemMonitorNoise(columnIndex, 0, 43) * trailRange),
+    });
+  }
+
+  systemMonitorCanvasState = {
+    canvas,
+    cellHeight: Math.max(2, gridY - gapY),
+    cellWidth: Math.max(2, gridX - gapX),
+    colors,
+    context,
+    frameRate,
+    gridX,
+    gridY,
+    height,
+    reducedMotion: window.matchMedia("(prefers-reduced-motion: reduce)").matches,
+    rows,
+    streams,
+    width,
+  };
+
+  window.cancelAnimationFrame(systemMonitorAnimationFrame);
+  systemMonitorLastFrameAt = 0;
+  drawSystemMonitorCascadeFrame(0);
+  if (!systemMonitorCanvasState.reducedMotion) {
+    systemMonitorAnimationFrame = window.requestAnimationFrame(drawSystemMonitorCascadeFrame);
+  }
+}
+
+function drawSystemMonitorCascadeFrame(now) {
+  const state = systemMonitorCanvasState;
+  if (!state) return;
+
+  const frameInterval = 1000 / state.frameRate;
+  if (now && systemMonitorLastFrameAt && now - systemMonitorLastFrameAt < frameInterval) {
+    systemMonitorAnimationFrame = window.requestAnimationFrame(drawSystemMonitorCascadeFrame);
+    return;
+  }
+
+  systemMonitorLastFrameAt = now;
+  const time = now / 1000;
+  const { cellHeight, cellWidth, colors, context, gridX, gridY, height, rows, streams, width } = state;
+
+  context.clearRect(0, 0, width, height);
+  streams.forEach((stream) => {
+    const x = stream.column * gridX;
+    const head = ((time / stream.step + stream.headOffset) % stream.cycleRows) - 12;
+    const topRow = Math.max(0, Math.floor(head - stream.trail));
+    const bottomRow = Math.min(rows - 1, Math.ceil(head));
+
+    for (let row = topRow; row <= bottomRow; row += 1) {
+      const distance = head - row;
+      if (distance < 0 || distance > stream.trail) continue;
+
+      const cellNoise = getSystemMonitorNoise(stream.column, row, 53);
+      const flicker = 0.72 + Math.sin(time * stream.pulse + cellNoise * Math.PI * 2) * 0.18 + getSystemMonitorNoise(stream.column, row, 59) * 0.1;
+      const falloff = Math.pow(1 - distance / Math.max(1, stream.trail), 1.42);
+      const headCell = distance < 1.15;
+      const channel = getSystemMonitorNoise(stream.column, row, 61);
+      const alpha = clampSystemMonitorValue(stream.opacity * falloff * flicker * (headCell ? 1.18 : 0.72), 0, 0.52);
+
+      if (alpha <= 0.01) continue;
+      context.globalAlpha = alpha;
+      if (headCell) {
+        context.fillStyle = channel > 0.72 ? colors.secondary : colors.hot;
+      } else if (channel > 0.86 && distance < stream.trail * 0.46) {
+        context.fillStyle = colors.secondary;
+      } else {
+        context.fillStyle = distance < stream.trail * 0.52 ? colors.mid : colors.tail;
+      }
+      context.fillRect(x, row * gridY, cellWidth, cellHeight);
+      if (headCell && stream.star) {
+        const twinkle = Math.max(0, Math.sin(time * stream.starBlink + stream.starPhase));
+        if (twinkle > 0.18) {
+          const centerX = x + cellWidth / 2;
+          const centerY = row * gridY + cellHeight / 2;
+          const dot = Math.max(1, Math.min(cellWidth, cellHeight) * 0.22);
+          const ray = Math.max(1, stream.starSpan);
+          const starAlpha = clampSystemMonitorValue(stream.starOpacity * (0.18 + alpha * 0.9) * (0.35 + twinkle * 0.9), 0, 0.55);
+
+          context.globalAlpha = starAlpha;
+          context.fillStyle = colors.star;
+          context.fillRect(centerX - ray, centerY - dot / 2, ray * 2, dot);
+          context.fillRect(centerX - dot / 2, centerY - ray, dot, ray * 2);
+          context.globalAlpha = Math.min(0.55, starAlpha * 1.25);
+          context.fillRect(centerX - dot / 2, centerY - dot / 2, dot, dot);
+        }
+      }
+    }
+  });
+  context.globalAlpha = 1;
+
+  if (!state.reducedMotion) {
+    systemMonitorAnimationFrame = window.requestAnimationFrame(drawSystemMonitorCascadeFrame);
+  }
+}
+
+function initSystemPage() {
+  initSystemThemeToggle();
+  initSystemMonitorCascadeField();
+
+  const hasSystemPageIcons = document.getElementById("iconGridGuide") || document.getElementById("iconLibraryExplorer");
+  if (!hasSystemPageIcons) return;
+
   renderIconGridGuide();
   initIconLibraryExplorer();
   initDynamicColorLab();

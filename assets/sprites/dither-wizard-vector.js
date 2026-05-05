@@ -9,6 +9,14 @@
   const transparent = data.transparent;
   const tokenByChar = new Map(data.palette.map((token) => [token.char, token.id]));
   const basePixelCache = new Map();
+  const hoverSpellStates = [
+    "cast-orb",
+    "cast-burst",
+    "cast-fire-south",
+    "cast-earth-north",
+    "cast-water-east",
+    "cast-electric-west",
+  ].filter((state) => data.animations[state]);
 
   function readBasePixels(name) {
     if (basePixelCache.has(name)) return basePixelCache.get(name);
@@ -29,7 +37,22 @@
   }
 
   function isMagicToken(token) {
-    return token.startsWith("purple") || token.startsWith("spell") || token === "highlight";
+    return (
+      token.startsWith("purple") ||
+      token.startsWith("spell") ||
+      token.startsWith("fire") ||
+      token.startsWith("earth") ||
+      token.startsWith("water") ||
+      token.startsWith("electric") ||
+      token === "highlight"
+    );
+  }
+
+  function directionVector(direction) {
+    if (direction === "up") return { x: 0, y: -1 };
+    if (direction === "right") return { x: 1, y: 0 };
+    if (direction === "left") return { x: -1, y: 0 };
+    return { x: 0, y: 1 };
   }
 
   function walkOffset(x, y, token, spec) {
@@ -72,6 +95,18 @@
     if (y < 32) dy += lift;
     if (isMagicToken(token) && spec.phase >= 2) dy -= 1;
     if (spec.kind === "cast-burst" && x < width / 2 && y < 34) dx -= spec.phase > 2 ? 1 : 0;
+    if (spec.kind === "elemental-cast") {
+      const vector = directionVector(spec.direction);
+      const pulse = spec.phase >= 2 && spec.phase <= 4 ? 1 : 0;
+      if (isStaffToken(token) && y < 32) {
+        dx += vector.x * pulse;
+        dy += vector.y * pulse;
+      }
+      if (isMagicToken(token) && spec.phase >= 2) {
+        dx += vector.x;
+        dy += vector.y;
+      }
+    }
 
     return { dx, dy };
   }
@@ -85,7 +120,7 @@
       return walkOffset(pixel.x, pixel.y, pixel.token, spec);
     }
 
-    if (spec.kind === "cast-orb" || spec.kind === "cast-burst") {
+    if (spec.kind === "cast-orb" || spec.kind === "cast-burst" || spec.kind === "elemental-cast") {
       return castOffset(pixel.x, pixel.y, pixel.token, spec);
     }
 
@@ -94,6 +129,30 @@
 
   function addEffectPixel(pixels, x, y, token, size = 1) {
     pixels.push({ x, y, token, size });
+  }
+
+  function addEffectLine(pixels, x0, y0, x1, y1, token) {
+    let x = x0;
+    let y = y0;
+    const dx = Math.abs(x1 - x0);
+    const sx = x0 < x1 ? 1 : -1;
+    const dy = -Math.abs(y1 - y0);
+    const sy = y0 < y1 ? 1 : -1;
+    let error = dx + dy;
+
+    while (true) {
+      addEffectPixel(pixels, x, y, token);
+      if (x === x1 && y === y1) break;
+      const e2 = 2 * error;
+      if (e2 >= dy) {
+        error += dy;
+        x += sx;
+      }
+      if (e2 <= dx) {
+        error += dx;
+        y += sy;
+      }
+    }
   }
 
   function orbEffect(phase) {
@@ -131,9 +190,110 @@
     return pixels;
   }
 
+  function fireEffect(phase) {
+    const pixels = [];
+    const flicker = phase % 2;
+    const reach = Math.min(phase, 4);
+    const y = 34 + reach;
+
+    addEffectPixel(pixels, 38, y + 2, "fire-shadow", 2);
+    addEffectPixel(pixels, 42, y + 3 - flicker, "fire-shadow", 2);
+    addEffectPixel(pixels, 37, y, "fire", 2);
+    addEffectPixel(pixels, 41, y + 1, "fire", 2);
+    addEffectPixel(pixels, 40, y - 3 - flicker, "fire-core", 2);
+    addEffectPixel(pixels, 44, y - 1, "fire-core", 1);
+    if (phase >= 2) {
+      addEffectPixel(pixels, 36, y + 5, "fire", 1);
+      addEffectPixel(pixels, 46, y + 4, "fire-shadow", 1);
+    }
+    if (phase >= 4) {
+      addEffectPixel(pixels, 40 + flicker, y + 7, "fire-core", 1);
+      addEffectPixel(pixels, 44 - flicker, y + 7, "fire", 1);
+    }
+    return pixels;
+  }
+
+  function earthEffect(phase) {
+    const pixels = [];
+    const lift = Math.min(phase, 4);
+    const jitter = phase % 2;
+
+    addEffectPixel(pixels, 15, 20 - lift, "earth-shadow", 2);
+    addEffectPixel(pixels, 34, 18 - lift + jitter, "earth-shadow", 2);
+    addEffectPixel(pixels, 18, 15 - lift, "earth", 2);
+    addEffectPixel(pixels, 38, 14 - lift - jitter, "earth", 1);
+    addEffectPixel(pixels, 25, 10 - lift, "earth-core", 1);
+    addEffectPixel(pixels, 13, 23 - lift, "earth-core", 1);
+    if (phase >= 2) {
+      addEffectLine(pixels, 14, 22 - lift, 39, 22 - lift, "earth-shadow");
+      addEffectPixel(pixels, 31, 13 - lift, "earth-core", 1);
+    }
+    if (phase >= 4) {
+      addEffectPixel(pixels, 30, 7 - lift, "earth-core", 1);
+      addEffectPixel(pixels, 12, 16 - lift, "earth", 1);
+    }
+    return pixels;
+  }
+
+  function waterEffect(phase) {
+    const pixels = [];
+    const roll = phase % 3;
+    const x = 30 + Math.min(phase, 4);
+
+    addEffectLine(pixels, x - 1, 25 + roll, x + 7, 20 - roll, "water-shadow");
+    addEffectLine(pixels, x, 24 + roll, x + 8, 19 - roll, "water");
+    addEffectPixel(pixels, x + 3, 22 - roll, "water-core", 2);
+    addEffectPixel(pixels, x + 8, 18 - roll, "water-core", 1);
+    addEffectPixel(pixels, x + 5, 27 + roll, "water", 1);
+    if (phase >= 2) {
+      addEffectPixel(pixels, x + 10, 21, "water", 2);
+      addEffectPixel(pixels, x + 12, 24, "water-shadow", 1);
+    }
+    if (phase >= 4) addEffectPixel(pixels, x + 13, 19 + roll, "water-core", 1);
+    return pixels;
+  }
+
+  function electricEffect(phase) {
+    const pixels = [];
+    const jitter = phase % 2;
+    const reach = Math.min(phase, 4);
+    const points = [
+      [20 - reach, 19 + jitter],
+      [16 - reach, 17 - jitter],
+      [17 - reach, 22 + jitter],
+      [12 - reach, 24 - jitter],
+      [13 - reach, 29],
+      [8 - reach, 31 + jitter],
+    ];
+
+    for (let index = 0; index < points.length - 1; index += 1) {
+      const [x0, y0] = points[index];
+      const [x1, y1] = points[index + 1];
+      addEffectLine(pixels, x0, y0 + 1, x1, y1 + 1, "electric-shadow");
+      addEffectLine(pixels, x0, y0, x1, y1, "electric");
+    }
+    addEffectPixel(pixels, points[0][0], points[0][1], "electric-core", 2);
+    addEffectPixel(pixels, points[2][0], points[2][1], "electric-core", 1);
+    addEffectPixel(pixels, points[5][0], points[5][1], "electric-core", 1);
+    if (phase >= 3) {
+      addEffectPixel(pixels, 14 - reach, 15 + jitter, "electric-core", 1);
+      addEffectPixel(pixels, 10 - reach, 27 - jitter, "electric", 1);
+    }
+    return pixels;
+  }
+
+  function elementalEffect(spec) {
+    if (spec.element === "fire") return fireEffect(spec.phase);
+    if (spec.element === "earth") return earthEffect(spec.phase);
+    if (spec.element === "water") return waterEffect(spec.phase);
+    if (spec.element === "electric") return electricEffect(spec.phase);
+    return [];
+  }
+
   function effectPixels(spec) {
     if (spec.kind === "cast-orb") return orbEffect(spec.phase);
     if (spec.kind === "cast-burst") return burstEffect(spec.phase);
+    if (spec.kind === "elemental-cast") return elementalEffect(spec);
     return [];
   }
 
@@ -173,6 +333,7 @@
       this.lastFrameAt = 0;
       this.playlistIndex = 0;
       this.playlistLoops = 0;
+      this.hoverSpellIndex = 0;
       this.once = null;
 
       this.bindInteractions();
@@ -183,10 +344,19 @@
     }
 
     bindInteractions() {
-      const trigger = this.root.closest(".brand-lockup") || this.root;
-      trigger.addEventListener("mouseenter", () => this.playOnce("cast-orb"));
-      trigger.addEventListener("focusin", () => this.playOnce("cast-orb"));
-      trigger.addEventListener("click", () => this.playOnce("cast-burst"));
+      const hoverTrigger = this.root.closest("[data-wizard-hover-cast]") || (this.state === "header" ? this.root : null);
+      const focusTrigger = this.root.closest(".brand-lockup") || (this.state === "header" ? this.root : null);
+      const hoverEvent = window.PointerEvent ? "pointerenter" : "mouseenter";
+
+      if (hoverTrigger) {
+        hoverTrigger.addEventListener(hoverEvent, () => this.playNextHoverSpell());
+      }
+
+      if (focusTrigger) {
+        focusTrigger.addEventListener("focusin", () => this.playNextHoverSpell());
+        focusTrigger.addEventListener("click", () => this.playOnce("cast-burst"));
+      }
+
       reducedMotionQuery.addEventListener("change", () => {
         if (reducedMotionQuery.matches) {
           renderFrame(this.svg, data.animations["idle-down"].frames[0]);
@@ -194,6 +364,13 @@
           requestAnimationFrame(this.tick);
         }
       });
+    }
+
+    playNextHoverSpell() {
+      if (!hoverSpellStates.length) return;
+      const state = hoverSpellStates[this.hoverSpellIndex % hoverSpellStates.length];
+      this.hoverSpellIndex = (this.hoverSpellIndex + 1) % hoverSpellStates.length;
+      this.playOnce(state);
     }
 
     observeBusyState() {

@@ -8,11 +8,16 @@ function getSiteFullscreenTarget() {
 
 function setFullscreenButtonState(button, target) {
   const active = getSiteFullscreenElement() === target;
+  const icon = button.querySelector("[data-pixel-icon]");
   target.classList.toggle("is-fullscreen", active);
   button.classList.toggle("is-active", active);
   button.setAttribute("aria-pressed", String(active));
   button.setAttribute("aria-label", active ? "Exit fullscreen" : "Enter fullscreen");
   button.title = active ? "Exit fullscreen" : "Enter fullscreen";
+  if (icon) {
+    icon.dataset.pixelIcon = active ? "Frame" : "Scale";
+    window.DitherIconSystem?.hydrate(icon);
+  }
 }
 
 function handleSiteFullscreenChange(button, target) {

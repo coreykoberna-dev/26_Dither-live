@@ -11,26 +11,23 @@ const video = document.getElementById("videoElement");
 const $ = (id) => document.getElementById(id);
 const DEFAULT_SAMPLE_URL = "assets/images/dither-wizard-default.png";
 const DEFAULT_SAMPLE_NAME = "dither-wizard-default.png";
-const LOGOTYPE_DEV_KEY = "dither-wizard-logotype-dev-figma-lockup";
 const DROP_TEXTURE_DEV_KEY = "dither-wizard-drop-texture-dev";
 const IDLE_THEME_INTERVAL = 110;
-const ANIMATED_THEME_INTERVAL = 420;
-const ANIMATED_EXPORT_METRIC_INTERVAL = 1600;
-const ANIMATED_RENDER_MIN_INTERVAL = 54;
-const ANIMATED_RENDER_MAX_INTERVAL = 180;
-const ANIMATED_PREVIEW_MAX_SIDE = 760;
-const LOGOTYPE_OPTIONS = [
-  "figma-lockup",
-  "mono-splice",
-  "narrow-deck",
-  "crossbar-drop",
-  "counter-lock",
-  "overlap-ligature",
-  "split-baseline",
-  "terminal-cut",
-  "dense-stamp",
-  "open-counter",
-];
+const ANIMATED_THEME_INTERVAL = 520;
+const ANIMATED_EXPORT_METRIC_INTERVAL = 2200;
+const ANIMATED_RENDER_MIN_INTERVAL = 66;
+const ANIMATED_RENDER_MAX_INTERVAL = 210;
+const ANIMATED_PREVIEW_MAX_SIDE = 700;
+const WEBM_EXPORT_FPS = 30;
+const WEBM_EXPORT_MAX_SECONDS = 8;
+const WEBM_EXPORT_MIN_BITRATE = 12000000;
+const WEBM_EXPORT_MAX_BITRATE = 80000000;
+const WEBM_EXPORT_BITS_PER_PIXEL = 0.32;
+const GIF_EXPORT_FPS = 8;
+const GIF_EXPORT_MAX_SECONDS = 4;
+const GIF_EXPORT_MAX_FRAMES = GIF_EXPORT_FPS * GIF_EXPORT_MAX_SECONDS;
+const GIF_EXPORT_COLORS = 256;
+const GIF_PALETTE_SAMPLE_PIXELS = 90000;
 const DROP_TEXTURE_OPTIONS = [
   "rain-vortex-fine",
   "rain-vortex-soft",
@@ -73,7 +70,9 @@ const els = {
   stepBackButton: $("stepBackButton"),
   stepForwardButton: $("stepForwardButton"),
   recordButton: $("recordButton"),
+  downloadGifButton: $("downloadGifButton"),
   recordWebmButton: $("recordWebmButton"),
+  lastExportLink: $("lastExportLink"),
   timelineSlider: $("timelineSlider"),
   timeReadout: $("timeReadout"),
   loopToggle: $("loopToggle"),
@@ -85,7 +84,7 @@ const els = {
   dimensionsReadout: $("dimensionsReadout"),
   fpsReadout: $("fpsReadout"),
   paletteReadout: $("paletteReadout"),
-  recordingStatus: $("recordingStatus"),
+  exportStatus: $("exportStatus"),
   exportFileName: $("exportFileName"),
   fileSizeMeter: $("fileSizeMeter"),
   exportPercent: $("exportPercent"),
@@ -106,7 +105,6 @@ const els = {
   themeText: $("themeText"),
   contextDevPanel: $("contextDevPanel"),
   contextPanelToggle: $("contextPanelToggle"),
-  logoOptions: $("logoOptions"),
   dropTextureOptions: $("dropTextureOptions"),
 };
 
@@ -561,6 +559,7 @@ const state = {
   dirty: true,
   batchFiles: [],
   isRecording: false,
+  isExporting: false,
   lastFrameAt: performance.now(),
   lastRenderCost: 0,
   nextAnimatedRenderAt: 0,
@@ -587,7 +586,11 @@ const state = {
 let renderRaf = 0;
 let playbackRaf = 0;
 let objectUrl = "";
+let lastExportUrl = "";
 let exportMetricsTimer = 0;
+let exportStatusTimer = 0;
+let errorDiffusionBuffer = new Float32Array(0);
+const luminanceSortedPaletteCache = new WeakMap();
 const themeCanvas = document.createElement("canvas");
 const themeCtx = themeCanvas.getContext("2d", { willReadFrequently: true });
 
@@ -605,7 +608,7 @@ function setTheme(theme) {
   const nextTheme = theme === "light" ? "light" : "dark";
   document.documentElement.dataset.theme = nextTheme;
   setAppPixelIconSlot(els.themeGlyph, nextTheme === "dark" ? "Sun" : "Moon");
-  els.themeText.textContent = nextTheme === "dark" ? "Light" : "Dark";
+  if (els.themeText) els.themeText.textContent = nextTheme === "dark" ? "Light" : "Dark";
   els.themeToggle.setAttribute("aria-label", `Switch to ${nextTheme === "dark" ? "light" : "dark"} mode`);
   applyDynamicThemeRoles(state.themeSeed || state.editThemeSeed || state.sourceThemeSeed || { hue: 148, saturation: 0.78, rgb: [95, 210, 104] });
   try {
@@ -730,78 +733,80 @@ function buildMaterialTheme(seed, mode) {
   const neutralHue = normalizeHue(hue + 5);
   const neutralChroma = clamp(0.01 + seed.saturation * 0.03, 0.012, 0.048);
   const variantChroma = clamp(0.024 + seed.saturation * 0.058, 0.034, 0.09);
+  const lightNeutralChroma = clamp(neutralChroma * 1.35, 0.018, 0.065);
+  const lightVariantChroma = clamp(variantChroma * 1.18, 0.044, 0.105);
 
   if (mode === "light") {
     return {
       "--m3-primary": oklch(48, chroma, hue),
-      "--m3-on-primary": oklch(99, neutralChroma, neutralHue),
+      "--m3-on-primary": oklch(98, lightNeutralChroma, neutralHue),
       "--m3-primary-container": oklch(84, chroma * 0.72, hue),
       "--m3-on-primary-container": oklch(24, chroma * 0.55, hue),
       "--m3-secondary": oklch(47, chroma * 0.42, secondaryHue),
-      "--m3-on-secondary": oklch(99, neutralChroma, neutralHue),
-      "--m3-secondary-container": oklch(86, chroma * 0.28, secondaryHue),
+      "--m3-on-secondary": oklch(98, lightNeutralChroma, neutralHue),
+      "--m3-secondary-container": oklch(84, chroma * 0.34, secondaryHue),
       "--m3-on-secondary-container": oklch(23, chroma * 0.36, secondaryHue),
       "--m3-tertiary": oklch(52, chroma * 0.56, tertiaryHue),
-      "--m3-on-tertiary": oklch(99, neutralChroma, neutralHue),
-      "--m3-tertiary-container": oklch(88, chroma * 0.38, tertiaryHue),
+      "--m3-on-tertiary": oklch(98, lightNeutralChroma, neutralHue),
+      "--m3-tertiary-container": oklch(86, chroma * 0.44, tertiaryHue),
       "--m3-on-tertiary-container": oklch(24, chroma * 0.48, tertiaryHue),
-      "--m3-background": oklch(97, neutralChroma, neutralHue),
-      "--m3-on-background": oklch(18, neutralChroma * 1.7, neutralHue),
-      "--m3-surface": oklch(97, neutralChroma, neutralHue),
-      "--m3-surface-dim": oklch(87, neutralChroma * 1.12, neutralHue),
-      "--m3-surface-bright": oklch(98, neutralChroma, neutralHue),
-      "--m3-surface-variant": oklch(90, variantChroma * 0.62, neutralHue),
-      "--m3-surface-container": oklch(93, neutralChroma * 1.25, neutralHue),
-      "--m3-surface-container-lowest": oklch(100, 0, neutralHue),
-      "--m3-surface-container-low": oklch(96, neutralChroma * 1.08, neutralHue),
-      "--m3-surface-container-high": oklch(89, neutralChroma * 1.55, neutralHue),
-      "--m3-surface-container-highest": oklch(86, neutralChroma * 1.75, neutralHue),
-      "--m3-on-surface": oklch(18, neutralChroma * 1.7, neutralHue),
-      "--m3-on-surface-variant": oklch(43, variantChroma * 0.82, neutralHue),
-      "--m3-outline": oklch(62, variantChroma, neutralHue),
-      "--m3-outline-variant": oklch(76, variantChroma * 0.76, neutralHue),
-      "--m3-inverse-surface": oklch(20, neutralChroma * 1.6, neutralHue),
-      "--m3-inverse-on-surface": oklch(95, neutralChroma, neutralHue),
+      "--m3-background": oklch(95, lightNeutralChroma, neutralHue),
+      "--m3-on-background": oklch(18, lightNeutralChroma * 1.7, neutralHue),
+      "--m3-surface": oklch(95, lightNeutralChroma, neutralHue),
+      "--m3-surface-dim": oklch(84, lightNeutralChroma * 1.22, neutralHue),
+      "--m3-surface-bright": oklch(96, lightNeutralChroma, neutralHue),
+      "--m3-surface-variant": oklch(87, lightVariantChroma * 0.72, neutralHue),
+      "--m3-surface-container": oklch(91, lightNeutralChroma * 1.32, neutralHue),
+      "--m3-surface-container-lowest": oklch(98, lightNeutralChroma * 0.72, neutralHue),
+      "--m3-surface-container-low": oklch(94, lightNeutralChroma * 1.12, neutralHue),
+      "--m3-surface-container-high": oklch(88, lightNeutralChroma * 1.64, neutralHue),
+      "--m3-surface-container-highest": oklch(84, lightNeutralChroma * 1.88, neutralHue),
+      "--m3-on-surface": oklch(18, lightNeutralChroma * 1.7, neutralHue),
+      "--m3-on-surface-variant": oklch(41, lightVariantChroma * 0.88, neutralHue),
+      "--m3-outline": oklch(58, lightVariantChroma, neutralHue),
+      "--m3-outline-variant": oklch(72, lightVariantChroma * 0.82, neutralHue),
+      "--m3-inverse-surface": oklch(20, lightNeutralChroma * 1.6, neutralHue),
+      "--m3-inverse-on-surface": oklch(94, lightNeutralChroma, neutralHue),
       "--m3-inverse-primary": oklch(78, chroma, hue),
       "--m3-scrim": oklch(0, 0, neutralHue),
-      "--m3-shadow": oklch(36, variantChroma, neutralHue, 0.18),
+      "--m3-shadow": oklch(34, lightVariantChroma, neutralHue, 0.2),
       "--m3-error": oklch(50, 0.17, 28),
-      "--m3-on-error": oklch(99, 0.01, 28),
-      "--m3-error-container": oklch(90, 0.08, 28),
+      "--m3-on-error": oklch(98, 0.012, 28),
+      "--m3-error-container": oklch(88, 0.095, 28),
       "--m3-on-error-container": oklch(22, 0.12, 28),
       "--m3-warning": oklch(53, 0.13, 82),
-      "--m3-on-warning": oklch(99, 0.01, 82),
-      "--m3-warning-container": oklch(90, 0.07, 82),
+      "--m3-on-warning": oklch(98, 0.012, 82),
+      "--m3-warning-container": oklch(88, 0.085, 82),
       "--m3-on-warning-container": oklch(24, 0.1, 82),
       "--m3-info": oklch(48, 0.12, normalizeHue(hue - 84)),
-      "--m3-on-info": oklch(99, neutralChroma, neutralHue),
-      "--m3-info-container": oklch(88, 0.07, normalizeHue(hue - 84)),
+      "--m3-on-info": oklch(98, lightNeutralChroma, neutralHue),
+      "--m3-info-container": oklch(86, 0.082, normalizeHue(hue - 84)),
       "--m3-on-info-container": oklch(24, 0.09, normalizeHue(hue - 84)),
       "--m3-success": oklch(47, 0.14, 148),
-      "--m3-on-success": oklch(99, 0.01, 148),
-      "--m3-success-container": oklch(88, 0.08, 148),
+      "--m3-on-success": oklch(98, 0.012, 148),
+      "--m3-success-container": oklch(86, 0.095, 148),
       "--m3-on-success-container": oklch(23, 0.1, 148),
       "--m3-tertiary-strong": oklch(44, chroma * 0.7, tertiaryHue),
-      "--body-bg": gradient(180, oklch(98, neutralChroma, neutralHue), oklch(90, chroma * 0.12, hue)),
-      "--topbar-bg": gradient(90, oklch(98, neutralChroma, neutralHue, 0.98), oklch(90, chroma * 0.16, hue, 0.96)),
-      "--control-bg": oklch(97, neutralChroma, neutralHue),
-      "--control-hover-bg": oklch(89, chroma * 0.24, hue),
-      "--chip-bg": oklch(98, neutralChroma, neutralHue, 0.82),
-      "--pane-bg": gradient(180, oklch(98, neutralChroma, neutralHue, 0.98), oklch(91, chroma * 0.11, hue, 0.97)),
-      "--drop-bg": gradient(135, oklch(97, neutralChroma + 0.004, neutralHue), oklch(90, chroma * 0.18, hue)),
-      "--drag-bg": oklch(89, chroma * 0.28, hue),
-      "--quiet-bg": oklch(95, chroma * 0.055, hue),
-      "--segment-bg": oklch(95, chroma * 0.052, hue),
-      "--segment-active-bg": oklch(84, chroma * 0.48, hue),
-      "--canvas-bg": repeatingGrid(oklch(88, neutralChroma + 0.006, neutralHue), oklch(94, neutralChroma, neutralHue)),
+      "--body-bg": gradient(180, oklch(96, lightNeutralChroma, neutralHue), oklch(87, chroma * 0.17, hue)),
+      "--topbar-bg": gradient(90, oklch(95, lightNeutralChroma, neutralHue, 0.98), oklch(89, chroma * 0.2, hue, 0.96)),
+      "--control-bg": oklch(94, lightNeutralChroma, neutralHue),
+      "--control-hover-bg": oklch(87, chroma * 0.3, hue),
+      "--chip-bg": oklch(94, lightNeutralChroma, neutralHue, 0.84),
+      "--pane-bg": gradient(180, oklch(95, lightNeutralChroma, neutralHue, 0.98), oklch(88, chroma * 0.15, hue, 0.97)),
+      "--drop-bg": gradient(135, oklch(94, lightNeutralChroma + 0.006, neutralHue), oklch(87, chroma * 0.22, hue)),
+      "--drag-bg": oklch(86, chroma * 0.32, hue),
+      "--quiet-bg": oklch(92, chroma * 0.075, hue),
+      "--segment-bg": oklch(92, chroma * 0.072, hue),
+      "--segment-active-bg": oklch(80, chroma * 0.54, hue),
+      "--canvas-bg": repeatingGrid(oklch(85, lightNeutralChroma + 0.008, neutralHue), oklch(91, lightNeutralChroma, neutralHue)),
       "--canvas-ring": oklch(45, chroma * 0.68, hue, 0.1),
       "--canvas-glow": oklch(53, chroma * 0.74, hue, 0.13),
       "--accent-glow": oklch(53, chroma * 0.82, hue, 0.3),
       "--scanline": oklch(42, chroma * 0.7, hue, 0.055),
-      "--timeline-bg": oklch(96, neutralChroma, neutralHue, 0.94),
-      "--effect-bg": oklch(95, chroma * 0.05, hue),
-      "--matrix-col": oklch(47, chroma * 0.68, hue, 0.1),
-      "--matrix-row": oklch(39, chroma * 0.76, hue, 0.055),
+      "--timeline-bg": oklch(92, lightNeutralChroma, neutralHue, 0.94),
+      "--effect-bg": oklch(92, chroma * 0.075, hue),
+      "--matrix-col": oklch(43, chroma * 0.78, hue, 0.11),
+      "--matrix-row": oklch(36, chroma * 0.86, hue, 0.065),
     };
   }
 
@@ -1089,7 +1094,7 @@ function resizePipelineCanvas(width, height) {
 function getRenderDimensions(forceFullQuality = false) {
   const width = sourceCanvas.width;
   const height = sourceCanvas.height;
-  if (forceFullQuality || !state.playing || state.isRecording) return { width, height, preview: false };
+  if (forceFullQuality || state.isRecording || !state.playing) return { width, height, preview: false };
 
   const maxSide = Math.max(width, height);
   if (maxSide <= ANIMATED_PREVIEW_MAX_SIDE) return { width, height, preview: false };
@@ -1102,8 +1107,9 @@ function getRenderDimensions(forceFullQuality = false) {
   };
 }
 
-function fitDimensions(width, height, maxSide = 1280) {
-  const scale = Math.min(1, maxSide / Math.max(width, height));
+function fitDimensions(width, height, maxSide = Number.POSITIVE_INFINITY) {
+  const longestSide = Math.max(width, height);
+  const scale = Number.isFinite(maxSide) && longestSide > maxSide ? maxSide / longestSide : 1;
   return {
     width: Math.max(1, Math.round(width * scale)),
     height: Math.max(1, Math.round(height * scale)),
@@ -1170,6 +1176,127 @@ function exportNameFromSource(name = "dither-wizard") {
   return `${base}.png`;
 }
 
+function exportFileBase() {
+  return (state.exportSourceName || state.sourceName || "dither-wizard").replace(/\.[^.]+$/, "") || "dither-wizard";
+}
+
+function exportFilename(extension, suffix = "dithered") {
+  const cleanExtension = String(extension).replace(/^\./, "");
+  const cleanSuffix = suffix ? `-${suffix}` : "";
+  return `${exportFileBase()}${cleanSuffix}.${cleanExtension}`;
+}
+
+function savePickerType(mimeType, extension, description) {
+  return {
+    description,
+    accept: { [mimeType]: [`.${String(extension).replace(/^\./, "")}`] },
+  };
+}
+
+function canPickSaveLocation() {
+  return false;
+}
+
+async function chooseSaveTarget(filename, mimeType, extension, description) {
+  if (!canPickSaveLocation()) return { handle: null, cancelled: false };
+  try {
+    const handle = await window.showSaveFilePicker({
+      suggestedName: filename,
+      types: [savePickerType(mimeType, extension, description)],
+    });
+    return { handle, cancelled: false };
+  } catch (error) {
+    if (error?.name === "AbortError") return { handle: null, cancelled: true };
+    return { handle: null, cancelled: false };
+  }
+}
+
+function setExportStatus(label, stateName = "ready", resetDelay = 0) {
+  if (!els.exportStatus) return;
+  if (exportStatusTimer) {
+    clearTimeout(exportStatusTimer);
+    exportStatusTimer = 0;
+  }
+  els.exportStatus.textContent = label;
+  els.exportStatus.dataset.state = stateName;
+  els.exportStatus.classList.toggle("is-recording", stateName === "recording");
+  if (resetDelay) {
+    exportStatusTimer = window.setTimeout(() => {
+      exportStatusTimer = 0;
+      if (!state.isRecording && !state.isExporting) setExportStatus("ready", "ready");
+    }, resetDelay);
+  }
+}
+
+function setExportButtonsDisabled(disabled) {
+  [
+    els.downloadGifButton,
+    els.downloadPngButton,
+    els.downloadJpgButton,
+    els.downloadSvgButton,
+    els.recordWebmButton,
+    els.recordButton,
+    els.exportPaletteButton,
+  ].forEach((button) => {
+    if (button) button.disabled = disabled;
+  });
+}
+
+function setExportResult(blob, format) {
+  if (!blob) return;
+  state.exportTargetFormat = format;
+  state.exportDitheredBytes = blob.size || null;
+  renderExportMetrics();
+}
+
+function validateExportBlob(blob, label) {
+  if (!blob || blob.size <= 0) {
+    throw new Error(`${label} export produced an empty file`);
+  }
+  return blob;
+}
+
+function canvasToBlob(canvas, type, quality) {
+  return new Promise((resolve, reject) => {
+    canvas.toBlob((blob) => {
+      if (blob) resolve(blob);
+      else reject(new Error("Canvas export failed"));
+    }, type, quality);
+  });
+}
+
+function clearLastExportLink() {
+  if (lastExportUrl && lastExportUrl.startsWith("blob:")) {
+    URL.revokeObjectURL(lastExportUrl);
+    lastExportUrl = "";
+  }
+  lastExportUrl = "";
+  if (!els.lastExportLink) return;
+  els.lastExportLink.hidden = true;
+  els.lastExportLink.removeAttribute("href");
+  els.lastExportLink.removeAttribute("download");
+}
+
+function blobToDataUrl(blob) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(String(reader.result));
+    reader.onerror = () => reject(reader.error || new Error("Could not prepare download"));
+    reader.readAsDataURL(blob);
+  });
+}
+
+async function setLastExportLink(blob, filename) {
+  clearLastExportLink();
+  if (!els.lastExportLink) return "";
+  lastExportUrl = await blobToDataUrl(blob);
+  els.lastExportLink.href = lastExportUrl;
+  els.lastExportLink.download = filename;
+  els.lastExportLink.textContent = `Download ${filename}`;
+  els.lastExportLink.hidden = false;
+  return lastExportUrl;
+}
+
 function setExportSource({ name, bytes = null, format = "PNG" }) {
   state.sourceMetricsRequest += 1;
   state.exportMetricsRequest += 1;
@@ -1226,6 +1353,7 @@ function scheduleExportMetrics(force = false) {
     exportMetricsTimer = 0;
     state.exportMetricsAt = performance.now();
     const request = ++state.exportMetricsRequest;
+    state.exportTargetFormat = "PNG";
     outputCanvas.toBlob((blob) => {
       if (request !== state.exportMetricsRequest) return;
       state.exportDitheredBytes = blob?.size || null;
@@ -1285,12 +1413,21 @@ function nearestColor(r, g, b, palette, levels) {
 function monoColor(r, g, b, palette, levels, threshold = 128) {
   const luma = luminance(r, g, b);
   if (palette && palette.length > 1) {
-    const sorted = [...palette].sort((a, bColor) => luminance(a[0], a[1], a[2]) - luminance(bColor[0], bColor[1], bColor[2]));
+    const sorted = getLuminanceSortedPalette(palette);
     const index = Math.round(clamp(luma / 255, 0, 1) * (sorted.length - 1));
     return sorted[index];
   }
   const value = luma >= threshold ? 255 : 0;
   return [value, value, value];
+}
+
+function getLuminanceSortedPalette(palette) {
+  let sorted = luminanceSortedPaletteCache.get(palette);
+  if (!sorted) {
+    sorted = [...palette].sort((a, bColor) => luminance(a[0], a[1], a[2]) - luminance(bColor[0], bColor[1], bColor[2]));
+    luminanceSortedPaletteCache.set(palette, sorted);
+  }
+  return sorted;
 }
 
 function applyBaseAdjustments(data, width, height, time) {
@@ -1324,20 +1461,21 @@ function pixelateSource() {
   }
   const smallW = Math.max(1, Math.round(workCanvas.width / cell));
   const smallH = Math.max(1, Math.round(workCanvas.height / cell));
-  pipelineCanvas.width = smallW;
-  pipelineCanvas.height = smallH;
+  setCanvasDimensions(pipelineCanvas, smallW, smallH);
   pipelineCtx.imageSmoothingEnabled = true;
   pipelineCtx.clearRect(0, 0, smallW, smallH);
   pipelineCtx.drawImage(sourceCanvas, 0, 0, smallW, smallH);
   workCtx.drawImage(pipelineCanvas, 0, 0, smallW, smallH, 0, 0, workCanvas.width, workCanvas.height);
-  pipelineCanvas.width = workCanvas.width;
-  pipelineCanvas.height = workCanvas.height;
+  setCanvasDimensions(pipelineCanvas, workCanvas.width, workCanvas.height);
 }
 
 function ditherErrorDiffusion(imageData, algorithm) {
   const { width, height, data } = imageData;
   const kernel = ERROR_KERNELS[algorithm.id] || ERROR_KERNELS["floyd-steinberg"];
-  const buffer = new Float32Array(data.length);
+  if (errorDiffusionBuffer.length < data.length) {
+    errorDiffusionBuffer = new Float32Array(data.length);
+  }
+  const buffer = errorDiffusionBuffer.subarray(0, data.length);
   for (let i = 0; i < data.length; i++) buffer[i] = data[i];
   const palette = getPalette();
   const levels = state.settings.levels;
@@ -1829,7 +1967,7 @@ function tick(now) {
   if (state.sourceType === "video" || state.animateStill) {
     if (state.dirty || now >= state.nextAnimatedRenderAt) {
       const elapsed = renderNow();
-      const interval = clamp(elapsed * 1.18, ANIMATED_RENDER_MIN_INTERVAL, ANIMATED_RENDER_MAX_INTERVAL);
+      const interval = clamp(elapsed * 1.35, ANIMATED_RENDER_MIN_INTERVAL, ANIMATED_RENDER_MAX_INTERVAL);
       state.nextAnimatedRenderAt = now + interval;
     }
   }
@@ -2210,7 +2348,7 @@ function loadImage(url, file) {
 function loadVideo(url) {
   return new Promise((resolve, reject) => {
     video.onloadedmetadata = () => {
-      const dims = fitDimensions(video.videoWidth || 960, video.videoHeight || 540, 960);
+      const dims = fitDimensions(video.videoWidth || 960, video.videoHeight || 540);
       resizeCanvases(dims.width, dims.height);
       state.sourceType = "video";
       state.duration = video.duration || 4;
@@ -2265,11 +2403,33 @@ function extractPalette() {
   scheduleEditRender();
 }
 
-function exportPalette() {
+async function exportPalette() {
+  if (state.isExporting || state.isRecording) return;
   const colors = getPalette();
   if (!colors) return;
-  const blob = new Blob([JSON.stringify({ name: "Dither Wizard Palette", colors }, null, 2)], { type: "application/json" });
-  downloadBlob(blob, "dither-wizard-palette.json");
+  const blob = validateExportBlob(
+    new Blob([JSON.stringify({ name: "Dither Wizard Palette", colors }, null, 2)], { type: "application/json" }),
+    "Palette",
+  );
+  const filename = "dither-wizard-palette.json";
+  state.isExporting = true;
+  setExportButtonsDisabled(true);
+  setExportStatus("saving", "saving");
+  try {
+    const target = await chooseSaveTarget(filename, "application/json", "json", "JSON palette");
+    if (target.cancelled) {
+      setExportStatus("cancelled", "ready", 1200);
+      return;
+    }
+    const result = await saveBlob(blob, filename, target.handle);
+    setExportStatus(result, "saved", 1600);
+  } catch (error) {
+    console.error(error);
+    setExportStatus("export error", "error", 2400);
+  } finally {
+    state.isExporting = false;
+    setExportButtonsDisabled(false);
+  }
 }
 
 function importPalette(file) {
@@ -2294,86 +2454,532 @@ function importPalette(file) {
   reader.readAsText(file);
 }
 
-function downloadBlob(blob, filename) {
+async function downloadBlob(blob, filename) {
+  const href = await setLastExportLink(blob, filename);
+  if (!href) throw new Error("Could not prepare download link");
   const link = document.createElement("a");
-  link.href = URL.createObjectURL(blob);
+  link.href = href;
   link.download = filename;
+  link.rel = "noopener";
   document.body.appendChild(link);
   link.click();
   link.remove();
-  setTimeout(() => URL.revokeObjectURL(link.href), 1000);
 }
 
-function downloadCanvas(type) {
-  const ext = type === "image/jpeg" ? "jpg" : "png";
-  const wasPlaying = state.playing;
-  if (wasPlaying) setPlaying(false);
-  renderNow({ forceFullQuality: true, skipExportMetrics: true });
-  outputCanvas.toBlob((blob) => {
-    if (wasPlaying) setPlaying(true);
-    if (!blob) return;
-    downloadBlob(blob, `dither-wizard-${Date.now()}.${ext}`);
-  }, type, 0.94);
+async function writeBlobToHandle(blob, handle) {
+  const writable = await handle.createWritable();
+  const data = await blob.arrayBuffer();
+  await writable.write({ type: "write", position: 0, data });
+  await writable.truncate(data.byteLength);
+  await writable.close();
 }
 
-function exportSVG() {
-  const wasPlaying = state.playing;
-  if (wasPlaying) setPlaying(false);
-  renderNow({ forceFullQuality: true, skipExportMetrics: true });
-  const width = outputCanvas.width;
-  const height = outputCanvas.height;
-  const imageData = outputCtx.getImageData(0, 0, width, height);
-  const step = Math.max(state.settings.cell, Math.ceil(Math.max(width, height) / 360));
-  const threshold = state.settings.threshold;
-  const rects = [];
-  for (let y = 0; y < height; y += step) {
-    for (let x = 0; x < width; x += step) {
-      const i = (y * width + x) * 4;
-      const luma = luminance(imageData.data[i], imageData.data[i + 1], imageData.data[i + 2]);
-      if (luma < threshold) rects.push(`<rect x="${x}" y="${y}" width="${step}" height="${step}"/>`);
+async function saveBlob(blob, filename, handle = null) {
+  if (handle) {
+    try {
+      await writeBlobToHandle(blob, handle);
+      clearLastExportLink();
+      return "saved";
+    } catch (error) {
+      console.warn(error);
+      await downloadBlob(blob, filename);
+      return "downloaded";
     }
   }
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} ${height}" width="${width}" height="${height}"><rect width="100%" height="100%" fill="rgb(238,241,228)"/><g fill="rgb(17,19,17)">${rects.join("")}</g></svg>`;
-  downloadBlob(new Blob([svg], { type: "image/svg+xml" }), `dither-wizard-vector-${Date.now()}.svg`);
-  if (wasPlaying) setPlaying(true);
+  await downloadBlob(blob, filename);
+  return "downloaded";
+}
+
+class GifByteWriter {
+  constructor() {
+    this.chunks = [];
+    this.buffer = new Uint8Array(65536);
+    this.offset = 0;
+  }
+
+  writeByte(value) {
+    if (this.offset >= this.buffer.length) this.flushBuffer();
+    this.buffer[this.offset] = value & 255;
+    this.offset += 1;
+  }
+
+  writeBytes(bytes) {
+    for (let i = 0; i < bytes.length; i++) this.writeByte(bytes[i]);
+  }
+
+  writeAscii(value) {
+    for (let i = 0; i < value.length; i++) this.writeByte(value.charCodeAt(i));
+  }
+
+  writeShort(value) {
+    this.writeByte(value);
+    this.writeByte(value >> 8);
+  }
+
+  flushBuffer() {
+    if (!this.offset) return;
+    this.chunks.push(this.buffer.slice(0, this.offset));
+    this.offset = 0;
+  }
+
+  toBlob(type) {
+    this.flushBuffer();
+    return new Blob(this.chunks, { type });
+  }
+}
+
+class GifSubBlockWriter {
+  constructor(writer) {
+    this.writer = writer;
+    this.block = new Uint8Array(255);
+    this.offset = 0;
+  }
+
+  writeByte(value) {
+    if (this.offset >= 255) this.flush();
+    this.block[this.offset] = value & 255;
+    this.offset += 1;
+  }
+
+  flush() {
+    if (!this.offset) return;
+    this.writer.writeByte(this.offset);
+    this.writer.writeBytes(this.block.subarray(0, this.offset));
+    this.offset = 0;
+  }
+
+  close() {
+    this.flush();
+    this.writer.writeByte(0);
+  }
+}
+
+function writeGifHeader(writer, width, height, palette) {
+  if (width > 65535 || height > 65535) {
+    throw new Error("GIF export is limited to 65535 pixels per side");
+  }
+  writer.writeAscii("GIF89a");
+  writer.writeShort(width);
+  writer.writeShort(height);
+  writer.writeByte(0xf7);
+  writer.writeByte(0);
+  writer.writeByte(0);
+  for (let i = 0; i < GIF_EXPORT_COLORS; i++) {
+    const color = palette[i] || palette[palette.length - 1] || [0, 0, 0];
+    writer.writeByte(color[0]);
+    writer.writeByte(color[1]);
+    writer.writeByte(color[2]);
+  }
+  writer.writeByte(0x21);
+  writer.writeByte(0xff);
+  writer.writeByte(0x0b);
+  writer.writeAscii("NETSCAPE2.0");
+  writer.writeByte(0x03);
+  writer.writeByte(0x01);
+  writer.writeShort(0);
+  writer.writeByte(0);
+}
+
+function writeGifFrameHeader(writer, width, height, delay) {
+  writer.writeByte(0x21);
+  writer.writeByte(0xf9);
+  writer.writeByte(0x04);
+  writer.writeByte(0x04);
+  writer.writeShort(delay);
+  writer.writeByte(0);
+  writer.writeByte(0);
+  writer.writeByte(0x2c);
+  writer.writeShort(0);
+  writer.writeShort(0);
+  writer.writeShort(width);
+  writer.writeShort(height);
+  writer.writeByte(0);
+}
+
+function writeGifLzwData(writer, indices) {
+  const minCodeSize = 8;
+  const clearCode = 1 << minCodeSize;
+  const endCode = clearCode + 1;
+  let codeSize = minCodeSize + 1;
+  let nextCode = endCode + 1;
+  let dictionary = new Map();
+  let bitBuffer = 0;
+  let bitCount = 0;
+  const blocks = new GifSubBlockWriter(writer);
+
+  writer.writeByte(minCodeSize);
+
+  const resetDictionary = () => {
+    dictionary = new Map();
+    codeSize = minCodeSize + 1;
+    nextCode = endCode + 1;
+  };
+
+  const writeCode = (code) => {
+    bitBuffer |= code << bitCount;
+    bitCount += codeSize;
+    while (bitCount >= 8) {
+      blocks.writeByte(bitBuffer & 255);
+      bitBuffer >>= 8;
+      bitCount -= 8;
+    }
+  };
+
+  resetDictionary();
+  writeCode(clearCode);
+  let prefix = indices[0] || 0;
+  for (let i = 1; i < indices.length; i++) {
+    const color = indices[i];
+    const key = (prefix << 8) | color;
+    const existing = dictionary.get(key);
+    if (existing !== undefined) {
+      prefix = existing;
+      continue;
+    }
+
+    writeCode(prefix);
+    if (nextCode < 4096) {
+      dictionary.set(key, nextCode);
+      nextCode += 1;
+      if (nextCode === (1 << codeSize) && codeSize < 12) codeSize += 1;
+    } else {
+      writeCode(clearCode);
+      resetDictionary();
+    }
+    prefix = color;
+  }
+  writeCode(prefix);
+  writeCode(endCode);
+  if (bitCount > 0) blocks.writeByte(bitBuffer & 255);
+  blocks.close();
+}
+
+function writeGifFrame(writer, width, height, indices, delay) {
+  writeGifFrameHeader(writer, width, height, delay);
+  writeGifLzwData(writer, indices);
+}
+
+function buildGifPalette(data) {
+  const buckets = new Map();
+  const pixelCount = data.length / 4;
+  const step = Math.max(1, Math.floor(pixelCount / GIF_PALETTE_SAMPLE_PIXELS));
+  for (let pixel = 0; pixel < pixelCount; pixel += step) {
+    const i = pixel * 4;
+    if (data[i + 3] < 128) continue;
+    const key = ((data[i] >> 3) << 10) | ((data[i + 1] >> 3) << 5) | (data[i + 2] >> 3);
+    let bucket = buckets.get(key);
+    if (!bucket) {
+      bucket = { count: 0, r: 0, g: 0, b: 0 };
+      buckets.set(key, bucket);
+    }
+    bucket.count += 1;
+    bucket.r += data[i];
+    bucket.g += data[i + 1];
+    bucket.b += data[i + 2];
+  }
+
+  const palette = [...buckets.values()]
+    .sort((a, b) => b.count - a.count)
+    .slice(0, GIF_EXPORT_COLORS)
+    .map((bucket) => [
+      Math.round(bucket.r / bucket.count),
+      Math.round(bucket.g / bucket.count),
+      Math.round(bucket.b / bucket.count),
+    ]);
+  if (!palette.length) palette.push([0, 0, 0]);
+  while (palette.length < GIF_EXPORT_COLORS) palette.push([...palette[palette.length - 1]]);
+  return palette;
+}
+
+function createGifPaletteCache() {
+  const cache = new Uint16Array(32768);
+  cache.fill(65535);
+  return cache;
+}
+
+function nearestGifPaletteIndex(red, green, blue, palette) {
+  let bestIndex = 0;
+  let bestDistance = Number.POSITIVE_INFINITY;
+  for (let i = 0; i < palette.length; i++) {
+    const color = palette[i];
+    const dr = red - color[0];
+    const dg = green - color[1];
+    const db = blue - color[2];
+    const distance = dr * dr + dg * dg + db * db;
+    if (distance < bestDistance) {
+      bestDistance = distance;
+      bestIndex = i;
+      if (distance === 0) break;
+    }
+  }
+  return bestIndex;
+}
+
+function indexGifFramePixels(data, palette, cache) {
+  const pixelCount = data.length / 4;
+  const indices = new Uint8Array(pixelCount);
+  for (let pixel = 0; pixel < pixelCount; pixel++) {
+    const i = pixel * 4;
+    if (data[i + 3] < 128) {
+      indices[pixel] = 0;
+      continue;
+    }
+    const key = ((data[i] >> 3) << 10) | ((data[i + 1] >> 3) << 5) | (data[i + 2] >> 3);
+    let paletteIndex = cache[key];
+    if (paletteIndex === 65535) {
+      paletteIndex = nearestGifPaletteIndex(data[i], data[i + 1], data[i + 2], palette);
+      cache[key] = paletteIndex;
+    }
+    indices[pixel] = paletteIndex;
+  }
+  return indices;
+}
+
+function waitForAnimationFrame() {
+  return new Promise((resolve) => requestAnimationFrame(resolve));
+}
+
+function seekVideoFrame(time) {
+  const duration = video.duration || state.duration || 0;
+  const target = clamp(time, 0, Math.max(0, duration - 0.001));
+  if (video.readyState >= 2 && Math.abs((video.currentTime || 0) - target) < 0.01) {
+    return Promise.resolve();
+  }
+  return new Promise((resolve) => {
+    let done = false;
+    let timeout = 0;
+    const finish = () => {
+      if (done) return;
+      done = true;
+      window.clearTimeout(timeout);
+      video.removeEventListener("seeked", finish);
+      resolve();
+    };
+    timeout = window.setTimeout(finish, 1200);
+    video.addEventListener("seeked", finish, { once: true });
+    try {
+      video.currentTime = target;
+    } catch {
+      finish();
+    }
+  });
+}
+
+async function renderFullQualityFrameAt(time) {
+  state.time = time;
+  if (state.sourceType === "video") await seekVideoFrame(time);
+  syncTimeline();
+  renderNow({ forceFullQuality: true, skipExportMetrics: true });
+  return outputCtx.getImageData(0, 0, outputCanvas.width, outputCanvas.height);
+}
+
+async function exportGIF() {
+  if (state.isExporting || state.isRecording) return;
+  const filename = exportFilename("gif", "loop");
+  const wasPlaying = state.playing;
+  const originalTime = state.time;
+  const originalVideoTime = video.currentTime || 0;
+  if (wasPlaying) setPlaying(false);
+  state.isExporting = true;
+  setExportButtonsDisabled(true);
+  setExportStatus("gif 0%", "saving");
+  try {
+    const sourceDuration = state.sourceType === "video" ? video.duration || state.duration : state.duration;
+    const duration = Math.max(1 / GIF_EXPORT_FPS, Math.min(sourceDuration || 1, GIF_EXPORT_MAX_SECONDS));
+    const frameCount = Math.max(2, Math.min(GIF_EXPORT_MAX_FRAMES, Math.round(duration * GIF_EXPORT_FPS)));
+    const frameDelay = Math.max(2, Math.round((duration / frameCount) * 100));
+    const firstFrame = await renderFullQualityFrameAt(0);
+    const width = firstFrame.width;
+    const height = firstFrame.height;
+    const palette = buildGifPalette(firstFrame.data);
+    const paletteCache = createGifPaletteCache();
+    const writer = new GifByteWriter();
+    writeGifHeader(writer, width, height, palette);
+
+    for (let frame = 0; frame < frameCount; frame++) {
+      const imageData = frame === 0 ? firstFrame : await renderFullQualityFrameAt((frame / frameCount) * duration);
+      const indices = indexGifFramePixels(imageData.data, palette, paletteCache);
+      writeGifFrame(writer, width, height, indices, frameDelay);
+      setExportStatus(`gif ${Math.round(((frame + 1) / frameCount) * 100)}%`, "saving");
+      if (frame % 2 === 1) await waitForAnimationFrame();
+    }
+    writer.writeByte(0x3b);
+    const blob = validateExportBlob(writer.toBlob("image/gif"), "GIF");
+    setExportResult(blob, "GIF");
+    setExportStatus("saving", "saving");
+    const target = await chooseSaveTarget(filename, "image/gif", "gif", "GIF animation");
+    if (target.cancelled) {
+      setExportStatus("cancelled", "ready", 1200);
+      return;
+    }
+    const result = await saveBlob(blob, filename, target.handle);
+    setExportStatus(result, "saved", 1600);
+  } catch (error) {
+    console.error(error);
+    setExportStatus("export error", "error", 2400);
+  } finally {
+    state.time = originalTime;
+    if (state.sourceType === "video") await seekVideoFrame(originalVideoTime);
+    syncTimeline();
+    renderNow({ forceFullQuality: true, skipExportMetrics: true });
+    if (wasPlaying) setPlaying(true);
+    state.isExporting = false;
+    setExportButtonsDisabled(false);
+  }
+}
+
+async function downloadCanvas(type) {
+  if (state.isExporting || state.isRecording) return;
+  const ext = type === "image/jpeg" ? "jpg" : "png";
+  const format = type === "image/jpeg" ? "JPG" : "PNG";
+  const description = type === "image/jpeg" ? "JPG image" : "PNG image";
+  const filename = exportFilename(ext);
+  const wasPlaying = state.playing;
+  if (wasPlaying) setPlaying(false);
+  state.isExporting = true;
+  setExportButtonsDisabled(true);
+  setExportStatus("saving", "saving");
+  try {
+    renderNow({ forceFullQuality: true, skipExportMetrics: true });
+    const blob = validateExportBlob(
+      await canvasToBlob(outputCanvas, type, type === "image/jpeg" ? 0.94 : undefined),
+      format,
+    );
+    setExportResult(blob, format);
+    const target = await chooseSaveTarget(filename, type, ext, description);
+    if (target.cancelled) {
+      setExportStatus("cancelled", "ready", 1200);
+      return;
+    }
+    const result = await saveBlob(blob, filename, target.handle);
+    setExportStatus(result, "saved", 1600);
+  } catch (error) {
+    console.error(error);
+    setExportStatus("export error", "error", 2400);
+  } finally {
+    if (wasPlaying) setPlaying(true);
+    state.isExporting = false;
+    setExportButtonsDisabled(false);
+  }
+}
+
+async function exportSVG() {
+  if (state.isExporting || state.isRecording) return;
+  const filename = exportFilename("svg", "vector");
+  const wasPlaying = state.playing;
+  if (wasPlaying) setPlaying(false);
+  state.isExporting = true;
+  setExportButtonsDisabled(true);
+  setExportStatus("saving", "saving");
+  try {
+    renderNow({ forceFullQuality: true, skipExportMetrics: true });
+    const width = outputCanvas.width;
+    const height = outputCanvas.height;
+    const imageData = outputCtx.getImageData(0, 0, width, height);
+    const step = Math.max(state.settings.cell, Math.ceil(Math.max(width, height) / 360));
+    const threshold = state.settings.threshold;
+    const rects = [];
+    for (let y = 0; y < height; y += step) {
+      for (let x = 0; x < width; x += step) {
+        const i = (y * width + x) * 4;
+        const luma = luminance(imageData.data[i], imageData.data[i + 1], imageData.data[i + 2]);
+        if (luma < threshold) rects.push(`<rect x="${x}" y="${y}" width="${step}" height="${step}"/>`);
+      }
+    }
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} ${height}" width="${width}" height="${height}"><rect width="100%" height="100%" fill="rgb(238,241,228)"/><g fill="rgb(17,19,17)">${rects.join("")}</g></svg>`;
+    const blob = validateExportBlob(new Blob([svg], { type: "image/svg+xml" }), "SVG");
+    setExportResult(blob, "SVG");
+    const target = await chooseSaveTarget(filename, "image/svg+xml", "svg", "SVG vector image");
+    if (target.cancelled) {
+      setExportStatus("cancelled", "ready", 1200);
+      return;
+    }
+    const result = await saveBlob(blob, filename, target.handle);
+    setExportStatus(result, "saved", 1600);
+  } catch (error) {
+    console.error(error);
+    setExportStatus("export error", "error", 2400);
+  } finally {
+    if (wasPlaying) setPlaying(true);
+    state.isExporting = false;
+    setExportButtonsDisabled(false);
+  }
+}
+
+function getWebmMimeType() {
+  return ["video/webm;codecs=vp9", "video/webm;codecs=vp8", "video/webm"].find((type) => (
+    MediaRecorder.isTypeSupported(type)
+  )) || "";
+}
+
+function getWebmBitrate(width, height) {
+  const estimated = width * height * WEBM_EXPORT_FPS * WEBM_EXPORT_BITS_PER_PIXEL;
+  return Math.round(clamp(estimated, WEBM_EXPORT_MIN_BITRATE, WEBM_EXPORT_MAX_BITRATE));
 }
 
 async function recordWebm() {
-  if (!outputCanvas.captureStream || !window.MediaRecorder || state.isRecording) return;
-  state.isRecording = true;
-  els.recordingStatus.textContent = "recording";
-  els.recordingStatus.classList.add("is-recording");
-  const stream = outputCanvas.captureStream(30);
-  const mimeType = MediaRecorder.isTypeSupported("video/webm;codecs=vp9")
-    ? "video/webm;codecs=vp9"
-    : "video/webm";
-  const recorder = new MediaRecorder(stream, { mimeType });
-  const chunks = [];
-  recorder.ondataavailable = (event) => {
-    if (event.data.size) chunks.push(event.data);
-  };
-  recorder.onstop = () => {
-    const blob = new Blob(chunks, { type: mimeType });
-    downloadBlob(blob, `dither-wizard-loop-${Date.now()}.webm`);
-    state.isRecording = false;
-    els.recordingStatus.textContent = "idle";
-    els.recordingStatus.classList.remove("is-recording");
-    stream.getTracks().forEach((track) => track.stop());
-  };
-  recorder.start();
-
-  const wasPlaying = state.playing;
-  state.time = 0;
-  if (state.sourceType === "video") {
-    video.currentTime = 0;
-    await video.play();
+  if (state.isRecording || state.isExporting) return;
+  if (!outputCanvas.captureStream || !window.MediaRecorder) {
+    setExportStatus("unavailable", "error", 2400);
+    return;
   }
-  setPlaying(true);
-  const duration = Math.min(state.sourceType === "video" ? video.duration || 4 : state.duration, 8);
-  setTimeout(() => {
-    recorder.stop();
-    setPlaying(wasPlaying);
-  }, duration * 1000);
+  const filename = exportFilename("webm", "loop");
+  state.isRecording = true;
+  setExportButtonsDisabled(true);
+  setExportStatus("recording", "recording");
+  const wasPlaying = state.playing;
+  let stream = null;
+  try {
+    if (wasPlaying) setPlaying(false);
+    renderNow({ forceFullQuality: true, skipExportMetrics: true });
+    stream = outputCanvas.captureStream(WEBM_EXPORT_FPS);
+    const mimeType = getWebmMimeType();
+    const recorderOptions = {
+      videoBitsPerSecond: getWebmBitrate(outputCanvas.width, outputCanvas.height),
+    };
+    if (mimeType) recorderOptions.mimeType = mimeType;
+    const recorder = new MediaRecorder(stream, recorderOptions);
+    const chunks = [];
+    recorder.ondataavailable = (event) => {
+      if (event.data.size) chunks.push(event.data);
+    };
+    recorder.onstop = async () => {
+      try {
+        const blob = validateExportBlob(new Blob(chunks, { type: mimeType || "video/webm" }), "WebM");
+        setExportResult(blob, "WEBM");
+        setExportStatus("saving", "saving");
+        const result = await saveBlob(blob, filename);
+        setExportStatus(result, "saved", 1600);
+      } catch (error) {
+        console.error(error);
+        setExportStatus("export error", "error", 2400);
+      } finally {
+        state.isRecording = false;
+        setExportButtonsDisabled(false);
+        stream.getTracks().forEach((track) => track.stop());
+      }
+    };
+    recorder.start();
+
+    state.time = 0;
+    if (state.sourceType === "video") {
+      video.currentTime = 0;
+      await video.play();
+    }
+    setPlaying(true);
+    const duration = Math.min(state.sourceType === "video" ? video.duration || 4 : state.duration, 8);
+    setTimeout(() => {
+      recorder.stop();
+      setPlaying(wasPlaying);
+    }, duration * 1000);
+  } catch (error) {
+    console.error(error);
+    state.isRecording = false;
+    setExportButtonsDisabled(false);
+    setExportStatus("record error", "error", 2400);
+    if (wasPlaying) setPlaying(true);
+    if (stream) stream.getTracks().forEach((track) => track.stop());
+  }
 }
 
 function renderBatchList() {
@@ -2411,7 +3017,7 @@ async function processBatch() {
     }));
     if (status) status.textContent = "export";
     await new Promise((resolve) => outputCanvas.toBlob((blob) => {
-      if (blob) downloadBlob(blob, `batch-${i + 1}-${state.batchFiles[i].name.replace(/\.[^.]+$/, "")}.png`);
+      if (blob) void downloadBlob(blob, `batch-${i + 1}-${state.batchFiles[i].name.replace(/\.[^.]+$/, "")}.png`);
       resolve();
     }, "image/png"));
     if (status) status.textContent = "done";
@@ -2449,41 +3055,6 @@ function savePreset() {
   };
   PRESETS.push(preset);
   renderPresets();
-}
-
-function getSavedLogotype() {
-  try {
-    const saved = sessionStorage.getItem(LOGOTYPE_DEV_KEY);
-    if (LOGOTYPE_OPTIONS.includes(saved)) return saved;
-  } catch {
-    return LOGOTYPE_OPTIONS[0];
-  }
-  return LOGOTYPE_OPTIONS[0];
-}
-
-function setLogotype(variant) {
-  const next = LOGOTYPE_OPTIONS.includes(variant) ? variant : LOGOTYPE_OPTIONS[0];
-  document.body.dataset.logoVariant = next;
-  els.logoOptions?.querySelectorAll("[data-logo-option]").forEach((button) => {
-    const active = button.dataset.logoOption === next;
-    button.classList.toggle("is-active", active);
-    button.setAttribute("aria-pressed", String(active));
-  });
-  try {
-    sessionStorage.setItem(LOGOTYPE_DEV_KEY, next);
-  } catch {
-    return;
-  }
-}
-
-function bindLogotypeDevOverlay() {
-  if (!els.logoOptions) return;
-  setLogotype(getSavedLogotype());
-  els.logoOptions.addEventListener("click", (event) => {
-    const button = event.target.closest("[data-logo-option]");
-    if (!button) return;
-    setLogotype(button.dataset.logoOption);
-  });
 }
 
 function getSavedDropTexture() {
@@ -2627,6 +3198,7 @@ function bindEvents() {
 
   els.downloadPngButton.addEventListener("click", () => downloadCanvas("image/png"));
   els.downloadJpgButton.addEventListener("click", () => downloadCanvas("image/jpeg"));
+  els.downloadGifButton.addEventListener("click", exportGIF);
   els.downloadSvgButton.addEventListener("click", exportSVG);
   els.batchInputButton.addEventListener("click", () => els.batchInput.click());
   els.batchInput.addEventListener("change", () => {
@@ -2640,7 +3212,6 @@ function bindEvents() {
     const current = document.documentElement.dataset.theme === "light" ? "light" : "dark";
     setTheme(current === "light" ? "dark" : "light");
   });
-  bindLogotypeDevOverlay();
   bindDropTextureDevOverlay();
   bindContextDevPanel();
 

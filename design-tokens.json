@@ -36,9 +36,9 @@
         "on-primary": 100,
         "primary-container": 90,
         "on-primary-container": 10,
-        "surface": 99,
+        "surface": 96,
         "on-surface": 10,
-        "surface-container": 94,
+        "surface-container": 92,
         "outline": 50
       },
       "dark": {
@@ -91,6 +91,28 @@
       "controlLabel": { "size": "10px", "lineHeight": "14px", "family": "GT Standard Mono", "tracking": "0.065em", "case": "uppercase", "usage": "field labels, slider labels, compact row labels" },
       "commandLabel": { "size": "12px", "lineHeight": "16px", "family": "GT Standard Mono", "tracking": "0.055em", "case": "uppercase", "usage": "buttons, segmented tabs, command controls" },
       "dataReadout": { "size": "11px", "lineHeight": "14px", "family": "GT Standard Mono", "tracking": "0.035em", "numeric": "tabular slashed-zero", "usage": "meters, dimensions, frame time, file size, export telemetry" }
+    }
+  },
+  "motion": {
+    "durations": {
+      "immediate": "80ms",
+      "fast": "100ms",
+      "base": "135ms",
+      "slow": "210ms",
+      "hero": "320ms"
+    },
+    "easing": {
+      "standard": "cubic-bezier(0.16, 1, 0.3, 1)",
+      "enter": "cubic-bezier(0.22, 1, 0.36, 1)",
+      "exit": "cubic-bezier(0.5, 0, 0.75, 0)",
+      "emphasis": "cubic-bezier(0.12, 0.86, 0.18, 1)"
+    },
+    "rules": {
+      "feedback": "Hover, focus, and pressed states respond immediately and resolve within roughly 80-150ms.",
+      "signature": "Longer motion is reserved for local scan, lock, compile, and cast feedback.",
+      "navigation": "The design-system documentation rail uses Bare Index as production: dechromed rule index, single-select active containment, and transform/opacity Trace Fold motion.",
+      "performance": "Animated preview may pace heavy frames so controls and navigation remain responsive.",
+      "accessibility": "Reduced motion disables nonessential loops and scan sweeps."
     }
   },
   "states": {

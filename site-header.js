@@ -2,13 +2,14 @@
   function currentPage() {
     const path = window.location.pathname.toLowerCase();
     if (path.endsWith("design-system.html")) return "design-system";
+    if (path.endsWith("contact.html")) return "contact";
     return "home";
   }
 
   function navLink(page, href, label) {
     const active = currentPage() === page;
     const state = active ? ' is-current" aria-current="page' : "";
-    return `<a class="primary-nav-link${state}" href="${href}">${label}</a>`;
+    return `<a class="primary-nav-link${state}" href="${href}"><span class="primary-nav-label">${label}</span></a>`;
   }
 
   function renderSiteHeader() {
@@ -17,9 +18,9 @@
 
     mount.outerHTML = `
       <header class="topbar">
-        <div class="brand-lockup">
+        <a class="brand-lockup" href="index.html" aria-label="Dither Wizard home">
           <span class="brand-mark" aria-hidden="true">
-            <span class="wizard-logo" aria-hidden="true">
+            <span class="wizard-logo" data-wizard-hover-cast aria-hidden="true">
               <span class="wizard-vector-sprite" data-wizard-vector data-wizard-state="header" aria-hidden="true"></span>
             </span>
           </span>
@@ -47,20 +48,19 @@
             </h1>
             <p>local signal processing studio</p>
           </div>
-        </div>
+        </a>
         <div class="topbar-actions">
           <nav class="primary-nav" aria-label="Primary navigation">
             ${navLink("home", "index.html", "Home")}
-            <a class="primary-nav-link" href="mailto:hello@coreykoberna.com">Contact</a>
-            ${navLink("design-system", "design-system.html", "Design System")}
+            ${navLink("design-system", "design-system.html", "Wizardry")}
+            ${navLink("contact", "contact.html", "Contact")}
           </nav>
           <div class="topbar-controls">
             <button class="theme-toggle" id="themeToggle" type="button" aria-label="Switch to light mode" title="Switch theme">
               <span id="themeGlyph" data-pixel-icon="Sun" aria-hidden="true"></span>
-              <span id="themeText">Light</span>
             </button>
             <button class="fullscreen-toggle icon-button" id="fullscreenToggle" type="button" aria-label="Enter fullscreen" aria-pressed="false" title="Enter fullscreen">
-              <span class="fullscreen-icon" data-pixel-icon="Expand All" aria-hidden="true"></span>
+              <span class="fullscreen-icon" data-pixel-icon="Scale" aria-hidden="true"></span>
             </button>
           </div>
         </div>

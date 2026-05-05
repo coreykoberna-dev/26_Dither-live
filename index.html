@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Dither Wizard</title>
-    <link rel="stylesheet" href="styles.css?v=20260504-figma-logotype-canonical" />
+    <link rel="stylesheet" href="styles.css?v=20260505-gif-export" />
   </head>
   <body data-bg-texture="matrix-fine" data-logo-variant="figma-lockup" data-drop-texture="rain-vortex-fine">
     <div class="matrix-field" aria-hidden="true"></div>
@@ -131,7 +131,7 @@
             <div class="section-head">
               <h2>Adjustments</h2>
               <button class="icon-button" id="randomizeButton" type="button" title="Randomize look" aria-label="Randomize look">
-                <span class="pixel-icon-slot" data-pixel-icon="Randomize" aria-hidden="true"></span>
+                <span class="pixel-icon-slot" data-pixel-icon="Dice" aria-hidden="true"></span>
               </button>
             </div>
             <div class="control-stack" id="adjustmentControls"></div>
@@ -175,7 +175,7 @@
           <section class="pane-section">
             <div class="section-head">
               <h2>Export</h2>
-              <span id="recordingStatus" class="recording-status">idle</span>
+              <span id="exportStatus" class="export-status" data-state="ready" aria-live="polite">ready</span>
             </div>
             <div class="file-size-module" aria-live="polite">
               <div class="file-size-head">
@@ -221,12 +221,14 @@
                 </dl>
               </div>
             </div>
+            <button id="downloadGifButton" class="export-gif-button" type="button">Download GIF</button>
             <div class="export-grid">
-              <button id="downloadPngButton" type="button">PNG</button>
-              <button id="downloadJpgButton" type="button">JPG</button>
-              <button id="downloadSvgButton" type="button">SVG Vector</button>
-              <button id="recordWebmButton" type="button">WebM Loop</button>
+              <button id="downloadPngButton" type="button">Download PNG</button>
+              <button id="downloadJpgButton" type="button">Download JPG</button>
+              <button id="downloadSvgButton" type="button">Download SVG</button>
+              <button id="recordWebmButton" type="button">Record WebM</button>
             </div>
+            <a id="lastExportLink" class="export-fallback-link" href="#" download hidden>Download latest export</a>
           </section>
         </aside>
       </main>
@@ -241,8 +243,8 @@
             <h2 id="footer-links-title">Links</h2>
             <ul class="footer-link-list">
               <li><a class="footer-link" href="index.html">Home</a></li>
-              <li><a class="footer-link" href="design-system.html">Design System</a></li>
-              <li><a class="footer-link" href="mailto:hello@coreykoberna.com">Contact</a></li>
+              <li><a class="footer-link" href="design-system.html">Wizardry</a></li>
+              <li><a class="footer-link" href="contact.html">Contact</a></li>
               <li><a class="footer-link" href="https://github.com/coreykoberna/26_Dither" target="_blank" rel="noreferrer">GitHub Repo</a></li>
             </ul>
           </nav>
@@ -256,21 +258,6 @@
         <button id="contextPanelToggle" type="button" aria-expanded="true">Hide</button>
       </div>
       <div class="dev-panel-body">
-        <div class="dev-panel-group">
-          <span class="dev-panel-label">Logotype</span>
-          <div class="logo-options" id="logoOptions" role="group" aria-label="Logotype options">
-            <button class="logo-option is-active" type="button" data-logo-option="figma-lockup" aria-pressed="true"><span>01</span><span>Figma Lockup</span></button>
-            <button class="logo-option" type="button" data-logo-option="mono-splice" aria-pressed="false"><span>02</span><span>Mono Splice</span></button>
-            <button class="logo-option" type="button" data-logo-option="narrow-deck" aria-pressed="false"><span>03</span><span>Narrow Deck</span></button>
-            <button class="logo-option" type="button" data-logo-option="crossbar-drop" aria-pressed="false"><span>04</span><span>Crossbar Drop</span></button>
-            <button class="logo-option" type="button" data-logo-option="counter-lock" aria-pressed="false"><span>05</span><span>Counter Lock</span></button>
-            <button class="logo-option" type="button" data-logo-option="overlap-ligature" aria-pressed="false"><span>06</span><span>Overlap Ligature</span></button>
-            <button class="logo-option" type="button" data-logo-option="split-baseline" aria-pressed="false"><span>07</span><span>Split Baseline</span></button>
-            <button class="logo-option" type="button" data-logo-option="terminal-cut" aria-pressed="false"><span>08</span><span>Terminal Cut</span></button>
-            <button class="logo-option" type="button" data-logo-option="dense-stamp" aria-pressed="false"><span>09</span><span>Dense Stamp</span></button>
-            <button class="logo-option" type="button" data-logo-option="open-counter" aria-pressed="false"><span>10</span><span>Open Counter</span></button>
-          </div>
-        </div>
         <div class="dev-panel-group">
           <span class="dev-panel-label">Drop texture</span>
           <div class="logo-options" id="dropTextureOptions" role="group" aria-label="Pixel rain texture options">
@@ -292,12 +279,12 @@
     <video id="videoElement" playsinline muted aria-hidden="true"></video>
     <canvas id="workCanvas" aria-hidden="true"></canvas>
     <canvas id="pipelineCanvas" aria-hidden="true"></canvas>
-    <script src="assets/sprites/dither-wizard-vector-data.js"></script>
+    <script src="assets/sprites/dither-wizard-vector-data.js?v=20260505-elemental-spell-rows"></script>
     <script src="site-header.js?v=20260504-figma-logotype-canonical"></script>
-    <script src="assets/sprites/dither-wizard-vector.js"></script>
+    <script src="assets/sprites/dither-wizard-vector.js?v=20260505-elemental-spell-rows-2"></script>
     <script src="assets/vendor/pixelarticons/pixelarticons-data.js?v=20260504-pixelarticons-install"></script>
     <script src="system.js"></script>
-    <script src="app.js?v=20260504-figma-logotype-canonical"></script>
+    <script src="app.js?v=20260505-gif-export"></script>
     <script src="footer.js"></script>
   </body>
 </html>

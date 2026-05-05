@@ -2,6 +2,9 @@
   const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
   let navIdSeed = 0;
   let activeNavId = "";
+  const canonicalHashGroups = {
+    "#components": "Components",
+  };
   const nav = [
     {
       title: "Foundations",
@@ -157,6 +160,15 @@
         && link.getAttribute("href") === hash
       ));
       if (preferred) return preferred;
+    }
+
+    const canonicalGroup = canonicalHashGroups[hash];
+    if (canonicalGroup) {
+      const canonical = links.find((link) => (
+        link.getAttribute("href") === hash
+        && link.closest("details")?.querySelector("summary")?.textContent === canonicalGroup
+      ));
+      if (canonical) return canonical;
     }
 
     return links.find((link) => (
@@ -321,7 +333,6 @@
       ".state-row",
       ".access-row",
       ".component-catalog",
-      ".nav-motion-lab",
       ".qa-grid article",
     ].join(","));
 
