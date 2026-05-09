@@ -1,5 +1,7 @@
 const SYSTEM_THEME_KEY = "dither-wizard-theme";
 const SYSTEM_COLOR_SEED_KEY = "dither-wizard-system-seed";
+const NAVIGATION_COLOR_SEED_KEY = "dither-wizard-last-page-color-seed";
+const SPELL_EXPRESSION_KEY = "dither-wizard-spell-form-level-v2";
 const SYSTEM_MONITOR_CASCADE_OVERSCAN_COLS = 4;
 const SYSTEM_MONITOR_CASCADE_OVERSCAN_ROWS = 8;
 const SYSTEM_MONITOR_CASCADE_RESIZE_DELAY = 180;
@@ -37,6 +39,19 @@ const DYNAMIC_COLOR_SEEDS = [
   { id: "oxide", name: "Oxide", hue: 16, saturation: 0.56, color: "oklch(58% 0.13 16)" },
 ];
 const SYSTEM_MONITOR_OPTIONS = ["ghost-stars"];
+const SPELL_EXPRESSION_LEVELS = ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10"];
+const SPELL_FORM_LABELS = {
+  "01": { title: "Bloom floor", fire: "Fire bloom", earth: "Fault bloom", water: "Tide bloom", electric: "Bolt bloom" },
+  "02": { title: "Ring form", fire: "Fire ring", earth: "Stone ring", water: "Water ring", electric: "Spark ring" },
+  "03": { title: "Serpent form", fire: "Fire snake", earth: "Root snake", water: "River eel", electric: "Chain bolt" },
+  "04": { title: "Lance form", fire: "Fire lance", earth: "Obsidian lance", water: "Water spear", electric: "Volt lance" },
+  "05": { title: "Crown form", fire: "Ember crown", earth: "Stone crown", water: "Foam crown", electric: "Static crown" },
+  "06": { title: "Spiral form", fire: "Fire spiral", earth: "Quake spiral", water: "Whirlpool", electric: "Arc spiral" },
+  "07": { title: "Gate form", fire: "Flame gate", earth: "Stone gate", water: "Wave gate", electric: "Storm gate" },
+  "08": { title: "Storm form", fire: "Cinder storm", earth: "Boulder storm", water: "Rain storm", electric: "Ion storm" },
+  "09": { title: "Nova form", fire: "Solar nova", earth: "Terra nova", water: "Flood nova", electric: "Thunder nova" },
+  "10": { title: "Summon form", fire: "Phoenix wing", earth: "Titan hand", water: "Leviathan curl", electric: "Tempest lattice" },
+};
 const TONAL_PALETTE_DEFS = [
   ["primary", 0, 1],
   ["secondary", 22, 0.42],
@@ -80,6 +95,12 @@ let systemMonitorResizeBound = false;
 let systemMonitorAnimationFrame = 0;
 let systemMonitorCanvasState = null;
 let systemMonitorLastFrameAt = 0;
+
+function getCurrentPageSurface() {
+  if (document.body?.classList.contains("contact-body")) return "contact";
+  if (document.body?.classList.contains("system-doc-body")) return "wizardry";
+  return "home";
+}
 
 const PIXEL_ICONS = [
   { category: "Navigation", name: "Home", tags: "route start footer", rects: [[4, 12, 2, 8], [6, 10, 2, 2], [8, 8, 2, 2], [10, 6, 4, 2], [14, 8, 2, 2], [16, 10, 2, 2], [18, 12, 2, 8], [8, 15, 8, 5]] },
@@ -224,6 +245,26 @@ const PIXEL_ICONS = [
 ];
 
 const ICON_GRID_EXAMPLES = ["Search", "Mail", "Phone", "Map"];
+const ICON_HERO_ROTATION_NAMES = [
+  "Search",
+  "Image",
+  "Home",
+  "Settings",
+  "Calendar",
+  "Moon Star",
+  "Zap",
+  "Map",
+  "Mail",
+  "Phone",
+  "Star",
+  "Alert",
+  "Grid",
+  "Pin",
+  "Sliders",
+  "Wind",
+];
+const ICON_HERO_ROTATION_MS = 5000;
+let iconHeroRotationTimer = null;
 const SALIENT_ICON_REVISIONS = new Map([
   ["Search", { cells: pixelRows(`
 ........................
@@ -2146,6 +2187,57 @@ function buildDynamicRoles(seed, mode) {
   return { palettes, roles };
 }
 
+function normalizeRuntimeSeed(seed, fallback = DYNAMIC_COLOR_SEEDS[0]) {
+  if (!seed || typeof seed !== "object") return fallback;
+  const hue = Number(seed.hue);
+  const saturation = Number(seed.saturation);
+  if (!Number.isFinite(hue) || !Number.isFinite(saturation)) return fallback;
+  const rgb = Array.isArray(seed.rgb)
+    ? seed.rgb.slice(0, 3).map((value) => clampDynamic(Math.round(Number(value) || 0), 0, 255))
+    : null;
+  return {
+    id: typeof seed.id === "string" && seed.id ? seed.id : "handoff",
+    name: typeof seed.name === "string" && seed.name ? seed.name : "Route handoff",
+    hue: normalizeDynamicHue(hue),
+    saturation: clampDynamic(saturation, 0, 1),
+    ...(rgb ? { rgb } : {}),
+    ...(typeof seed.color === "string" ? { color: seed.color } : {}),
+  };
+}
+
+function readNavigationColorSeed() {
+  try {
+    const raw = localStorage.getItem(NAVIGATION_COLOR_SEED_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    const seed = normalizeRuntimeSeed(parsed?.seed, null);
+    return seed ? { ...parsed, seed } : null;
+  } catch {
+    return null;
+  }
+}
+
+function recordNavigationColorSeed(seed, options = {}) {
+  const nextSeed = normalizeRuntimeSeed(seed, null);
+  if (!nextSeed) return;
+  const payload = {
+    page: options.page || getCurrentPageSurface(),
+    seed: nextSeed,
+    updatedAt: Date.now(),
+  };
+  try {
+    localStorage.setItem(NAVIGATION_COLOR_SEED_KEY, JSON.stringify(payload));
+  } catch {
+    return;
+  }
+}
+
+function getInitialNavigationAwareSeed(fallback = getSavedDynamicSeed()) {
+  const surface = getCurrentPageSurface();
+  if (surface === "home") return fallback;
+  return readNavigationColorSeed()?.seed || fallback;
+}
+
 function getSavedDynamicSeed() {
   try {
     const saved = localStorage.getItem(SYSTEM_COLOR_SEED_KEY);
@@ -2156,6 +2248,7 @@ function getSavedDynamicSeed() {
 }
 
 function saveDynamicSeed(seed) {
+  if (!DYNAMIC_COLOR_SEEDS.some((item) => item.id === seed.id)) return;
   try {
     localStorage.setItem(SYSTEM_COLOR_SEED_KEY, seed.id);
   } catch {
@@ -2163,19 +2256,221 @@ function saveDynamicSeed(seed) {
   }
 }
 
+function buildSiteColorVariables(seed, palettes, roles, mode) {
+  const light = mode === "light";
+  return {
+    "--green": roles.primary,
+    "--green-strong": roles["on-primary-container"],
+    "--amber": roles.warning,
+    "--red": roles.error,
+    "--cyan": roles.info,
+    "--magenta": roles.tertiary,
+    "--line": light
+      ? `color-mix(in oklch, ${roles.outline}, ${roles.primary} 18%)`
+      : roles.outline,
+    "--line-dim": roles["outline-variant"],
+    "--field-focus-ring": `color-mix(in oklch, ${roles.primary}, transparent ${light ? "82%" : "76%"})`,
+    "--wizard-px-outline": `color-mix(in oklch, ${roles.scrim}, ${roles.primary} ${light ? "14%" : "10%"})`,
+    "--wizard-px-void": `color-mix(in oklch, ${roles.scrim}, ${roles.surface} ${light ? "4%" : "6%"})`,
+    "--wizard-px-robe-shadow": light
+      ? `color-mix(in oklch, ${roles.primary}, ${roles.scrim} 46%)`
+      : `color-mix(in oklch, ${roles["primary-container"]}, ${roles.scrim} 64%)`,
+    "--wizard-px-robe-dark": light
+      ? `color-mix(in oklch, ${roles.primary}, ${roles.scrim} 24%)`
+      : `color-mix(in oklch, ${roles["primary-container"]}, ${roles.scrim} 42%)`,
+    "--wizard-px-robe-mid": light
+      ? `color-mix(in oklch, ${roles.primary}, ${roles.secondary} 28%)`
+      : `color-mix(in oklch, ${roles.primary}, ${roles["secondary-container"]} 44%)`,
+    "--wizard-px-robe-light": light
+      ? `color-mix(in oklch, ${roles["primary-container"]}, ${roles.primary} 46%)`
+      : `color-mix(in oklch, ${roles["on-primary-container"]}, ${roles.secondary} 34%)`,
+    "--wizard-px-gold-shadow": `color-mix(in oklch, ${roles.warning}, ${roles.scrim} ${light ? "38%" : "48%"})`,
+    "--wizard-px-gold": roles.warning,
+    "--wizard-px-gold-light": light
+      ? `color-mix(in oklch, ${roles.warning}, ${roles["on-warning"]} 28%)`
+      : `color-mix(in oklch, ${roles["on-warning"]}, ${roles.warning} 45%)`,
+    "--wizard-px-purple-shadow": `color-mix(in oklch, ${light ? roles.tertiary : roles["tertiary-container"]}, ${roles.scrim} ${light ? "38%" : "42%"})`,
+    "--wizard-px-purple": roles.tertiary,
+    "--wizard-px-purple-light": light
+      ? `color-mix(in oklch, ${roles["tertiary-container"]}, ${roles.tertiary} 38%)`
+      : `color-mix(in oklch, ${roles["on-tertiary-container"]}, ${roles.tertiary} 42%)`,
+    "--wizard-px-staff-dark": `color-mix(in oklch, ${roles.warning}, ${roles.scrim} ${light ? "58%" : "70%"})`,
+    "--wizard-px-staff-mid": `color-mix(in oklch, ${roles.warning}, ${roles.surface} ${light ? "28%" : "18%"})`,
+    "--wizard-px-staff-gold": roles.warning,
+    "--wizard-px-highlight": `color-mix(in oklch, ${roles["on-surface"]}, ${light ? "white" : roles.primary} ${light ? "36%" : "12%"})`,
+    "--wizard-px-spell-shadow": `color-mix(in oklch, ${light ? roles.tertiary : roles["tertiary-container"]}, ${roles.scrim} 34%)`,
+    "--wizard-px-spell": roles.tertiary,
+    "--wizard-px-spell-core": `color-mix(in oklch, ${light ? roles["tertiary-container"] : roles["on-tertiary-container"]}, white 28%)`,
+  };
+}
+
+function buildContactPageVariables(seed, palettes, roles, mode) {
+  const light = mode === "light";
+  const neutral4 = pickTone(palettes, "neutral", 4);
+  const neutral6 = pickTone(palettes, "neutral", 6);
+  const neutral10 = pickTone(palettes, "neutral", 10);
+  const neutral12 = pickTone(palettes, "neutral", 12);
+  const neutral15 = pickTone(palettes, "neutral", 15);
+  const neutral17 = pickTone(palettes, "neutral", 17);
+  const neutral90 = pickTone(palettes, "neutral", 90);
+  const neutral94 = pickTone(palettes, "neutral", 94);
+  const primary12 = pickTone(palettes, "primary", 12);
+  const primary24 = pickTone(palettes, "primary", 24);
+  const primary40 = pickTone(palettes, "primary", 40);
+  const primary80 = pickTone(palettes, "primary", 80);
+  const bg = light
+    ? `color-mix(in oklch, ${roles.background}, ${roles.primary} 4%)`
+    : `color-mix(in oklch, ${neutral4}, ${primary12} 18%)`;
+  const bg2 = light
+    ? `color-mix(in oklch, ${roles["surface-container-low"]}, ${roles.primary} 5%)`
+    : `color-mix(in oklch, ${neutral6}, ${primary12} 22%)`;
+  const panel = light
+    ? `color-mix(in oklch, ${roles["surface-container"]}, ${roles.primary} 5%)`
+    : `color-mix(in oklch, ${neutral12}, ${primary24} 14%)`;
+  const panel2 = light
+    ? `color-mix(in oklch, ${roles["surface-container-high"]}, ${roles.primary} 7%)`
+    : `color-mix(in oklch, ${neutral15}, ${primary24} 18%)`;
+  const quietBg = light
+    ? `color-mix(in oklch, ${neutral94}, ${roles.primary} 4%)`
+    : `color-mix(in oklch, ${neutral10}, ${primary12} 18%)`;
+  const line = light
+    ? `color-mix(in oklch, ${roles.outline}, ${roles.primary} 16%)`
+    : `color-mix(in oklch, ${roles.outline}, ${primary40} 18%)`;
+  const lineDim = light
+    ? `color-mix(in oklch, ${roles["outline-variant"]}, ${roles.primary} 10%)`
+    : `color-mix(in oklch, ${roles["outline-variant"]}, ${neutral4} 28%)`;
+  const navBg = light
+    ? `color-mix(in oklch, ${bg2}, ${panel} 36%)`
+    : `color-mix(in oklch, ${neutral10}, ${primary24} 16%)`;
+  const navLine = light
+    ? `color-mix(in oklch, ${lineDim}, ${roles.primary} 18%)`
+    : `color-mix(in oklch, ${lineDim}, ${primary40} 20%)`;
+  const ruleBg = light
+    ? `color-mix(in oklch, ${bg}, ${roles.primary} 3%)`
+    : `color-mix(in oklch, ${bg}, ${primary12} 22%)`;
+  const ruleBg2 = light
+    ? `color-mix(in oklch, ${bg2}, ${roles.primary} 4%)`
+    : `color-mix(in oklch, ${bg2}, ${primary12} 18%)`;
+  const ruleLine = light
+    ? `color-mix(in oklch, ${roles.primary}, ${bg} 58%)`
+    : `color-mix(in oklch, ${primary40}, ${neutral4} 70%)`;
+  const ruleMajor = light
+    ? `color-mix(in oklch, ${roles.secondary}, ${bg} 66%)`
+    : `color-mix(in oklch, ${roles.secondary}, ${neutral4} 82%)`;
+  const paneBg = light
+    ? `color-mix(in oklch, ${panel}, ${roles.primary} 8%)`
+    : `color-mix(in oklch, ${panel}, ${primary24} 22%)`;
+  const paneBgStrong = light
+    ? `color-mix(in oklch, ${panel2}, ${roles.primary} 9%)`
+    : `color-mix(in oklch, ${panel2}, ${primary24} 28%)`;
+
+  return {
+    "--contact-seed-name": `"${seed.name}"`,
+    "--bg": bg,
+    "--bg-2": bg2,
+    "--panel": panel,
+    "--panel-2": panel2,
+    "--quiet-bg": quietBg,
+    "--body-bg": bg,
+    "--topbar-bg": navBg,
+    "--control-bg": light ? `color-mix(in oklch, ${panel}, ${neutral90} 28%)` : neutral12,
+    "--control-hover-bg": light ? `color-mix(in oklch, ${panel2}, ${roles.primary} 9%)` : neutral17,
+    "--chip-bg": light ? `color-mix(in oklch, ${panel}, ${roles.primary} 6%)` : neutral12,
+    "--line": line,
+    "--line-dim": lineDim,
+    "--matrix-col": light
+      ? `color-mix(in oklch, ${roles.primary}, ${bg} 76%)`
+      : `color-mix(in oklch, ${primary40}, ${neutral4} 68%)`,
+    "--matrix-row": light
+      ? `color-mix(in oklch, ${roles.primary}, ${bg} 84%)`
+      : `color-mix(in oklch, ${primary80}, ${neutral4} 86%)`,
+    "--contact-nav-bg": navBg,
+    "--contact-nav-line": navLine,
+    "--rule-stack-bg": ruleBg,
+    "--rule-stack-bg-2": ruleBg2,
+    "--rule-stack-line": ruleLine,
+    "--rule-stack-major": ruleMajor,
+    "--rule-stack-dot": light
+      ? `color-mix(in oklch, ${roles["on-surface"]}, ${roles["primary-container"]} 42%)`
+      : `color-mix(in oklch, ${roles["on-surface"]}, ${primary24} 50%)`,
+    "--contact-pane-bg": paneBg,
+    "--contact-pane-bg-strong": paneBgStrong,
+    "--contact-pane-rule": light
+      ? `color-mix(in oklch, ${roles.primary}, ${line} 56%)`
+      : `color-mix(in oklch, ${primary40}, ${line} 48%)`,
+    "--trail-color": light
+      ? `color-mix(in oklch, ${roles.primary}, ${bg} 30%)`
+      : `color-mix(in oklch, ${primary80}, ${neutral4} 68%)`,
+    "--trail-hot-color": light
+      ? `color-mix(in oklch, ${roles["on-primary-container"]}, ${roles.primary} 30%)`
+      : `color-mix(in oklch, ${roles["on-primary-container"]}, ${neutral12} 48%)`,
+    "--hair-bg": ruleBg,
+    "--hair-bg-low": ruleBg2,
+    "--hair-bg-mid": panel,
+    "--hair-bg-high": panel2,
+    "--hair-solid-dark": light
+      ? `color-mix(in oklch, ${bg}, ${roles.scrim} 4%)`
+      : `color-mix(in oklch, ${neutral4}, ${roles.scrim} 46%)`,
+    "--hair-line-a": ruleLine,
+    "--hair-line-b": ruleMajor,
+    "--hair-line-c": `color-mix(in oklch, ${roles.tertiary}, ${bg} ${light ? "68%" : "82%"})`,
+    "--hair-dot": `color-mix(in oklch, ${roles["on-surface"]}, ${roles["primary-container"]} ${light ? "48%" : "64%"})`,
+    "--hair-band": `color-mix(in oklch, ${roles.primary}, ${roles["on-primary-container"]} ${light ? "22%" : "34%"})`,
+    "--hair-band-soft": `color-mix(in oklch, ${roles["primary-container"]}, ${bg} ${light ? "38%" : "62%"})`,
+  };
+}
+
+function writeMaterialVariables(targets, roles, variables = {}) {
+  const materialVariables = {};
+  Object.entries(roles).forEach(([role, value]) => {
+    materialVariables[`--m3-${role}`] = value;
+    materialVariables[`--md-sys-color-${role}`] = value;
+  });
+  targets.forEach((target) => {
+    Object.entries({ ...materialVariables, ...variables }).forEach(([name, value]) => target.style.setProperty(name, value));
+  });
+}
+
+function applyDynamicContactPageTheme(seed, mode) {
+  const page = document.body;
+  if (!page?.classList.contains("contact-body")) return;
+  const nextSeed = normalizeRuntimeSeed(seed);
+  const { palettes, roles } = buildDynamicRoles(nextSeed, mode);
+  const shell = document.querySelector(".contact-shell");
+  const targets = [document.documentElement, page, shell].filter((target) => target?.style);
+  writeMaterialVariables(
+    targets,
+    roles,
+    {
+      ...buildSiteColorVariables(nextSeed, palettes, roles, mode),
+      ...buildContactPageVariables(nextSeed, palettes, roles, mode),
+    },
+  );
+  document.documentElement.dataset.navigationSeed = nextSeed.id;
+  page.dataset.navigationSeed = nextSeed.id;
+  if (shell) shell.dataset.navigationSeed = nextSeed.id;
+  recordNavigationColorSeed(nextSeed, { page: "contact" });
+  document.querySelectorAll("[data-wizard-vector]").forEach((sprite) => {
+    sprite.dataset.systemSeed = nextSeed.id;
+  });
+}
+
 function applyDynamicSystemPageTheme(seed, palettes, roles, mode) {
   const page = document.body;
   if (!page?.classList.contains("system-doc-body")) return;
+  const nextSeed = normalizeRuntimeSeed(seed);
   const targets = [document.documentElement, page].filter((target) => target?.style);
-  const pageRoles = roles || buildDynamicRoles(seed, mode).roles;
+  const roleSet = roles && palettes ? { palettes, roles } : buildDynamicRoles(nextSeed, mode);
+  const pageRoles = roleSet.roles;
+  const pagePalettes = roleSet.palettes;
   const light = mode === "light";
-  const primaryTone10 = palettes.primary[10];
-  const primaryTone12 = palettes.primary[12];
-  const primaryTone15 = palettes.primary[15];
-  const primaryTone20 = palettes.primary[20];
-  const primaryTone24 = palettes.primary[24];
-  const primaryTone40 = palettes.primary[40];
-  const primaryTone80 = palettes.primary[80];
+  const primaryTone10 = pagePalettes.primary[10];
+  const primaryTone12 = pagePalettes.primary[12];
+  const primaryTone15 = pagePalettes.primary[15];
+  const primaryTone20 = pagePalettes.primary[20];
+  const primaryTone24 = pagePalettes.primary[24];
+  const primaryTone40 = pagePalettes.primary[40];
+  const primaryTone80 = pagePalettes.primary[80];
   const pageBase = light ? pageRoles.background : primaryTone10;
   const pageBase2 = light ? pageRoles["surface-container-low"] : primaryTone12;
   const panel = light
@@ -2276,16 +2571,13 @@ function applyDynamicSystemPageTheme(seed, palettes, roles, mode) {
     "--wizard-px-spell-core": `color-mix(in oklch, ${light ? pageRoles["tertiary-container"] : pageRoles["on-tertiary-container"]}, white 28%)`,
   };
 
-  Object.entries(pageRoles).forEach(([role, value]) => {
-    variables[`--m3-${role}`] = value;
-    variables[`--md-sys-color-${role}`] = value;
-  });
+  writeMaterialVariables(targets, pageRoles, variables);
   targets.forEach((target) => {
-    Object.entries(variables).forEach(([name, value]) => target.style.setProperty(name, value));
-    target.dataset.systemSeed = seed.id;
+    target.dataset.systemSeed = nextSeed.id;
   });
+  recordNavigationColorSeed(nextSeed, { page: "wizardry" });
   document.querySelectorAll("[data-wizard-vector]").forEach((sprite) => {
-    sprite.dataset.systemSeed = seed.id;
+    sprite.dataset.systemSeed = nextSeed.id;
   });
 }
 
@@ -2404,8 +2696,15 @@ function applyDynamicPreviewVariables(roles) {
   Object.entries(mapping).forEach(([name, value]) => lab.style.setProperty(name, value));
 }
 
-function renderDynamicColorLab(seedId = activeDynamicSeed.id) {
-  const nextSeed = DYNAMIC_COLOR_SEEDS.find((seed) => seed.id === seedId) || DYNAMIC_COLOR_SEEDS[0];
+function resolveDynamicSeedInput(seedInput) {
+  if (typeof seedInput === "string") {
+    return DYNAMIC_COLOR_SEEDS.find((seed) => seed.id === seedInput) || DYNAMIC_COLOR_SEEDS[0];
+  }
+  return normalizeRuntimeSeed(seedInput, DYNAMIC_COLOR_SEEDS[0]);
+}
+
+function renderDynamicColorLab(seedInput = activeDynamicSeed) {
+  const nextSeed = resolveDynamicSeedInput(seedInput);
   activeDynamicSeed = nextSeed;
   const mode = document.documentElement.dataset.theme === "light" ? "light" : "dark";
   const { palettes, roles } = buildDynamicRoles(nextSeed, mode);
@@ -2420,8 +2719,8 @@ function renderDynamicColorLab(seedId = activeDynamicSeed.id) {
 
 function initDynamicColorLab() {
   if (!document.getElementById("dynamicColorLab")) return;
-  activeDynamicSeed = getSavedDynamicSeed();
-  renderDynamicColorLab(activeDynamicSeed.id);
+  activeDynamicSeed = getInitialNavigationAwareSeed();
+  renderDynamicColorLab(activeDynamicSeed);
 }
 
 function getSystemTheme() {
@@ -2436,6 +2735,7 @@ function getSystemTheme() {
 
 function setSystemTheme(theme) {
   const next = theme === "light" ? "light" : "dark";
+  const mode = next;
   document.documentElement.dataset.theme = next;
   const glyph = document.getElementById("themeGlyph");
   const text = document.getElementById("themeText");
@@ -2449,15 +2749,19 @@ function setSystemTheme(theme) {
   try {
     localStorage.setItem(SYSTEM_THEME_KEY, next);
   } catch {
-    return;
+    // Theme preference storage is optional; the current page should still render the selected stack.
   }
-  if (document.getElementById("dynamicColorLab")) renderDynamicColorLab(activeDynamicSeed.id);
+  if (document.getElementById("dynamicColorLab")) {
+    renderDynamicColorLab(activeDynamicSeed);
+  } else if (document.body?.classList.contains("contact-body")) {
+    applyDynamicContactPageTheme(activeDynamicSeed, mode);
+  }
 }
 
 function initSystemThemeToggle() {
   if (!document.querySelector(".system-shell")) return;
 
-  activeDynamicSeed = getSavedDynamicSeed();
+  activeDynamicSeed = getInitialNavigationAwareSeed();
   setSystemTheme(getSystemTheme());
 
   const toggle = document.getElementById("themeToggle");
@@ -2719,9 +3023,192 @@ function drawSystemMonitorCascadeFrame(now) {
   }
 }
 
+function getDefaultSpellExpressionLevel() {
+  const pageDefault = document.querySelector("[data-spell-expression-lab]")?.dataset.spellExpressionLevel;
+  if (SPELL_EXPRESSION_LEVELS.includes(pageDefault)) return pageDefault;
+  return "01";
+}
+
+function getSavedSpellExpressionLevel() {
+  try {
+    const saved = sessionStorage.getItem(SPELL_EXPRESSION_KEY);
+    if (SPELL_EXPRESSION_LEVELS.includes(saved)) return saved;
+  } catch {
+    return getDefaultSpellExpressionLevel();
+  }
+  return getDefaultSpellExpressionLevel();
+}
+
+function setSpellExpressionLevel(level) {
+  const lab = document.querySelector("[data-spell-expression-lab]");
+  if (!lab) return;
+  const next = SPELL_EXPRESSION_LEVELS.includes(level) ? level : getDefaultSpellExpressionLevel();
+  const labels = SPELL_FORM_LABELS[next] || SPELL_FORM_LABELS["01"];
+  lab.dataset.spellExpressionLevel = next;
+  const activeLabel = lab.querySelector("[data-spell-expression-active]");
+  if (activeLabel) activeLabel.textContent = `Level ${next} / ${labels.title}`;
+
+  lab.querySelectorAll("[data-spell-expression-option]").forEach((button) => {
+    const active = button.dataset.spellExpressionOption === next;
+    button.classList.toggle("is-active", active);
+    button.setAttribute("aria-pressed", String(active));
+  });
+
+  lab.querySelectorAll("[data-spell-expression-preview]").forEach((preview) => {
+    const base = preview.dataset.spellExpressionBase;
+    if (!base) return;
+    const state = `${base}-l${next}`;
+    preview.dataset.wizardState = state;
+    window.DitherWizardSprite?.setRootState?.(preview, state);
+  });
+
+  lab.querySelectorAll("[data-spell-expression-name]").forEach((label) => {
+    const element = label.dataset.spellExpressionName;
+    if (element && labels[element]) label.textContent = labels[element];
+  });
+
+  try {
+    sessionStorage.setItem(SPELL_EXPRESSION_KEY, next);
+  } catch {
+    return;
+  }
+}
+
+function initSpellExpressionLab() {
+  const lab = document.querySelector("[data-spell-expression-lab]");
+  const options = document.getElementById("spellExpressionOptions");
+  if (!lab || !options || lab.dataset.spellExpressionBound === "true") return;
+
+  lab.dataset.spellExpressionBound = "true";
+  setSpellExpressionLevel(getSavedSpellExpressionLevel());
+  options.addEventListener("click", (event) => {
+    const button = event.target instanceof Element ? event.target.closest("[data-spell-expression-option]") : null;
+    if (!button) return;
+    setSpellExpressionLevel(button.dataset.spellExpressionOption);
+  });
+}
+
+function normalizeWizardInspectorLevel(level) {
+  return SPELL_EXPRESSION_LEVELS.includes(level) ? level : "10";
+}
+
+function wizardInspectorState(inspector) {
+  const mode = inspector.dataset.wizardInspectorMode || "summon";
+  if (mode !== "summon") return mode;
+  const element = inspector.dataset.wizardInspectorElement || "fire";
+  const direction = inspector.dataset.wizardInspectorDirection || "south";
+  const level = normalizeWizardInspectorLevel(inspector.dataset.wizardInspectorLevel);
+  return `cast-${element}-${direction}-l${level}`;
+}
+
+function wizardInspectorTitle(inspector) {
+  const mode = inspector.dataset.wizardInspectorMode || "summon";
+  if (mode === "header") return "Header sequence";
+  if (mode === "walk-down") return "South walk";
+  if (mode === "walk-up") return "North walk";
+  if (mode === "walk-right") return "East walk";
+  if (mode === "walk-left") return "West walk";
+  if (mode === "cast-orb") return "Orb cast";
+  if (mode === "cast-burst") return "Burst cast";
+
+  const element = inspector.dataset.wizardInspectorElement || "fire";
+  const direction = inspector.dataset.wizardInspectorDirection || "south";
+  const level = normalizeWizardInspectorLevel(inspector.dataset.wizardInspectorLevel);
+  const label = SPELL_FORM_LABELS[level]?.[element] || element;
+  return `${label}, ${direction}`;
+}
+
+function wizardInspectorReadout(state) {
+  const data = window.DITHER_WIZARD_VECTOR_DATA;
+  if (state === "header") return "header sequence / shared clock";
+  const animation = data?.animations?.[state];
+  if (!animation) return `${state} / unavailable`;
+  return `${state} / ${animation.fps}fps / ${animation.frames.length} frames`;
+}
+
+function updateWizardInspectorPressed(inspector) {
+  const mode = inspector.dataset.wizardInspectorMode || "summon";
+  const element = inspector.dataset.wizardInspectorElement || "fire";
+  const direction = inspector.dataset.wizardInspectorDirection || "south";
+  const level = normalizeWizardInspectorLevel(inspector.dataset.wizardInspectorLevel);
+
+  inspector.querySelectorAll("[data-wizard-inspector-mode-option]").forEach((button) => {
+    const active = button.dataset.wizardInspectorModeOption === mode;
+    button.classList.toggle("is-active", active);
+    button.setAttribute("aria-pressed", String(active));
+  });
+  inspector.querySelectorAll("[data-wizard-inspector-element-option]").forEach((button) => {
+    const active = button.dataset.wizardInspectorElementOption === element;
+    button.classList.toggle("is-active", active);
+    button.setAttribute("aria-pressed", String(active));
+  });
+  inspector.querySelectorAll("[data-wizard-inspector-direction-option]").forEach((button) => {
+    const active = button.dataset.wizardInspectorDirectionOption === direction;
+    button.classList.toggle("is-active", active);
+    button.setAttribute("aria-pressed", String(active));
+  });
+  inspector.querySelectorAll("[data-wizard-inspector-level-option]").forEach((button) => {
+    const active = button.dataset.wizardInspectorLevelOption === level;
+    button.classList.toggle("is-active", active);
+    button.setAttribute("aria-pressed", String(active));
+  });
+}
+
+function renderWizardInspector(inspector) {
+  const preview = inspector.querySelector("[data-wizard-inspector-preview]");
+  const state = wizardInspectorState(inspector);
+  if (preview) {
+    preview.dataset.wizardState = state;
+    window.DitherWizardSprite?.setRootState?.(preview, state);
+  }
+
+  const title = inspector.querySelector("[data-wizard-inspector-title]");
+  if (title) title.textContent = wizardInspectorTitle(inspector);
+
+  const readout = inspector.querySelector("[data-wizard-inspector-readout]");
+  if (readout) readout.textContent = wizardInspectorReadout(state);
+
+  updateWizardInspectorPressed(inspector);
+}
+
+function initWizardSpriteInspector() {
+  document.querySelectorAll("[data-wizard-inspector]").forEach((inspector) => {
+    if (inspector.dataset.wizardInspectorBound === "true") return;
+    inspector.dataset.wizardInspectorBound = "true";
+    inspector.dataset.wizardInspectorLevel = normalizeWizardInspectorLevel(inspector.dataset.wizardInspectorLevel);
+
+    inspector.addEventListener("click", (event) => {
+      const button = event.target instanceof Element ? event.target.closest("button") : null;
+      if (!button || !inspector.contains(button)) return;
+
+      if (button.dataset.wizardInspectorModeOption) {
+        inspector.dataset.wizardInspectorMode = button.dataset.wizardInspectorModeOption;
+      }
+      if (button.dataset.wizardInspectorElementOption) {
+        inspector.dataset.wizardInspectorMode = "summon";
+        inspector.dataset.wizardInspectorElement = button.dataset.wizardInspectorElementOption;
+      }
+      if (button.dataset.wizardInspectorDirectionOption) {
+        inspector.dataset.wizardInspectorMode = "summon";
+        inspector.dataset.wizardInspectorDirection = button.dataset.wizardInspectorDirectionOption;
+      }
+      if (button.dataset.wizardInspectorLevelOption) {
+        inspector.dataset.wizardInspectorMode = "summon";
+        inspector.dataset.wizardInspectorLevel = normalizeWizardInspectorLevel(button.dataset.wizardInspectorLevelOption);
+      }
+
+      renderWizardInspector(inspector);
+    });
+
+    renderWizardInspector(inspector);
+  });
+}
+
 function initSystemPage() {
   initSystemThemeToggle();
   initSystemMonitorCascadeField();
+  initSpellExpressionLab();
+  initWizardSpriteInspector();
 
   const hasSystemPageIcons = document.getElementById("iconGridGuide") || document.getElementById("iconLibraryExplorer");
   if (!hasSystemPageIcons) return;
@@ -2899,6 +3386,56 @@ function createIconGuideMetric(label, value) {
   return item;
 }
 
+function setIconHeroGlyph(stage, screen, icon, index, total, animate = true) {
+  if (!stage || !screen || !icon) return;
+  screen.innerHTML = "";
+  screen.appendChild(createPixelGridSvg(icon));
+  stage.dataset.iconName = icon.name;
+  stage.setAttribute("aria-label", `Icon hero ${icon.name}, ${index + 1} of ${total}`);
+  stage.style.setProperty("--icon-hero-index", String(index));
+
+  if (!animate) return;
+  stage.classList.remove("is-switching");
+  stage.classList.add("is-switching");
+  window.setTimeout?.(() => stage.classList.remove("is-switching"), 920);
+}
+
+function initIconHeroRotation(stage, screen, icons) {
+  if (iconHeroRotationTimer) {
+    window.clearInterval?.(iconHeroRotationTimer);
+    iconHeroRotationTimer = null;
+  }
+  if (!stage || !screen || icons.length < 2) return;
+
+  let iconIndex = 0;
+  setIconHeroGlyph(stage, screen, icons[iconIndex], iconIndex, icons.length, false);
+
+  const reducedMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
+  if (reducedMotion || typeof window.setInterval !== "function") return;
+
+  iconHeroRotationTimer = window.setInterval(() => {
+    iconIndex = (iconIndex + 1) % icons.length;
+    setIconHeroGlyph(stage, screen, icons[iconIndex], iconIndex, icons.length);
+  }, ICON_HERO_ROTATION_MS);
+}
+
+function iconHeroRotationIcons(examples) {
+  const icons = [];
+  const seen = new Set();
+  const addIcon = (icon) => {
+    if (!icon) return;
+    const key = icon.id || icon.slug || iconSearchKey(icon.name);
+    if (seen.has(key)) return;
+    seen.add(key);
+    icons.push(icon);
+  };
+
+  ICON_HERO_ROTATION_NAMES.forEach((name) => addIcon(findActiveIconByName(name)));
+  examples.forEach(addIcon);
+  activeFoundationIcons().forEach(addIcon);
+  return icons;
+}
+
 function renderIconGridGuide() {
   const guide = document.getElementById("iconGridGuide");
   if (!guide) return;
@@ -2906,20 +3443,28 @@ function renderIconGridGuide() {
   const examples = ICON_GRID_EXAMPLES
     .map((name) => findActiveIconByName(name))
     .filter(Boolean);
-  const sample = examples[0];
+  const heroIcons = iconHeroRotationIcons(examples);
+  const sample = heroIcons[0] || examples[0];
   if (!sample) return;
 
   guide.innerHTML = "";
 
   const diagram = document.createElement("div");
-  diagram.className = "icon-grid-diagram-panel";
-  diagram.appendChild(createPixelGridSvg(sample));
+  diagram.className = "icon-grid-diagram-panel icon-hero-panel";
+  const heroStage = document.createElement("div");
+  heroStage.className = "icon-hero-stage";
+  heroStage.setAttribute("aria-live", "polite");
+  const heroScreen = document.createElement("div");
+  heroScreen.className = "icon-hero-screen";
+  heroStage.appendChild(heroScreen);
+  diagram.appendChild(heroStage);
 
   const equation = document.createElement("code");
   equation.textContent = ACTIVE_ICON_SOURCE?.packageName === "pixelarticons"
-    ? "pixelarticons@1.8.1 SVG -> 24x24 currentColor glyph -> crisp 24/48/72/96px render"
+    ? "pixelarticons@1.8.1 SVG -> 24x24 currentColor glyph -> 5s monitor fill -> next icon"
     : "Material 24dp keylines -> hand-snapped semantic glyph -> 48-cell pixel texture -> currentColor rects";
   diagram.appendChild(equation);
+  initIconHeroRotation(heroStage, heroScreen, heroIcons.length ? heroIcons : [sample]);
 
   const math = document.createElement("div");
   math.className = "icon-grid-math";
@@ -3112,6 +3657,18 @@ window.DitherIconSystem = Object.freeze({
   create: createNamedPixelIcon,
   get: getPixelIcon,
   hydrate: hydratePixelIcons,
+});
+
+window.DitherColorRuntime = Object.freeze({
+  applyContactSeed(seed) {
+    applyDynamicContactPageTheme(seed, document.documentElement.dataset.theme === "light" ? "light" : "dark");
+  },
+  buildRoles(seed, mode = document.documentElement.dataset.theme === "light" ? "light" : "dark") {
+    return buildDynamicRoles(normalizeRuntimeSeed(seed), mode);
+  },
+  currentPage: getCurrentPageSurface,
+  readLastPageSeed: readNavigationColorSeed,
+  recordPageSeed: recordNavigationColorSeed,
 });
 
 hydratePixelIcons();

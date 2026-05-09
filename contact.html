@@ -4,11 +4,11 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Contact Dither Wizard</title>
-    <link rel="stylesheet" href="styles.css?v=20260505-contact-feature-monitor" />
+    <link rel="stylesheet" href="styles.css?v=20260509-contact-three-window-form" />
   </head>
-  <body class="contact-body" data-bg-texture="matrix-micro" data-logo-variant="figma-lockup" data-contact-variant="terminal-deck">
+  <body class="contact-body" data-bg-texture="matrix-micro" data-logo-variant="figma-lockup" data-contact-variant="terminal-deck" data-contact-content="signal-ledger" data-contact-layout="offset-stack">
     <div class="matrix-field" aria-hidden="true"></div>
-    <div class="system-shell contact-shell" data-contact-variant="terminal-deck">
+    <div class="system-shell contact-shell" data-contact-variant="terminal-deck" data-contact-content="signal-ledger" data-contact-layout="offset-stack">
       <div data-site-header></div>
 
       <main class="system-page contact-page" aria-labelledby="contact-title">
@@ -26,25 +26,13 @@
             <div class="contact-hero-copy contact-module contact-window contact-window-intro" data-contact-module="intro">
               <button class="contact-window-handle" type="button" aria-label="Move intro window">
                 <span>intro.signal</span>
-                <span>drag</span>
+                <span>click + drag</span>
               </button>
               <div class="contact-intro-layout">
                 <div class="contact-intro-main">
                   <p class="system-kicker">contact / signal intake</p>
                   <h2 class="system-title" id="contact-title">Contact</h2>
-                  <p class="contact-lede">Send project notes, bug reports, design-system feedback, or collaboration details to the Dither Wizard channel.</p>
-                  <div class="contact-repo-focus">
-                    <span class="contact-repo-icon" data-pixel-icon="Github" aria-hidden="true"></span>
-                    <div>
-                      <span class="token-name">source / public repo</span>
-                      <strong>GitHub Repo</strong>
-                      <p>Use the repo for issue context, implementation notes, design-system drift, and visible product feedback.</p>
-                      <a class="contact-command contact-command-primary contact-command-large" href="https://github.com/coreykoberna/26_Dither" target="_blank" rel="noreferrer">
-                        <span class="pixel-icon-slot" data-pixel-icon="Github" aria-hidden="true"></span>
-                        <span>Open GitHub Repo</span>
-                      </a>
-                    </div>
-                  </div>
+                  <p class="contact-lede">Send project notes, product feedback, design-system questions, or collaboration details.</p>
                   <div class="contact-actions" aria-label="Contact actions">
                     <a class="contact-command" href="mailto:hello@ditherwizard.ai">
                       <span class="pixel-icon-slot" data-pixel-icon="Mail" aria-hidden="true"></span>
@@ -54,8 +42,21 @@
                 </div>
 
                 <aside class="contact-beacon contact-beacon-inline" aria-label="Contact signal status">
-                  <div class="contact-beacon-stage" data-contact-beacon aria-hidden="true">
-                    <span class="wizard-vector-sprite" data-wizard-vector data-wizard-state="cast-orb" aria-hidden="true"></span>
+                  <div class="contact-pulse-console">
+                    <div class="contact-beacon-stage contact-scope-stage" data-contact-beacon aria-hidden="true">
+                      <div class="contact-wave-scope contact-signal-scope">
+                        <span class="contact-wave-reticle"></span>
+                        <span class="contact-wave-meta">
+                          <span id="contactPulseReadout">pulse 09</span>
+                          <span>mail link</span>
+                        </span>
+                        <svg class="contact-wave-screen" viewBox="0 0 320 88" preserveAspectRatio="none" focusable="false">
+                          <path class="contact-wave-ghost" data-contact-pulse-ghost d="M0 48 L18 48 L26 30 L34 68 L42 48 L52 48 L60 38 L68 58 L77 48 L94 48 L103 18 L114 73 L126 42 L144 42 L153 54 L165 54 L174 28 L185 66 L198 48 L216 48 L226 40 L236 56 L247 46 L260 46 L270 22 L282 70 L296 48 L320 48" />
+                          <path class="contact-wave-primary" data-contact-pulse-primary d="M0 48 L18 48 L26 30 L34 68 L42 48 L52 48 L60 38 L68 58 L77 48 L94 48 L103 18 L114 73 L126 42 L144 42 L153 54 L165 54 L174 28 L185 66 L198 48 L216 48 L226 40 L236 56 L247 46 L260 46 L270 22 L282 70 L296 48 L320 48" />
+                        </svg>
+                        <span class="contact-wave-sweep"></span>
+                      </div>
+                    </div>
                   </div>
                   <dl class="contact-signal-list">
                     <div>
@@ -76,43 +77,11 @@
             </div>
           </section>
 
-          <section class="contact-workflow" aria-labelledby="contact-workflow-title">
-            <div class="contact-channel-list contact-module contact-window contact-window-routes" data-contact-module="routes">
-              <button class="contact-window-handle" type="button" aria-label="Move routes window">
-                <span>routes.stack</span>
-                <span>drag</span>
-              </button>
-              <p class="system-label" id="contact-workflow-title">01 / routes</p>
-              <article class="contact-channel">
-                <span class="contact-channel-icon" data-pixel-icon="Mail" aria-hidden="true"></span>
-                <div>
-                  <span class="token-name">primary</span>
-                  <strong>Email channel</strong>
-                  <p>Use email for collaborations, private context, asset questions, and longer notes.</p>
-                </div>
-              </article>
-              <article class="contact-channel">
-                <span class="contact-channel-icon" data-pixel-icon="Bug" aria-hidden="true"></span>
-                <div>
-                  <span class="token-name">product</span>
-                  <strong>Issue context</strong>
-                  <p>Include source format, browser, expected output, and what happened in the workbench.</p>
-                </div>
-              </article>
-              <article class="contact-channel">
-                <span class="contact-channel-icon" data-pixel-icon="Palette" aria-hidden="true"></span>
-                <div>
-                  <span class="token-name">design</span>
-                  <strong>System notes</strong>
-                  <p>Send visual drift, token gaps, accessibility concerns, or workflow polish requests.</p>
-                </div>
-              </article>
-            </div>
-
+          <section class="contact-workflow" aria-label="Contact transmission">
             <form class="contact-form contact-module contact-window contact-window-form" id="contactForm" action="mailto:hello@ditherwizard.ai" method="post" enctype="text/plain" data-contact-module="form">
               <button class="contact-window-handle" type="button" aria-label="Move form window">
                 <span>transmission.form</span>
-                <span>drag</span>
+                <span>click + drag</span>
               </button>
               <div class="section-head">
                 <h2>Transmission</h2>
@@ -129,7 +98,7 @@
               <label class="field-group">
                 <span class="field-label">Subject</span>
                 <select name="subject" required>
-                  <option value="Project inquiry">Project inquiry</option>
+                  <option value="General inquiry">General inquiry</option>
                   <option value="Dither Wizard support">Dither Wizard support</option>
                   <option value="Design system feedback">Design system feedback</option>
                   <option value="Collaboration">Collaboration</option>
@@ -155,30 +124,80 @@
           <aside class="context-dev-panel contact-dev-panel contact-feature-monitor contact-module contact-window contact-window-monitor" id="contactVariantPanel" aria-label="Feature monitor tool" data-contact-variant-panel data-contact-module="monitor">
             <button class="contact-window-handle" type="button" aria-label="Move feature monitor tool">
               <span>feature.monitor</span>
-              <span>drag</span>
+              <span>click + drag</span>
             </button>
             <div class="context-dev-head">
-              <span>Feature Monitor Tool</span>
+              <span>Feature Monitor</span>
               <button id="contactVariantToggle" type="button" aria-expanded="true">Collapse</button>
             </div>
             <div class="dev-panel-body">
               <div class="dev-panel-group">
-                <span class="dev-panel-label">Rule Stack trail studies</span>
-                <div class="logo-options contact-variant-options" id="contactVariantOptions" role="group" aria-label="Contact page alternatives">
-                  <button class="logo-option contact-variant-option is-active" type="button" data-contact-variant-option="terminal-deck" aria-pressed="true"><span>01</span><span>Rule Stack</span></button>
-                  <button class="logo-option contact-variant-option" type="button" data-contact-variant-option="archive-console" aria-pressed="false"><span>02</span><span>Slow Afterimage</span></button>
-                  <button class="logo-option contact-variant-option" type="button" data-contact-variant-option="blue-noc" aria-pressed="false"><span>03</span><span>Fine Wake</span></button>
-                  <button class="logo-option contact-variant-option" type="button" data-contact-variant-option="deep-raster" aria-pressed="false"><span>04</span><span>Micro Spark</span></button>
-                  <button class="logo-option contact-variant-option" type="button" data-contact-variant-option="amber-mainframe" aria-pressed="false"><span>05</span><span>Large Tiles</span></button>
-                  <button class="logo-option contact-variant-option" type="button" data-contact-variant-option="split-tty" aria-pressed="false"><span>06</span><span>Rail Trail</span></button>
-                  <button class="logo-option contact-variant-option" type="button" data-contact-variant-option="paper-crt" aria-pressed="false"><span>07</span><span>Ledger Glow</span></button>
-                  <button class="logo-option contact-variant-option" type="button" data-contact-variant-option="null-shell" aria-pressed="false"><span>08</span><span>Long Ghost</span></button>
-                  <button class="logo-option contact-variant-option" type="button" data-contact-variant-option="red-panic" aria-pressed="false"><span>09</span><span>Fault Scatter</span></button>
-                  <button class="logo-option contact-variant-option" type="button" data-contact-variant-option="radar-shell" aria-pressed="false"><span>10</span><span>Broad Pulse</span></button>
+                <span class="dev-panel-label">Background preview</span>
+                <div class="contact-wave-selector" id="contactVariantOptions" role="group" aria-label="Contact background alternatives">
+                  <div class="contact-block-preview" aria-hidden="true">
+                    <span class="contact-block-preview-meta">
+                      <span>active sample</span>
+                      <span>cell / decay</span>
+                    </span>
+                    <canvas class="contact-block-preview-canvas" id="contactBlockPreviewCanvas"></canvas>
+                    <span class="contact-demo-mouse"></span>
+                  </div>
+                  <div class="contact-wave-options">
+                    <button class="contact-wave-option is-active" type="button" data-contact-variant-option="terminal-deck" aria-pressed="true">
+                      <span class="contact-wave-index">01</span>
+                      <span class="contact-wave-name">Rule Stack</span>
+                      <span class="contact-wave-measure">24px / 850ms</span>
+                    </button>
+                    <button class="contact-wave-option" type="button" data-contact-variant-option="archive-console" aria-pressed="false">
+                      <span class="contact-wave-index">02</span>
+                      <span class="contact-wave-name">Slow Afterimage</span>
+                      <span class="contact-wave-measure">24px / 1800ms</span>
+                    </button>
+                    <button class="contact-wave-option" type="button" data-contact-variant-option="blue-noc" aria-pressed="false">
+                      <span class="contact-wave-index">03</span>
+                      <span class="contact-wave-name">Fine Wake</span>
+                      <span class="contact-wave-measure">14px / 700ms</span>
+                    </button>
+                    <button class="contact-wave-option" type="button" data-contact-variant-option="deep-raster" aria-pressed="false">
+                      <span class="contact-wave-index">04</span>
+                      <span class="contact-wave-name">Micro Spark</span>
+                      <span class="contact-wave-measure">8px / 430ms</span>
+                    </button>
+                    <button class="contact-wave-option" type="button" data-contact-variant-option="amber-mainframe" aria-pressed="false">
+                      <span class="contact-wave-index">05</span>
+                      <span class="contact-wave-name">Large Tiles</span>
+                      <span class="contact-wave-measure">36px / 1150ms</span>
+                    </button>
+                    <button class="contact-wave-option" type="button" data-contact-variant-option="split-tty" aria-pressed="false">
+                      <span class="contact-wave-index">06</span>
+                      <span class="contact-wave-name">Rail Trail</span>
+                      <span class="contact-wave-measure">18px / 950ms</span>
+                    </button>
+                    <button class="contact-wave-option" type="button" data-contact-variant-option="paper-crt" aria-pressed="false">
+                      <span class="contact-wave-index">07</span>
+                      <span class="contact-wave-name">Ledger Glow</span>
+                      <span class="contact-wave-measure">28px / 1400ms</span>
+                    </button>
+                    <button class="contact-wave-option" type="button" data-contact-variant-option="null-shell" aria-pressed="false">
+                      <span class="contact-wave-index">08</span>
+                      <span class="contact-wave-name">Long Ghost</span>
+                      <span class="contact-wave-measure">32px / 2600ms</span>
+                    </button>
+                    <button class="contact-wave-option" type="button" data-contact-variant-option="red-panic" aria-pressed="false">
+                      <span class="contact-wave-index">09</span>
+                      <span class="contact-wave-name">Fault Scatter</span>
+                      <span class="contact-wave-measure">16px / 520ms</span>
+                    </button>
+                    <button class="contact-wave-option" type="button" data-contact-variant-option="radar-shell" aria-pressed="false">
+                      <span class="contact-wave-index">10</span>
+                      <span class="contact-wave-name">Broad Pulse</span>
+                      <span class="contact-wave-measure">42px / 1100ms</span>
+                    </button>
+                  </div>
                 </div>
               </div>
               <div class="contact-variant-readout" aria-live="polite">
-                <span>active</span>
+                <span>trail</span>
                 <strong id="contactVariantReadout">Rule Stack</strong>
               </div>
             </div>
@@ -189,28 +208,26 @@
       <footer class="site-footer" id="siteFooter">
         <div class="site-footer-inner">
           <div class="footer-brand" aria-label="Dither Wizard">
-            <strong>Dither Wizard</strong>
-            <span>Local browser dither studio</span>
+            <strong>Dither Wizard<sup class="footer-trademark" aria-label="trademark">&trade;</sup><time class="footer-year" datetime="2026" data-current-year>2026</time></strong>
+            <a class="footer-credit" href="https://coreykoberna.com/" target="_blank" rel="noreferrer"><span>Built by Corey Koberna</span></a>
           </div>
-          <nav class="footer-section" aria-labelledby="footer-links-title">
-            <h2 id="footer-links-title">Links</h2>
+          <nav class="footer-section" aria-label="Footer navigation">
             <ul class="footer-link-list">
-              <li><a class="footer-link" href="index.html">Home</a></li>
-              <li><a class="footer-link" href="design-system.html">Wizardry</a></li>
-              <li><a class="footer-link" href="contact.html">Contact</a></li>
-              <li><a class="footer-link" href="https://github.com/coreykoberna/26_Dither" target="_blank" rel="noreferrer">GitHub Repo</a></li>
+              <li><a class="footer-link" href="index.html"><span>Home</span></a></li>
+              <li><a class="footer-link" href="design-system.html"><span>Wizardry</span></a></li>
+              <li><a class="footer-link" href="contact.html"><span>Contact</span></a></li>
             </ul>
           </nav>
         </div>
       </footer>
     </div>
 
-    <script src="assets/sprites/dither-wizard-vector-data.js"></script>
-    <script src="site-header.js?v=20260505-contact-page"></script>
-    <script src="assets/sprites/dither-wizard-vector.js"></script>
+    <script src="assets/sprites/dither-wizard-vector-data.js?v=20260509-fluid-wizard-motion"></script>
+    <script src="site-header.js?v=20260509-logotype-tool-match"></script>
+    <script src="assets/sprites/dither-wizard-vector.js?v=20260509-fluid-wizard-motion"></script>
     <script src="assets/vendor/pixelarticons/pixelarticons-data.js?v=20260504-pixelarticons-install"></script>
-    <script src="system.js"></script>
-    <script src="contact.js?v=20260505-contact-feature-monitor"></script>
+    <script src="system.js?v=20260509-sprite-inspector"></script>
+    <script src="contact.js?v=20260509-contact-three-window-form"></script>
     <script src="footer.js"></script>
   </body>
 </html>

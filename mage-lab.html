@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Mage Motion Lab</title>
+    <link rel="stylesheet" href="styles.css?v=20260509-mage-lab-chamber" />
+  </head>
+  <body class="system-doc-body mage-lab-body" data-logo-variant="figma-lockup" data-system-monitor="ghost-stars">
+    <div class="matrix-field" aria-hidden="true"></div>
+    <div class="system-shell mage-lab-shell">
+      <div data-site-header></div>
+
+      <main class="mage-lab-page" data-mage-lab>
+        <section class="mage-lab-hero" aria-labelledby="mage-lab-title">
+          <div class="mage-lab-hero-copy">
+            <p class="system-kicker">hidden character workbench</p>
+            <h1 id="mage-lab-title">Mage Motion Lab</h1>
+            <p>The selected mage is isolated here as a vector-pixel character system: directional motion, spell casting, runtime color roles, and dungeon movement all stay editable before this replaces the current wizard.</p>
+          </div>
+          <div class="mage-lab-hero-stage" data-mage-hover-cast aria-label="Live mage character specimen">
+            <span class="mage-vector-sprite" data-mage-vector data-mage-state="header" aria-hidden="true"></span>
+            <div class="mage-stage-readout" aria-hidden="true">
+              <span>72 x 84 vector pixels</span>
+              <span>fire / earth / electric / water</span>
+            </div>
+          </div>
+        </section>
+
+        <section class="mage-workbench" aria-label="Mage animation and dungeon workbench">
+          <div class="mage-dungeon-shell">
+            <canvas id="mageDungeonCanvas" class="mage-dungeon-canvas" width="1440" height="900" aria-label="Pixel dungeon movement stage"></canvas>
+            <div class="mage-dungeon-actor" id="mageDungeonActor" aria-hidden="true">
+              <span class="mage-vector-sprite" data-mage-vector data-mage-state="idle-down" data-mage-dungeon-sprite aria-hidden="true"></span>
+            </div>
+            <div class="mage-dungeon-hud" aria-live="polite">
+              <span data-mage-position-readout>cell 10 / 10</span>
+              <span data-mage-state-readout>idle-down</span>
+              <span data-mage-spell-readout>spell fire / level 10</span>
+            </div>
+          </div>
+
+          <aside class="mage-control-console" aria-label="Mage controls">
+            <section class="mage-console-section mage-color-system" aria-labelledby="mage-color-title">
+              <div class="mage-console-heading">
+                <span class="token-name">runtime color</span>
+                <h2 id="mage-color-title">Dynamic seed</h2>
+              </div>
+              <label class="mage-color-picker">
+                <span>Seed color</span>
+                <input id="mageSeedColor" type="color" value="#8e49ca" aria-label="Mage seed color" />
+              </label>
+              <div class="mage-seed-presets" role="group" aria-label="Mage seed presets">
+                <button type="button" data-mage-seed="#8e49ca" aria-pressed="true"><span>Violet</span></button>
+                <button type="button" data-mage-seed="#2c9ecb" aria-pressed="false"><span>Water</span></button>
+                <button type="button" data-mage-seed="#718143" aria-pressed="false"><span>Earth</span></button>
+                <button type="button" data-mage-seed="#e45324" aria-pressed="false"><span>Fire</span></button>
+              </div>
+              <div class="mage-token-strip" aria-label="Mage token preview">
+                <span style="--mage-token-preview: var(--mage-px-robe-dark)"></span>
+                <span style="--mage-token-preview: var(--mage-px-robe-mid)"></span>
+                <span style="--mage-token-preview: var(--mage-px-gold)"></span>
+                <span style="--mage-token-preview: var(--mage-px-beard)"></span>
+                <span style="--mage-token-preview: var(--mage-px-spell)"></span>
+                <span style="--mage-token-preview: var(--mage-px-fire)"></span>
+                <span style="--mage-token-preview: var(--mage-px-earth)"></span>
+                <span style="--mage-token-preview: var(--mage-px-water)"></span>
+                <span style="--mage-token-preview: var(--mage-px-electric)"></span>
+              </div>
+            </section>
+
+            <section class="mage-console-section" aria-labelledby="mage-motion-title">
+              <div class="mage-console-heading">
+                <span class="token-name">states</span>
+                <h2 id="mage-motion-title">Motion</h2>
+              </div>
+              <div class="mage-control-grid" role="group" aria-label="Mage motion states">
+                <button type="button" data-mage-lab-state="idle-down" aria-pressed="true"><span>Idle</span><small>south</small></button>
+                <button type="button" data-mage-lab-state="walk-down" aria-pressed="false"><span>South</span><small>walk</small></button>
+                <button type="button" data-mage-lab-state="walk-up" aria-pressed="false"><span>North</span><small>walk</small></button>
+                <button type="button" data-mage-lab-state="walk-right" aria-pressed="false"><span>East</span><small>walk</small></button>
+                <button type="button" data-mage-lab-state="walk-left" aria-pressed="false"><span>West</span><small>walk</small></button>
+                <button type="button" data-mage-lab-state="header" aria-pressed="false"><span>Loop</span><small>all</small></button>
+              </div>
+            </section>
+
+            <section class="mage-console-section" aria-labelledby="mage-spell-title">
+              <div class="mage-console-heading">
+                <span class="token-name">casts</span>
+                <h2 id="mage-spell-title">Spell channel</h2>
+              </div>
+              <div class="mage-control-grid mage-spell-grid" role="group" aria-label="Mage spell elements">
+                <button type="button" data-mage-spell="fire" aria-pressed="true"><span>Fire</span></button>
+                <button type="button" data-mage-spell="earth" aria-pressed="false"><span>Earth</span></button>
+                <button type="button" data-mage-spell="electric" aria-pressed="false"><span>Electric</span></button>
+                <button type="button" data-mage-spell="water" aria-pressed="false"><span>Water</span></button>
+              </div>
+              <label class="mage-range-field">
+                <span>Expression</span>
+                <input id="mageSpellLevel" type="range" min="1" max="10" step="1" value="10" />
+                <output id="mageSpellLevelOutput">10</output>
+              </label>
+              <button class="mage-primary-action" type="button" id="mageCastButton">
+                <span data-pixel-icon="Zap" aria-hidden="true"></span>
+                <span>Cast</span>
+              </button>
+            </section>
+          </aside>
+        </section>
+
+        <section class="mage-system-matrix" aria-label="Mage micro design system status">
+          <article><span class="token-name">source</span><strong>variant 05</strong><p>Selected purple diviner sheet, split into north, south, east, and west vector bases.</p></article>
+          <article><span class="token-name">grid</span><strong>72 x 84</strong><p>Higher-density logical pixels rendered as SVG cells for scalable animation.</p></article>
+          <article><span class="token-name">motion</span><strong>idle, walk, cast</strong><p>Directional walking and spell offsets use the same state names as the current wizard.</p></article>
+          <article><span class="token-name">hidden route</span><strong>mage-lab.html</strong><p>Kept outside primary navigation until the character is tuned.</p></article>
+        </section>
+      </main>
+
+      <footer class="site-footer" id="siteFooter">
+        <div class="site-footer-inner">
+          <div class="footer-brand" aria-label="Dither Wizard">
+            <strong>Dither Wizard<sup class="footer-trademark" aria-label="trademark">&trade;</sup><time class="footer-year" datetime="2026" data-current-year>2026</time></strong>
+            <a class="footer-credit" href="https://coreykoberna.com/" target="_blank" rel="noreferrer"><span>Built by Corey Koberna</span></a>
+          </div>
+          <nav class="footer-section" aria-label="Footer navigation">
+            <ul class="footer-link-list">
+              <li><a class="footer-link" href="index.html"><span>Home</span></a></li>
+              <li><a class="footer-link" href="design-system.html"><span>Wizardry</span></a></li>
+              <li><a class="footer-link" href="contact.html"><span>Contact</span></a></li>
+            </ul>
+          </nav>
+        </div>
+      </footer>
+    </div>
+
+    <script src="assets/sprites/dither-wizard-vector-data.js?v=20260509-fluid-wizard-motion"></script>
+    <script src="site-header.js?v=20260509-logotype-tool-match"></script>
+    <script src="assets/sprites/dither-wizard-vector.js?v=20260509-fluid-wizard-motion"></script>
+    <script src="assets/sprites/dither-mage-vector-data.js?v=20260509-mage-lab"></script>
+    <script src="assets/sprites/dither-mage-vector.js?v=20260509-mage-lab"></script>
+    <script src="assets/vendor/pixelarticons/pixelarticons-data.js?v=20260504-pixelarticons-install"></script>
+    <script src="system.js?v=20260509-mage-lab"></script>
+    <script src="mage-lab.js?v=20260509-mage-lab-chamber"></script>
+    <script src="footer.js"></script>
+  </body>
+</html>

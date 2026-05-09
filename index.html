@@ -4,15 +4,15 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Dither Wizard</title>
-    <link rel="stylesheet" href="styles.css?v=20260505-gif-export" />
+    <link rel="stylesheet" href="styles.css?v=20260509-effect-list-stack" />
   </head>
-  <body data-bg-texture="matrix-fine" data-logo-variant="figma-lockup" data-drop-texture="rain-vortex-fine">
+  <body data-bg-texture="matrix-fine" data-logo-variant="figma-lockup" data-drop-texture="rain-vortex-wide">
     <div class="matrix-field" aria-hidden="true"></div>
     <div class="app-shell">
       <div data-site-header></div>
 
       <main class="workbench">
-        <aside class="pane ingest-pane" aria-label="Source and presets">
+        <aside class="pane ingest-pane" aria-label="Source, export, and batch">
           <section class="pane-section">
             <div class="section-head">
               <h2>Source</h2>
@@ -27,9 +27,12 @@
                 <span class="drop-subtext">Files stay local. PNG, JPEG, GIF, WebP, MP4, MOV, WebM.</span>
               </span>
             </label>
-            <div class="media-actions">
+            <div class="media-actions source-actions">
+              <button id="wizardSignalButton" class="wizard-source-button" type="button" aria-label="Summon a random wizard source image">
+                <span class="pixel-icon-slot" data-pixel-icon="Bolt" aria-hidden="true"></span>
+                <span class="wizard-source-main">Summon Random Image</span>
+              </button>
               <button id="loadButton" type="button">Open File</button>
-              <button id="snapshotButton" type="button">Capture Frame</button>
             </div>
           </section>
 
@@ -40,7 +43,75 @@
                 <span class="pixel-icon-slot" data-pixel-icon="Save" aria-hidden="true"></span>
               </button>
             </div>
-            <div class="preset-grid" id="presetGrid"></div>
+            <div class="preset-grid" id="presetGrid" aria-label="Preset looks"></div>
+          </section>
+
+          <section class="pane-section export-section">
+            <div class="section-head">
+              <h2>Export</h2>
+              <div class="section-tools">
+                <span id="exportStatus" class="export-status" data-state="ready" aria-live="polite">ready</span>
+                <button class="icon-button" id="exportIconButton" type="button" title="Download GIF" aria-label="Download GIF" data-export-format="gif">
+                  <span class="pixel-icon-slot" data-pixel-icon="Download" aria-hidden="true"></span>
+                </button>
+              </div>
+            </div>
+            <div class="file-size-module" aria-live="polite">
+              <div class="file-size-head">
+                <div class="file-size-icon" aria-hidden="true">
+                  <span></span>
+                  <span></span>
+                  <span></span>
+                </div>
+                <div>
+                  <span class="field-label">File Size</span>
+                  <strong id="exportFileName">procedural.png</strong>
+                </div>
+              </div>
+              <div class="file-size-body">
+                <div class="file-meter" id="fileSizeMeter" style="--file-percent: 0%">
+                  <span id="exportPercent">--</span>
+                </div>
+                <dl class="file-size-list">
+                  <div>
+                    <dt>Original</dt>
+                    <dd id="originalSize">measuring</dd>
+                  </div>
+                  <div>
+                    <dt>Dithered</dt>
+                    <dd id="ditheredSize">measuring</dd>
+                  </div>
+                  <div class="file-size-delta">
+                    <dt id="exportDeltaLabel">Saved</dt>
+                    <dd id="savedSize">--</dd>
+                  </div>
+                  <div>
+                    <dt>Dimensions</dt>
+                    <dd id="exportDimensions">1024×640</dd>
+                  </div>
+                  <div>
+                    <dt>Megapixels</dt>
+                    <dd id="exportMegapixels">0.7 MP</dd>
+                  </div>
+                  <div>
+                    <dt>Format</dt>
+                    <dd id="exportFormat">PNG → PNG</dd>
+                  </div>
+                </dl>
+              </div>
+            </div>
+            <div id="exportPreview" class="export-preview" aria-live="polite">
+              <span id="exportPreviewFormat">GIF Loop</span>
+              <span id="exportPreviewDetails">Full resolution animated export</span>
+            </div>
+            <button id="downloadGifButton" class="export-gif-button" type="button" data-export-format="gif">Download GIF</button>
+            <div class="export-grid">
+              <button id="downloadPngButton" type="button" data-export-format="png">Download PNG</button>
+              <button id="downloadJpgButton" type="button" data-export-format="jpg">Download JPG</button>
+              <button id="downloadSvgButton" type="button" data-export-format="svg">Download SVG</button>
+              <button id="recordWebmButton" type="button" data-export-format="webm">Record WebM</button>
+            </div>
+            <a id="lastExportLink" class="export-fallback-link" href="#" download hidden>Download latest export</a>
           </section>
 
           <section class="pane-section">
@@ -115,8 +186,38 @@
         <aside class="pane control-pane" aria-label="Dither controls">
           <section class="pane-section">
             <div class="section-head">
+              <h2>Palette</h2>
+              <button class="icon-button" id="randomizePaletteButton" type="button" title="Randomize palette source" aria-label="Randomize palette source">
+                <span class="pixel-icon-slot" data-pixel-icon="Dice" aria-hidden="true"></span>
+              </button>
+            </div>
+            <div class="palette-controls">
+              <div class="field-group palette-field">
+                <label class="field-label" id="palettePickerLabel" for="paletteSelect">Palette source</label>
+                <select id="paletteSelect" class="palette-native-select" aria-label="Palette" tabindex="-1"></select>
+                <div class="palette-picker" id="palettePicker" aria-labelledby="palettePickerLabel">
+                  <div class="palette-picker-list" id="palettePickerList" role="listbox" aria-labelledby="palettePickerLabel"></div>
+                </div>
+              </div>
+              <div class="swatch-row" id="swatchRow"></div>
+              <div class="media-actions">
+                <button id="extractPaletteButton" type="button">Extract</button>
+                <button id="exportPaletteButton" type="button">Export Palette</button>
+                <button id="importPaletteButton" type="button">Import</button>
+              </div>
+              <input id="paletteInput" type="file" accept="application/json,.json" />
+            </div>
+          </section>
+
+          <section class="pane-section">
+            <div class="section-head">
               <h2>Algorithm</h2>
-              <span class="count-pill">63</span>
+              <div class="section-tools">
+                <span class="count-pill">63</span>
+                <button class="icon-button" id="randomizeAlgorithmButton" type="button" title="Randomize algorithm" aria-label="Randomize algorithm">
+                  <span class="pixel-icon-slot" data-pixel-icon="Dice" aria-hidden="true"></span>
+                </button>
+              </div>
             </div>
             <div class="form-stack">
               <div class="field-group">
@@ -130,161 +231,56 @@
           <section class="pane-section">
             <div class="section-head">
               <h2>Adjustments</h2>
-              <button class="icon-button" id="randomizeButton" type="button" title="Randomize look" aria-label="Randomize look">
+              <button class="icon-button" id="randomizeButton" type="button" title="Randomize adjustments" aria-label="Randomize adjustments">
                 <span class="pixel-icon-slot" data-pixel-icon="Dice" aria-hidden="true"></span>
               </button>
             </div>
             <div class="control-stack" id="adjustmentControls"></div>
           </section>
 
-          <section class="pane-section">
-            <div class="section-head">
-              <h2>Palette</h2>
-              <button class="icon-button" id="extractPaletteButton" type="button" title="Extract palette" aria-label="Extract palette">
-                <span class="pixel-icon-slot" data-pixel-icon="Palette" aria-hidden="true"></span>
-              </button>
-            </div>
-            <div class="palette-controls">
-              <div class="field-group">
-                <label class="field-label" for="paletteSelect">Palette source</label>
-                <select id="paletteSelect" aria-label="Palette"></select>
-              </div>
-              <div class="swatch-row" id="swatchRow"></div>
-              <div class="media-actions">
-                <button id="exportPaletteButton" type="button">Export Palette</button>
-                <button id="importPaletteButton" type="button">Import</button>
-              </div>
-              <input id="paletteInput" type="file" accept="application/json,.json" />
-            </div>
-          </section>
-
-          <section class="pane-section">
+          <section class="pane-section effects-section">
             <div class="section-head">
               <h2>Effects Stack</h2>
-              <button class="icon-button" id="addEffectButton" type="button" title="Add effect" aria-label="Add effect">
-                <span class="pixel-icon-slot" data-pixel-icon="Plus" aria-hidden="true"></span>
+              <button class="icon-button" id="randomizeEffectsButton" type="button" title="Randomize effects stack" aria-label="Randomize effects stack">
+                <span class="pixel-icon-slot" data-pixel-icon="Dice" aria-hidden="true"></span>
               </button>
             </div>
             <div class="field-group">
               <label class="field-label" for="effectSelect">Effect type</label>
-              <select id="effectSelect" aria-label="Effect to add"></select>
+              <select id="effectSelect" class="menu-list effect-type-list" size="7" aria-label="Effect to add"></select>
             </div>
             <ol class="effects-stack" id="effectsStack"></ol>
           </section>
 
-          <section class="pane-section">
-            <div class="section-head">
-              <h2>Export</h2>
-              <span id="exportStatus" class="export-status" data-state="ready" aria-live="polite">ready</span>
-            </div>
-            <div class="file-size-module" aria-live="polite">
-              <div class="file-size-head">
-                <div class="file-size-icon" aria-hidden="true">
-                  <span></span>
-                  <span></span>
-                  <span></span>
-                </div>
-                <div>
-                  <span class="field-label">File Size</span>
-                  <strong id="exportFileName">procedural.png</strong>
-                </div>
-              </div>
-              <div class="file-size-body">
-                <div class="file-meter" id="fileSizeMeter" style="--file-percent: 0%">
-                  <span id="exportPercent">--</span>
-                </div>
-                <dl class="file-size-list">
-                  <div>
-                    <dt>Original</dt>
-                    <dd id="originalSize">measuring</dd>
-                  </div>
-                  <div>
-                    <dt>Dithered</dt>
-                    <dd id="ditheredSize">measuring</dd>
-                  </div>
-                  <div class="file-size-delta">
-                    <dt id="exportDeltaLabel">Saved</dt>
-                    <dd id="savedSize">--</dd>
-                  </div>
-                  <div>
-                    <dt>Dimensions</dt>
-                    <dd id="exportDimensions">1024×640</dd>
-                  </div>
-                  <div>
-                    <dt>Megapixels</dt>
-                    <dd id="exportMegapixels">0.7 MP</dd>
-                  </div>
-                  <div>
-                    <dt>Format</dt>
-                    <dd id="exportFormat">PNG → PNG</dd>
-                  </div>
-                </dl>
-              </div>
-            </div>
-            <button id="downloadGifButton" class="export-gif-button" type="button">Download GIF</button>
-            <div class="export-grid">
-              <button id="downloadPngButton" type="button">Download PNG</button>
-              <button id="downloadJpgButton" type="button">Download JPG</button>
-              <button id="downloadSvgButton" type="button">Download SVG</button>
-              <button id="recordWebmButton" type="button">Record WebM</button>
-            </div>
-            <a id="lastExportLink" class="export-fallback-link" href="#" download hidden>Download latest export</a>
-          </section>
         </aside>
       </main>
 
       <footer class="site-footer" id="siteFooter">
         <div class="site-footer-inner">
           <div class="footer-brand" aria-label="Dither Wizard">
-            <strong>Dither Wizard</strong>
-            <span>Local browser dither studio</span>
+            <strong>Dither Wizard<sup class="footer-trademark" aria-label="trademark">&trade;</sup><time class="footer-year" datetime="2026" data-current-year>2026</time></strong>
+            <a class="footer-credit" href="https://coreykoberna.com/" target="_blank" rel="noreferrer"><span>Built by Corey Koberna</span></a>
           </div>
-          <nav class="footer-section" aria-labelledby="footer-links-title">
-            <h2 id="footer-links-title">Links</h2>
+          <nav class="footer-section" aria-label="Footer navigation">
             <ul class="footer-link-list">
-              <li><a class="footer-link" href="index.html">Home</a></li>
-              <li><a class="footer-link" href="design-system.html">Wizardry</a></li>
-              <li><a class="footer-link" href="contact.html">Contact</a></li>
-              <li><a class="footer-link" href="https://github.com/coreykoberna/26_Dither" target="_blank" rel="noreferrer">GitHub Repo</a></li>
+              <li><a class="footer-link" href="index.html"><span>Home</span></a></li>
+              <li><a class="footer-link" href="design-system.html"><span>Wizardry</span></a></li>
+              <li><a class="footer-link" href="contact.html"><span>Contact</span></a></li>
             </ul>
           </nav>
         </div>
       </footer>
     </div>
 
-    <aside class="context-dev-panel" id="contextDevPanel" aria-label="Temporary context switcher" data-temp-dev-overlay>
-      <div class="context-dev-head">
-        <span>Context Lab</span>
-        <button id="contextPanelToggle" type="button" aria-expanded="true">Hide</button>
-      </div>
-      <div class="dev-panel-body">
-        <div class="dev-panel-group">
-          <span class="dev-panel-label">Drop texture</span>
-          <div class="logo-options" id="dropTextureOptions" role="group" aria-label="Pixel rain texture options">
-            <button class="logo-option is-active" type="button" data-drop-texture-option="rain-vortex-fine" aria-pressed="true"><span>01</span><span>Fine Inflow</span></button>
-            <button class="logo-option" type="button" data-drop-texture-option="rain-vortex-soft" aria-pressed="false"><span>02</span><span>Soft Well</span></button>
-            <button class="logo-option" type="button" data-drop-texture-option="rain-vortex-wide" aria-pressed="false"><span>03</span><span>Wide Pull</span></button>
-            <button class="logo-option" type="button" data-drop-texture-option="rain-vortex-spiral" aria-pressed="false"><span>04</span><span>Spiral Sink</span></button>
-            <button class="logo-option" type="button" data-drop-texture-option="rain-vortex-cross" aria-pressed="false"><span>05</span><span>Cross Intake</span></button>
-            <button class="logo-option" type="button" data-drop-texture-option="rain-vortex-cyan" aria-pressed="false"><span>06</span><span>Cyan Thread</span></button>
-            <button class="logo-option" type="button" data-drop-texture-option="rain-vortex-amber" aria-pressed="false"><span>07</span><span>Amber Signal</span></button>
-            <button class="logo-option" type="button" data-drop-texture-option="rain-vortex-static" aria-pressed="false"><span>08</span><span>Static Well</span></button>
-            <button class="logo-option" type="button" data-drop-texture-option="rain-vortex-deep" aria-pressed="false"><span>09</span><span>Deep Funnel</span></button>
-            <button class="logo-option" type="button" data-drop-texture-option="rain-vortex-phosphor" aria-pressed="false"><span>10</span><span>Phosphor Mesh</span></button>
-          </div>
-        </div>
-      </div>
-    </aside>
-
     <video id="videoElement" playsinline muted aria-hidden="true"></video>
     <canvas id="workCanvas" aria-hidden="true"></canvas>
     <canvas id="pipelineCanvas" aria-hidden="true"></canvas>
-    <script src="assets/sprites/dither-wizard-vector-data.js?v=20260505-elemental-spell-rows"></script>
-    <script src="site-header.js?v=20260504-figma-logotype-canonical"></script>
-    <script src="assets/sprites/dither-wizard-vector.js?v=20260505-elemental-spell-rows-2"></script>
+    <script src="assets/sprites/dither-wizard-vector-data.js?v=20260509-fluid-wizard-motion"></script>
+    <script src="site-header.js?v=20260509-logotype-tool-match"></script>
+    <script src="assets/sprites/dither-wizard-vector.js?v=20260509-fluid-wizard-motion"></script>
     <script src="assets/vendor/pixelarticons/pixelarticons-data.js?v=20260504-pixelarticons-install"></script>
-    <script src="system.js"></script>
-    <script src="app.js?v=20260505-gif-export"></script>
+    <script src="system.js?v=20260509-sprite-inspector"></script>
+    <script src="app.js?v=20260509-source-view-theme"></script>
     <script src="footer.js"></script>
   </body>
 </html>

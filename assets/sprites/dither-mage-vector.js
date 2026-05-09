@@ -1,11 +1,16 @@
 (function () {
-  const data = window.DITHER_WIZARD_VECTOR_DATA;
+  const data = window.DITHER_MAGE_VECTOR_DATA;
   if (!data) return;
 
   const SVG_NS = "http://www.w3.org/2000/svg";
   const reducedMotionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
   const width = data.logicalSize.width;
   const height = data.logicalSize.height;
+  const motionScale = Math.max(1, width / 48);
+  const upperBodyY = Math.round(height * 0.57);
+  const lowerBodyY = Math.round(height * 0.68);
+  const footPlantY = Math.round(height * 0.82);
+  const hemY = Math.round(height * 0.78);
   const transparent = data.transparent;
   const tokenByChar = new Map(data.palette.map((token) => [token.char, token.id]));
   const basePixelCache = new Map();
@@ -62,10 +67,10 @@
   }
 
   function spellOrigin(direction) {
-    if (direction === "up") return { x: 24, y: 31 };
-    if (direction === "right") return { x: 27, y: 27 };
-    if (direction === "left") return { x: 20, y: 27 };
-    return { x: 31, y: 30 };
+    if (direction === "up") return { x: Math.round(width * 0.5), y: Math.round(height * 0.43) };
+    if (direction === "right") return { x: Math.round(width * 0.62), y: Math.round(height * 0.42) };
+    if (direction === "left") return { x: Math.round(width * 0.38), y: Math.round(height * 0.42) };
+    return { x: Math.round(width * 0.56), y: Math.round(height * 0.45) };
   }
 
   function castPhase(phase) {
@@ -85,12 +90,12 @@
   function walkOffset(x, y, token, spec) {
     const phase = spec.phase % 8;
     const center = width / 2;
-    const lower = y >= 38;
-    const hem = y >= 45;
+    const lower = y >= lowerBodyY;
+    const hem = y >= hemY;
     const side = x < center ? -1 : 1;
     const bob = [0, -1, -1, 0, 0, 1, 1, 0][phase];
     let dx = 0;
-    let dy = y < 47 ? bob : 0;
+    let dy = y < footPlantY ? bob : 0;
 
     if (lower) {
       const stride = [1, 1, 0, -1, -1, 0, 0, 1][phase];
@@ -107,7 +112,7 @@
       dx += [0, -side, -side, 0, 0, side, side, 0][phase] || 0;
     }
 
-    if (isStaffToken(token) && y > 15) {
+    if (isStaffToken(token) && y > Math.round(height * 0.27)) {
       dy -= bob;
     }
 
@@ -120,14 +125,14 @@
     let dx = 0;
     let dy = 0;
 
-    if (y < 32) dy += lift;
+    if (y < upperBodyY) dy += lift;
     if (isMagicToken(token) && spec.phase >= 2) dy -= 1;
-    if (spec.kind === "cast-burst" && x < width / 2 && y < 34) dx -= spec.phase > 2 ? 1 : 0;
+    if (spec.kind === "cast-burst" && x < width / 2 && y < upperBodyY) dx -= spec.phase > 2 ? 1 : 0;
     if (spec.kind === "elemental-cast") {
       const vector = directionVector(spec.direction);
-      const upperBody = y < 38;
-      const lowerBody = y >= 38 && y < 49;
-      const footPlant = y >= 49;
+      const upperBody = y < lowerBodyY;
+      const lowerBody = y >= lowerBodyY && y < footPlantY;
+      const footPlant = y >= footPlantY;
       const lean = phase.thrust;
 
       if (upperBody) {
@@ -140,7 +145,7 @@
         dy += phase.stage === 4 ? -1 : 0;
       }
 
-      if (isStaffToken(token) && y < 32) {
+      if (isStaffToken(token) && y < upperBodyY) {
         dx += vector.x * (phase.release ? 2 : -1);
         dy += vector.y * (phase.release ? 2 : 0);
       }
@@ -155,7 +160,7 @@
 
   function pixelOffset(pixel, spec) {
     if (spec.kind === "idle") {
-      return { dx: 0, dy: spec.phase === 1 && pixel.y < 43 ? -1 : 0 };
+      return { dx: 0, dy: spec.phase === 1 && pixel.y < footPlantY ? -1 : 0 };
     }
 
     if (spec.kind === "walk") {
@@ -284,13 +289,13 @@
 
   function spellTarget(origin, vector, phase, maxTravel = 18) {
     const stage = castPhase(phase);
-    return orientedPoint(origin, vector, Math.min(maxTravel, spellTravelByPhase[stage]));
+    return orientedPoint(origin, vector, Math.min(maxTravel * motionScale, spellTravelByPhase[stage] * motionScale));
   }
 
   function spellRadius(phase, form, scale = 1) {
     const stage = castPhase(phase);
     const base = spellRadiusByPhase[stage] + Math.floor(form / 3);
-    return Math.max(2, Math.floor(base * scale));
+    return Math.max(2, Math.floor(base * scale * motionScale));
   }
 
   function addSpellCharge(pixels, origin, tokens, phase) {
@@ -643,7 +648,7 @@
   }
 
   function rectMarkup(x, y, token, size = 1) {
-    return `<rect class="wizard-pixel wizard-px-${token}" x="${x}" y="${y}" width="${size}" height="${size}"></rect>`;
+    return `<rect class="mage-pixel mage-px-${token}" x="${x}" y="${y}" width="${size}" height="${size}"></rect>`;
   }
 
   function frameMarkup(spec) {
@@ -669,9 +674,9 @@
   }
 
   function renderFrame(svg, spec) {
-    if (!spec || svg.__ditherWizardFrame === spec) return;
+    if (!spec || svg.__ditherMageFrame === spec) return;
     svg.innerHTML = frameMarkup(spec);
-    svg.__ditherWizardFrame = spec;
+    svg.__ditherMageFrame = spec;
   }
 
   function runAnimationFrame(now) {
@@ -699,16 +704,16 @@
     animationRequest = 0;
   }
 
-  class DitherWizardVector {
+  class DitherMageVector {
     constructor(root) {
       this.root = root;
       this.svg = document.createElementNS(SVG_NS, "svg");
-      this.svg.classList.add("wizard-vector");
+      this.svg.classList.add("mage-vector");
       this.svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
       this.svg.setAttribute("aria-hidden", "true");
       this.root.appendChild(this.svg);
 
-      this.state = root.dataset.wizardState || "header";
+      this.state = root.dataset.mageState || "header";
       this.frame = 0;
       this.lastFrameAt = 0;
       this.playlistIndex = 0;
@@ -717,7 +722,7 @@
       this.facing = "south";
       this.once = null;
       this.isVisible = true;
-      this.root.__ditherWizardVector = this;
+      this.root.__ditherMageVector = this;
 
       this.bindInteractions();
       this.observeBusyState();
@@ -726,8 +731,8 @@
     }
 
     bindInteractions() {
-      const hoverTrigger = this.root.closest("[data-wizard-hover-cast]") || (this.state === "header" ? this.root : null);
-      const focusTrigger = this.root.closest(".brand-lockup") || (this.state === "header" ? this.root : null);
+      const hoverTrigger = this.root.closest("[data-mage-hover-cast]") || (this.state === "header" ? this.root : null);
+      const focusTrigger = this.root.closest("[data-mage-hover-cast]") || (this.state === "header" ? this.root : null);
       const hoverEvent = window.PointerEvent ? "pointerenter" : "mouseenter";
 
       if (hoverTrigger) {
@@ -850,7 +855,7 @@
       ? new IntersectionObserver(
           (entries) => {
             for (const entry of entries) {
-              const instance = entry.target.__ditherWizardVector;
+              const instance = entry.target.__ditherMageVector;
               if (!instance) continue;
               instance.isVisible = entry.isIntersecting;
               if (entry.isIntersecting) {
@@ -864,8 +869,8 @@
         )
       : null;
 
-  document.querySelectorAll("[data-wizard-vector]").forEach((root) => {
-    instances.push(new DitherWizardVector(root));
+  document.querySelectorAll("[data-mage-vector]").forEach((root) => {
+    instances.push(new DitherMageVector(root));
   });
 
   reducedMotionQuery.addEventListener("change", () => {
@@ -882,7 +887,7 @@
 
   startAnimationLoop();
 
-  window.DitherWizardSprite = {
+  window.DitherMageSprite = {
     states: Object.keys(data.animations),
     instances,
     setState(state) {
@@ -892,7 +897,7 @@
       instances.forEach((instance) => instance.playOnce(state));
     },
     setRootState(root, state) {
-      root?.__ditherWizardVector?.setState(state);
+      root?.__ditherMageVector?.setState(state);
     },
   };
 })();

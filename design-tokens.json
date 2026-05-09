@@ -58,6 +58,7 @@
       "productPrefix": "--green, --bg, --panel, --line, --text, --muted"
     },
     "seedBehavior": {
+      "defaultLoad": "default sample defers raw source color and activates the rendered output seed after the first process pass",
       "upload": "source image seeds roles",
       "edit": "rendered output canvas becomes active seed",
       "newMedia": "new media resets edit seed",
@@ -72,7 +73,9 @@
     "expressionRules": {
       "primaryVoice": "GT Standard Mono remains the default product, display, UI, label, command, and data face.",
       "extendedCaps": "Use widened all-caps Mono only for rare display specimens, brand proof, pane section labels, and major operational readouts.",
-      "readingFallback": "Switch to GT Standard only for long-form copy around 45-72 characters per line."
+      "readingFallback": "Switch to GT Standard only for long-form copy around 45-72 characters per line.",
+      "liveDitherText": "Home workbench headings, command labels, and telemetry readouts may carry a readable masked pixel overlay driven by active palette colors, selected algorithm type, adjustment density, and effects strength.",
+      "logotypeToolMatchedCutout": "The outlined Dither Wizard logotype samples assets/video/dither-magic.mp4 into a 229 x 54 canvas, runs it through the active algorithm, adjustments, palette, and effects stack, and clips that processed source through the full lockup as one continuous texture."
     },
     "roles": {
       "displayLarge": { "size": "120px", "lineHeight": "124px", "family": "GT Standard Mono", "tracking": "0.015em", "case": "uppercase", "usage": "system title" },
@@ -111,8 +114,16 @@
       "feedback": "Hover, focus, and pressed states respond immediately and resolve within roughly 80-150ms.",
       "signature": "Longer motion is reserved for local scan, lock, compile, and cast feedback.",
       "navigation": "The design-system documentation rail uses Bare Index as production: dechromed rule index, single-select active containment, and transform/opacity Trace Fold motion.",
+      "heroSizzle": "The design-system hero sizzle is a full-width automatic slideshow with the Wizardly Design System title embedded as the fixed lead object inside an open quiet field. The title field is an exclusion zone for readable labels, plotted paths, component panels, and state strips. Background texture is tertiary, midground structure carries sparse grids and token/type/state maps, and each phase reveals one real design-system or product primitive: foundations, components, commerce/account surfaces, workbench controls, or governance checks.",
       "performance": "Animated preview may pace heavy frames so controls and navigation remain responsive.",
       "accessibility": "Reduced motion disables nonessential loops and scan sweeps."
+    },
+    "sizzleSections": {
+      "foundations": ["color roles", "type roles", "state matrix", "motion tokens"],
+      "componentCatalog": ["button states", "text inputs", "data table", "documentation rail"],
+      "accountCommerce": ["sign-in form", "account settings", "store product card", "billing recovery"],
+      "ditherWorkbench": ["dropzone", "preview canvas", "timeline transport", "export meter"],
+      "systemGovernance": ["source files", "access gates", "qa gates", "handoff"]
     }
   },
   "states": {
@@ -125,13 +136,25 @@
     }
   },
   "components": {
+    "records": {
+      "requiredFields": ["visual specimen", "states", "variants or modes", "tokens", "accessibility", "Dither Wizard use"],
+      "disclosure": ["family tabs", "single open record", "deep-linked subsection records"],
+      "dataTableVariants": ["invoice ledger", "session list", "plan comparison", "entitlement cards", "team seats", "payment methods", "activity log", "order history", "usage meters", "refund queue"]
+    },
     "forms": {
       "fieldHeight": "34px",
       "denseMenuRow": "30px",
       "labelRole": "labelSmall",
       "valueRole": "bodySmall",
       "focusTreatment": "primary border plus soft primary halo",
-      "requiredSpecimens": ["search input", "single select", "dense menu", "selected option", "group label"]
+      "requiredSpecimens": ["search input", "single select", "dense menu", "selected option", "group label", "email login", "password field", "payment method field", "billing address"]
+    },
+    "commerce": {
+      "families": ["auth", "account", "store", "billing"],
+      "pageKits": ["login and signup", "account management", "store and cart", "checkout and billing", "payment recovery"],
+      "requiredSpecimens": ["sign-in form", "sign-up form", "password field", "one-time code field", "validation summary", "account menu", "settings section", "settings row", "danger zone", "activity log", "subscription settings", "product listing", "product card", "price row", "plan selector", "cart drawer", "checkout stepper", "checkout shell", "payment provider frame", "payment method form", "tax and VAT fields", "invoice list", "billing ledger table", "payment failure recovery"],
+      "requiredStates": ["empty", "loading", "saving", "success", "warning", "error", "locked", "owned", "expired", "past due"],
+      "guardrails": ["no placeholder-only labels", "prices and totals render as text", "payment errors include next action", "locked entitlements keep context visible", "security-sensitive actions require confirmation copy"]
     }
   },
   "icons": {
@@ -156,6 +179,10 @@
     "edit": ["preview", "inspector", "dynamic theme", "preset dirty", "undo"],
     "animate": ["timeline", "frame count", "speed", "recording", "reduced motion"],
     "batch": ["queued", "processing", "complete", "failed", "selected"],
-    "export": ["format", "dimensions", "file size", "saved bytes", "over-budget", "complete"]
+    "export": ["format", "dimensions", "file size", "saved bytes", "over-budget", "complete"],
+    "auth": ["sign in", "sign up", "verify", "reset password", "session expired"],
+    "account": ["profile", "security", "subscription", "team seats", "entitlements"],
+    "store": ["browse", "product detail", "cart", "checkout", "purchase confirmation"],
+    "billing": ["payment method", "billing address", "invoice", "receipt", "payment failure"]
   }
 }
