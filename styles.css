@@ -975,7 +975,7 @@ main.workbench input[type="range"]::-moz-range-thumb {
   mask-image: var(--texture-mask);
   transform: var(--texture-drift-from);
   transform-origin: center;
-  will-change: background-position, transform, opacity;
+  will-change: transform, opacity;
   animation: matrixTextureDrift var(--texture-duration) linear infinite;
 }
 
@@ -3989,6 +3989,8 @@ body.bug-report-open .matrix-field {
 .pane-section {
   padding: 10px 12px;
   border-bottom: 1px solid var(--line-dim);
+  content-visibility: auto;
+  contain-intrinsic-size: auto 150px;
 }
 
 .section-head,
@@ -4426,6 +4428,7 @@ body[data-drop-texture="rain-vortex-phosphor"] .drop-zone {
   padding: 4px;
   border: 1px solid var(--line);
   border-radius: var(--radius);
+  contain: layout paint style;
   background:
     linear-gradient(180deg, color-mix(in oklch, white, transparent 97%), transparent 45%),
     var(--field-bg);
@@ -4504,6 +4507,7 @@ body[data-drop-texture="rain-vortex-phosphor"] .drop-zone {
   display: grid;
   gap: 0;
   margin-bottom: 8px;
+  contain: layout paint style;
 }
 
 .batch-empty,
@@ -4633,6 +4637,7 @@ body[data-drop-texture="rain-vortex-phosphor"] .drop-zone {
   position: relative;
   min-height: 0;
   overflow: hidden;
+  contain: layout paint style;
   border: 1px solid var(--line);
   border-radius: var(--radius);
   background: var(--canvas-bg);
@@ -4739,6 +4744,7 @@ body[data-drop-texture="rain-vortex-phosphor"] .drop-zone {
 .timeline {
   border-top: 1px solid var(--line-dim);
   border-radius: 0;
+  contain: layout paint style;
   background: transparent;
   padding: 8px 0 0;
 }
@@ -4970,6 +4976,7 @@ main.workbench {
   --palette-scroll-thumb-top: 5px;
   position: relative;
   z-index: 2;
+  contain: layout paint style;
 }
 
 .palette-picker::before,
@@ -5127,6 +5134,7 @@ main.workbench {
   padding: 0;
   margin: 7px 0 0;
   border-top: 1px solid var(--line-dim);
+  contain: layout paint style;
   list-style: none;
 }
 
@@ -5197,6 +5205,7 @@ main.workbench {
   margin-bottom: 8px;
   padding: 9px 0;
   overflow: hidden;
+  contain: layout paint style;
   border-top: 1px solid var(--line-dim);
   border-bottom: 1px solid var(--line-dim);
   border-radius: 0;

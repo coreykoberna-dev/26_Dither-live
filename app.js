@@ -24,6 +24,9 @@ const ANIMATED_EXPORT_METRIC_INTERVAL = 2200;
 const ANIMATED_RENDER_MIN_INTERVAL = 66;
 const ANIMATED_RENDER_MAX_INTERVAL = 210;
 const ANIMATED_PREVIEW_MAX_SIDE = 700;
+const PLAYBACK_UI_SYNC_INTERVAL = 100;
+const LOGOTYPE_RENDER_INTERVAL = 1000 / 12;
+const STARTUP_RANDOM_SOURCE_MAX_BYTES = 2600000;
 const WEBM_EXPORT_FPS = 30;
 const WEBM_EXPORT_MAX_SECONDS = 8;
 const WEBM_EXPORT_MIN_BITRATE = 12000000;
@@ -648,6 +651,7 @@ const state = {
   isRecording: false,
   isExporting: false,
   lastFrameAt: performance.now(),
+  lastPlaybackUiSyncAt: 0,
   lastRenderCost: 0,
   nextAnimatedRenderAt: 0,
   fpsFrames: 0,
@@ -762,6 +766,7 @@ let exportMetricsTimer = 0;
 let exportStatusTimer = 0;
 let errorDiffusionBuffer = new Float32Array(0);
 let logotypeRaf = 0;
+let lastLogotypeRenderAt = 0;
 let logotypeSurfaces = [];
 const unavailableRandomSourceIds = new Set();
 const luminanceSortedPaletteCache = new WeakMap();
@@ -2755,9 +2760,12 @@ function renderLogotypeSurfaces() {
   }
 }
 
-function tickLogotypeSurfaces() {
+function tickLogotypeSurfaces(now = performance.now()) {
   logotypeRaf = 0;
-  renderLogotypeSurfaces();
+  if (document.visibilityState !== "hidden" && now - lastLogotypeRenderAt >= LOGOTYPE_RENDER_INTERVAL) {
+    lastLogotypeRenderAt = now;
+    renderLogotypeSurfaces();
+  }
   logotypeRaf = requestAnimationFrame(tickLogotypeSurfaces);
 }
 
@@ -2776,7 +2784,7 @@ function initLogotypeSurfaces() {
     })
     .filter(Boolean);
 
-  if (logotypeSurfaces.length && !logotypeRaf) {
+  if (logotypeSurfaces.length && !logotypeRaf && !prefersReducedMotion()) {
     logotypeRaf = requestAnimationFrame(tickLogotypeSurfaces);
   }
 }
@@ -2934,13 +2942,23 @@ function tick(now) {
     if (state.time > state.duration) state.time = els.loopToggle.checked ? state.time % state.duration : state.duration;
   }
 
-  syncTimeline();
-  if (sourceHasNativeMotion() || state.animateStill) {
-    if (state.dirty || now >= state.nextAnimatedRenderAt) {
+  const shouldRenderMotionFrame = sourceHasNativeMotion() || state.animateStill;
+  const shouldSyncTimeline = now - state.lastPlaybackUiSyncAt >= PLAYBACK_UI_SYNC_INTERVAL;
+  if (shouldRenderMotionFrame) {
+    const shouldRender = state.dirty || now >= state.nextAnimatedRenderAt;
+    if (shouldRender) {
+      syncTimeline();
+      state.lastPlaybackUiSyncAt = now;
       const elapsed = renderNow();
       const interval = clamp(elapsed * 1.35, ANIMATED_RENDER_MIN_INTERVAL, ANIMATED_RENDER_MAX_INTERVAL);
       state.nextAnimatedRenderAt = now + interval;
+    } else if (shouldSyncTimeline) {
+      syncTimeline();
+      state.lastPlaybackUiSyncAt = now;
     }
+  } else if (shouldSyncTimeline) {
+    syncTimeline();
+    state.lastPlaybackUiSyncAt = now;
   }
   playbackRaf = requestAnimationFrame(tick);
 }
@@ -2957,6 +2975,7 @@ function setPlaying(playing) {
   state.playing = playing;
   setAppPixelIconSlot(els.playIcon, playing ? "Pause" : "Play");
   state.lastFrameAt = performance.now();
+  state.lastPlaybackUiSyncAt = 0;
   state.nextAnimatedRenderAt = 0;
   if (playing && renderRaf) {
     cancelAnimationFrame(renderRaf);
@@ -3045,6 +3064,7 @@ function syncDitherTextElement(element) {
     delete element.dataset.ditherText;
     return;
   }
+  if (element.dataset.ditherText === text && element.classList.contains("dither-texture")) return;
   element.classList.add("dither-texture");
   element.dataset.ditherText = text;
 }
@@ -3705,12 +3725,14 @@ async function loadDefaultSample() {
   }
 }
 
-function getRandomSourceLibrary() {
+function getRandomSourceLibrary(options = {}) {
+  const maxBytes = Number(options.maxBytes || 0);
   return Array.isArray(window.DITHER_RANDOM_SOURCE_LIBRARY)
     ? window.DITHER_RANDOM_SOURCE_LIBRARY.filter((asset) => (
       asset?.src &&
       asset?.filename &&
-      !unavailableRandomSourceIds.has(randomSourceKey(asset))
+      !unavailableRandomSourceIds.has(randomSourceKey(asset)) &&
+      (!maxBytes || !Number.isFinite(asset.bytes) || asset.bytes <= maxBytes)
     ))
     : [];
 }
@@ -3719,8 +3741,8 @@ function randomSourceKey(asset) {
   return asset?.id || asset?.filename || asset?.src || "";
 }
 
-function pickRandomSourceAsset(excludedIds = new Set()) {
-  const library = getRandomSourceLibrary().filter((asset) => !excludedIds.has(randomSourceKey(asset)));
+function pickRandomSourceAsset(excludedIds = new Set(), options = {}) {
+  const library = getRandomSourceLibrary(options).filter((asset) => !excludedIds.has(randomSourceKey(asset)));
   if (!library.length) return null;
   let lastSourceId = "";
   try {
@@ -3796,9 +3818,10 @@ async function loadRandomSourceAsset(asset, options = {}) {
 
 async function loadRandomLibrarySource(options = {}) {
   const tried = new Set();
-  const maxAttempts = getRandomSourceLibrary().length;
+  const libraryOptions = options.startupMaxBytes ? { maxBytes: options.startupMaxBytes } : {};
+  const maxAttempts = getRandomSourceLibrary(libraryOptions).length;
   for (let attempt = 0; attempt < maxAttempts; attempt++) {
-    const asset = pickRandomSourceAsset(tried);
+    const asset = pickRandomSourceAsset(tried, libraryOptions);
     if (!asset) return false;
     tried.add(randomSourceKey(asset));
     const loaded = await loadRandomSourceAsset(asset, options);
@@ -3808,7 +3831,11 @@ async function loadRandomLibrarySource(options = {}) {
 }
 
 async function loadStartupSource() {
-  const loaded = await loadRandomLibrarySource({ deferSourceTheme: true, seedFromOutput: true });
+  const loaded = await loadRandomLibrarySource({
+    deferSourceTheme: true,
+    seedFromOutput: true,
+    startupMaxBytes: STARTUP_RANDOM_SOURCE_MAX_BYTES,
+  });
   if (!loaded) await loadDefaultSample();
   applyRandomSourceClarityLook({ startup: true });
 }
@@ -3850,6 +3877,7 @@ async function loadFile(file, options = {}) {
 function loadImage(url, file, options = {}) {
   return new Promise((resolve, reject) => {
     const image = new Image();
+    image.decoding = "async";
     image.onload = () => {
       clearAnimatedImageSource();
       const dims = fitDimensions(image.naturalWidth, image.naturalHeight);

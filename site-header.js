@@ -2,6 +2,7 @@
   const LOGOTYPE_TEXTURE_SRC = "assets/video/dither-magic.mp4";
   const LOGOTYPE_TEXTURE_WIDTH = 229;
   const LOGOTYPE_TEXTURE_HEIGHT = 54;
+  const LOGOTYPE_RENDER_INTERVAL = 1000 / 12;
   const LOGOTYPE_SELECTOR = ".brand-logotype-art";
   const STORAGE = {
     user: "ditherWizardUser",
@@ -50,6 +51,7 @@
   const glowCtx = glowCanvas.getContext("2d", { willReadFrequently: true });
   let logotypeSurfaces = [];
   let logotypeRaf = 0;
+  let lastLogotypeRenderAt = 0;
   let cursorThemeRefresh = 0;
   let cursorThemeSignature = "";
 
@@ -470,7 +472,10 @@
   }
 
   function tickLogotypes(time) {
-    renderLogotypes(time);
+    if (document.visibilityState !== "hidden" && time - lastLogotypeRenderAt >= LOGOTYPE_RENDER_INTERVAL) {
+      lastLogotypeRenderAt = time;
+      renderLogotypes(time);
+    }
     logotypeRaf = requestAnimationFrame(tickLogotypes);
   }
 
@@ -488,7 +493,13 @@
       })
       .filter(Boolean);
 
-    if (logotypeSurfaces.length && !logotypeRaf) logotypeRaf = requestAnimationFrame(tickLogotypes);
+    if (
+      logotypeSurfaces.length &&
+      !logotypeRaf &&
+      !window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches
+    ) {
+      logotypeRaf = requestAnimationFrame(tickLogotypes);
+    }
   }
 
   window.DitherSharedLogotype = {
@@ -511,5 +522,5 @@
   renderSiteHeader();
   recordLocalTraffic();
   initDynamicCursor();
-  initSharedLogotypes();
+  if (currentPage() !== "home") initSharedLogotypes();
 })();
