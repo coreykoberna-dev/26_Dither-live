@@ -25,7 +25,7 @@ const DYNAMIC_COLOR_TONES = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 95, 99, 100]
 const DYNAMIC_ROLE_TONES = [4, 6, 12, 15, 17, 22, 24, 87, 92, 94, 96, 98];
 const ALL_DYNAMIC_COLOR_TONES = [...new Set([...DYNAMIC_COLOR_TONES, ...DYNAMIC_ROLE_TONES])].sort((a, b) => a - b);
 const DYNAMIC_COLOR_SEEDS = [
-  { id: "phosphor", name: "Phosphor", hue: 148, saturation: 0.78, color: "oklch(78% 0.21 148)" },
+  { id: "phosphor", name: "Phosphor", hue: 148, saturation: 0.78, color: "oklch(78% 0.21 148)", scheme: "monochrome" },
   { id: "viridian", name: "Viridian", hue: 168, saturation: 0.62, color: "oklch(72% 0.14 168)" },
   { id: "cyan", name: "Cyan Scan", hue: 205, saturation: 0.72, color: "oklch(78% 0.14 205)" },
   { id: "blueprint", name: "Blueprint", hue: 238, saturation: 0.68, color: "oklch(67% 0.16 238)" },
@@ -75,18 +75,18 @@ const DYNAMIC_ROLE_SPECS = [
   ["info", "on-info", "Info", "Signal diagnostics and codec metadata"],
 ];
 const SITE_TOKEN_MAP = [
-  ["--md-sys-color-primary", "--m3-primary", "--green", "Active controls, focus, pixel icons"],
-  ["--md-sys-color-primary-container", "--m3-primary-container", "--segment-active-bg", "Selected algorithm and mode fills"],
-  ["--md-sys-color-surface", "--m3-surface", "--bg", "Body and editor base"],
-  ["--md-sys-color-surface-container", "--m3-surface-container", "--panel", "Pane material"],
-  ["--md-sys-color-surface-container-high", "--m3-surface-container-high", "--panel-2", "Toolbar and elevated tools"],
-  ["--md-sys-color-on-surface", "--m3-on-surface", "--text", "Primary text and labels"],
-  ["--md-sys-color-on-surface-variant", "--m3-on-surface-variant", "--muted", "Secondary text and meters"],
-  ["--md-sys-color-outline-variant", "--m3-outline-variant", "--line-dim", "Hairlines and quiet separators"],
-  ["--md-sys-color-error", "--m3-error", "--red", "Recoverable errors"],
-  ["extension:info", "--m3-info", "--cyan", "FPS, signal, codec info"],
-  ["extension:warning", "--m3-warning", "--amber", "Recording and pending states"],
-  ["extension:tertiary", "--m3-tertiary", "--magenta", "Palette and noise channel"],
+  ["role:primary", "runtime:primary", "--green", "Active controls, focus, pixel icons"],
+  ["role:primary-container", "runtime:primary-container", "--segment-active-bg", "Selected algorithm and mode fills"],
+  ["role:surface", "runtime:surface", "--bg", "Body and editor base"],
+  ["role:surface-container", "runtime:surface-container", "--panel", "Pane surface"],
+  ["role:surface-container-high", "runtime:surface-container-high", "--panel-2", "Toolbar and elevated tools"],
+  ["role:on-surface", "runtime:on-surface", "--text", "Primary text and labels"],
+  ["role:on-surface-variant", "runtime:on-surface-variant", "--muted", "Secondary text and meters"],
+  ["role:outline-variant", "runtime:outline-variant", "--line-dim", "Hairlines and quiet separators"],
+  ["role:error", "runtime:error", "--red", "Recoverable errors"],
+  ["role:info", "runtime:info", "--cyan", "FPS, signal, codec info"],
+  ["role:warning", "runtime:warning", "--amber", "Recording and pending states"],
+  ["role:tertiary", "runtime:tertiary", "--magenta", "Palette and noise channel"],
 ];
 
 let activeDynamicSeed = DYNAMIC_COLOR_SEEDS[0];
@@ -157,7 +157,7 @@ const PIXEL_ICONS = [
   { category: "Workflow", name: "Export", tags: "render output", rects: [[6, 4, 12, 2], [6, 6, 2, 14], [16, 6, 2, 14], [8, 18, 8, 2], [11, 7, 2, 8], [8, 12, 2, 2], [10, 14, 4, 2], [14, 12, 2, 2]] },
   { category: "Theme", name: "Seed", tags: "dynamic color", rects: [[10, 4, 4, 4], [8, 8, 8, 2], [6, 10, 12, 2], [8, 12, 8, 2], [10, 14, 4, 4], [11, 18, 2, 2]] },
   { category: "Theme", name: "Contrast", tags: "accessible tone", rects: [[4, 4, 16, 2], [4, 6, 2, 12], [18, 6, 2, 12], [4, 18, 16, 2], [6, 8, 5, 8], [13, 8, 5, 8]] },
-  { category: "Theme", name: "Roles", tags: "material tokens", rects: [[4, 5, 4, 14], [10, 5, 4, 14], [16, 5, 4, 14], [5, 6, 2, 4], [11, 10, 2, 4], [17, 14, 2, 4]] },
+  { category: "Theme", name: "Roles", tags: "role tokens", rects: [[4, 5, 4, 14], [10, 5, 4, 14], [16, 5, 4, 14], [5, 6, 2, 4], [11, 10, 2, 4], [17, 14, 2, 4]] },
   { category: "Access", name: "Keyboard", tags: "shortcut focus", rects: [[4, 6, 16, 2], [4, 8, 2, 10], [18, 8, 2, 10], [4, 18, 16, 2], [7, 10, 2, 2], [11, 10, 2, 2], [15, 10, 2, 2], [7, 14, 10, 2]] },
   { category: "Access", name: "Focus Ring", tags: "keyboard visible", rects: [[5, 5, 14, 2], [5, 17, 14, 2], [5, 7, 2, 10], [17, 7, 2, 10], [9, 9, 6, 6]] },
   { category: "Access", name: "Reduced Motion", tags: "motion safe", rects: [[5, 5, 14, 2], [5, 17, 14, 2], [5, 7, 2, 10], [17, 7, 2, 10], [8, 8, 2, 2], [10, 10, 4, 4], [14, 14, 2, 2], [8, 14, 2, 2], [14, 8, 2, 2]] },
@@ -779,7 +779,7 @@ function materialBenchmarkForm(icon, symbol) {
   if (icon.category === "Dither") return "adapted product metaphor";
   if (icon.category === "Text Formatting") return "typographic control";
   if (icon.category === "Weather") return "weather glyph";
-  return "Material system symbol";
+  return "platform system symbol";
 }
 
 function materialBenchmarkStatus(icon, symbol) {
@@ -795,7 +795,7 @@ function materialBenchmarkForIcon(icon) {
     symbol,
     status,
     form: materialBenchmarkForm(icon, symbol),
-    criteria: "match Material metaphor, keyline balance, counter placement, and stroke weight before adding pixel texture",
+    criteria: "match platform metaphor, keyline balance, counter placement, and stroke weight before adding pixel texture",
   };
 }
 
@@ -2048,6 +2048,12 @@ function normalizeDynamicHue(hue) {
   return ((hue % 360) + 360) % 360;
 }
 
+function dynamicSeedScheme(seed) {
+  if (!seed || typeof seed !== "object") return null;
+  if (seed.scheme === "monochrome" || seed.monochrome === true) return "monochrome";
+  return null;
+}
+
 function dynamicOklch(lightness, chroma, hue, alpha = 1) {
   const l = clampDynamic(lightness, 0, 100).toFixed(1);
   const c = Math.max(0, chroma).toFixed(3);
@@ -2067,13 +2073,21 @@ function toneChroma(baseChroma, tone) {
 }
 
 function createTonalPalettes(seed) {
-  const baseChroma = clampDynamic(0.08 + seed.saturation * 0.17, 0.1, 0.23);
-  const neutralChroma = clampDynamic(0.012 + seed.saturation * 0.03, 0.012, 0.048);
-  const variantChroma = clampDynamic(0.034 + seed.saturation * 0.058, 0.034, 0.09);
+  const monochrome = dynamicSeedScheme(seed) === "monochrome";
+  const baseChroma = monochrome
+    ? clampDynamic(0.045 + seed.saturation * 0.13, 0.035, 0.18)
+    : clampDynamic(0.08 + seed.saturation * 0.17, 0.1, 0.23);
+  const neutralChroma = monochrome
+    ? clampDynamic(0.008 + seed.saturation * 0.018, 0.01, 0.034)
+    : clampDynamic(0.012 + seed.saturation * 0.03, 0.012, 0.048);
+  const variantChroma = monochrome
+    ? clampDynamic(0.018 + seed.saturation * 0.035, 0.022, 0.064)
+    : clampDynamic(0.034 + seed.saturation * 0.058, 0.034, 0.09);
   const palettes = {};
 
   TONAL_PALETTE_DEFS.forEach(([name, hueShift, chromaRatio]) => {
-    const hue = name === "error" ? 28 : normalizeDynamicHue(seed.hue + hueShift);
+    const familyHueShift = monochrome && name !== "error" ? 0 : hueShift;
+    const hue = name === "error" ? 28 : normalizeDynamicHue(seed.hue + familyHueShift);
     const familyChroma = name === "neutral"
       ? neutralChroma
       : name === "neutral-variant"
@@ -2192,6 +2206,7 @@ function normalizeRuntimeSeed(seed, fallback = DYNAMIC_COLOR_SEEDS[0]) {
   const hue = Number(seed.hue);
   const saturation = Number(seed.saturation);
   if (!Number.isFinite(hue) || !Number.isFinite(saturation)) return fallback;
+  const scheme = dynamicSeedScheme(seed);
   const rgb = Array.isArray(seed.rgb)
     ? seed.rgb.slice(0, 3).map((value) => clampDynamic(Math.round(Number(value) || 0), 0, 255))
     : null;
@@ -2202,6 +2217,7 @@ function normalizeRuntimeSeed(seed, fallback = DYNAMIC_COLOR_SEEDS[0]) {
     saturation: clampDynamic(saturation, 0, 1),
     ...(rgb ? { rgb } : {}),
     ...(typeof seed.color === "string" ? { color: seed.color } : {}),
+    ...(scheme ? { scheme, monochrome: scheme === "monochrome" } : {}),
   };
 }
 
@@ -2450,7 +2466,7 @@ function applyDynamicContactPageTheme(seed, mode) {
   page.dataset.navigationSeed = nextSeed.id;
   if (shell) shell.dataset.navigationSeed = nextSeed.id;
   recordNavigationColorSeed(nextSeed, { page: "contact" });
-  document.querySelectorAll("[data-wizard-vector]").forEach((sprite) => {
+  document.querySelectorAll("[data-wizard-vector], [data-mage-vector]").forEach((sprite) => {
     sprite.dataset.systemSeed = nextSeed.id;
   });
 }
@@ -2574,9 +2590,10 @@ function applyDynamicSystemPageTheme(seed, palettes, roles, mode) {
   writeMaterialVariables(targets, pageRoles, variables);
   targets.forEach((target) => {
     target.dataset.systemSeed = nextSeed.id;
+    target.dataset.systemScheme = dynamicSeedScheme(nextSeed) || "dynamic";
   });
   recordNavigationColorSeed(nextSeed, { page: "wizardry" });
-  document.querySelectorAll("[data-wizard-vector]").forEach((sprite) => {
+  document.querySelectorAll("[data-wizard-vector], [data-mage-vector]").forEach((sprite) => {
     sprite.dataset.systemSeed = nextSeed.id;
   });
 }
@@ -2597,7 +2614,7 @@ function renderSeedControls(seed) {
     const label = document.createElement("span");
     label.textContent = item.name;
     const meta = document.createElement("small");
-    meta.textContent = `${Math.round(item.hue)}°`;
+    meta.textContent = dynamicSeedScheme(item) === "monochrome" ? "mono" : `${Math.round(item.hue)}°`;
     button.append(label, meta);
     button.addEventListener("click", () => renderDynamicColorLab(item.id));
     controls.appendChild(button);
@@ -2642,7 +2659,7 @@ function renderDynamicRoleBoard(roles) {
     card.style.setProperty("--role-fg", roles[foregroundRole] || roles["on-surface"]);
     const role = document.createElement("span");
     role.className = "token-name";
-    role.textContent = `--md-sys-color-${backgroundRole}`;
+    role.textContent = `role:${backgroundRole}`;
     const strong = document.createElement("strong");
     strong.textContent = title;
     const text = document.createElement("p");
@@ -2657,18 +2674,18 @@ function renderSiteTokenMap() {
   if (!map) return;
   map.innerHTML = "";
 
-  SITE_TOKEN_MAP.forEach(([material, runtime, product, use]) => {
+  SITE_TOKEN_MAP.forEach(([systemRole, runtime, product, use]) => {
     const item = document.createElement("article");
     item.className = "token-map-item";
     const title = document.createElement("strong");
     title.textContent = product;
-    const materialCode = document.createElement("code");
-    materialCode.textContent = material;
+    const systemRoleCode = document.createElement("code");
+    systemRoleCode.textContent = systemRole;
     const runtimeCode = document.createElement("code");
     runtimeCode.textContent = runtime;
     const text = document.createElement("p");
     text.textContent = use;
-    item.append(materialCode, runtimeCode, title, text);
+    item.append(systemRoleCode, runtimeCode, title, text);
     map.appendChild(item);
   });
 }
@@ -3058,8 +3075,7 @@ function setSpellExpressionLevel(level) {
     const base = preview.dataset.spellExpressionBase;
     if (!base) return;
     const state = `${base}-l${next}`;
-    preview.dataset.wizardState = state;
-    window.DitherWizardSprite?.setRootState?.(preview, state);
+    setSpritePreviewState(preview, state);
   });
 
   lab.querySelectorAll("[data-spell-expression-name]").forEach((label) => {
@@ -3072,6 +3088,21 @@ function setSpellExpressionLevel(level) {
   } catch {
     return;
   }
+}
+
+function setSpritePreviewState(preview, state) {
+  if (!preview) return;
+  if (preview.hasAttribute("data-mage-vector")) {
+    preview.dataset.mageState = state;
+    window.DitherMageSprite?.setRootState?.(preview, state);
+    return;
+  }
+  preview.dataset.wizardState = state;
+  window.DitherWizardSprite?.setRootState?.(preview, state);
+}
+
+function spritePreviewData() {
+  return window.DITHER_MAGE_VECTOR_DATA || window.DITHER_WIZARD_VECTOR_DATA;
 }
 
 function initSpellExpressionLab() {
@@ -3119,7 +3150,7 @@ function wizardInspectorTitle(inspector) {
 }
 
 function wizardInspectorReadout(state) {
-  const data = window.DITHER_WIZARD_VECTOR_DATA;
+  const data = spritePreviewData();
   if (state === "header") return "header sequence / shared clock";
   const animation = data?.animations?.[state];
   if (!animation) return `${state} / unavailable`;
@@ -3158,8 +3189,7 @@ function renderWizardInspector(inspector) {
   const preview = inspector.querySelector("[data-wizard-inspector-preview]");
   const state = wizardInspectorState(inspector);
   if (preview) {
-    preview.dataset.wizardState = state;
-    window.DitherWizardSprite?.setRootState?.(preview, state);
+    setSpritePreviewState(preview, state);
   }
 
   const title = inspector.querySelector("[data-wizard-inspector-title]");
@@ -3462,7 +3492,7 @@ function renderIconGridGuide() {
   const equation = document.createElement("code");
   equation.textContent = ACTIVE_ICON_SOURCE?.packageName === "pixelarticons"
     ? "pixelarticons@1.8.1 SVG -> 24x24 currentColor glyph -> 5s monitor fill -> next icon"
-    : "Material 24dp keylines -> hand-snapped semantic glyph -> 48-cell pixel texture -> currentColor rects";
+    : "24dp keylines -> hand-snapped semantic glyph -> 48-cell pixel texture -> currentColor rects";
   diagram.appendChild(equation);
   initIconHeroRotation(heroStage, heroScreen, heroIcons.length ? heroIcons : [sample]);
 
@@ -3487,11 +3517,11 @@ function renderIconGridGuide() {
   const title = document.createElement("h3");
   title.textContent = ACTIVE_ICON_SOURCE?.packageName === "pixelarticons"
     ? "Installed Pixelarticons source"
-    : "Material benchmark, precision pixel finish";
+    : "Platform benchmark, precision pixel finish";
   const text = document.createElement("p");
   text.textContent = ACTIVE_ICON_SOURCE?.packageName === "pixelarticons"
     ? "The design system now renders the real installed Pixelarticons SVGs instead of approximating them with generated geometry. Each icon is a handmade 24x24 currentColor glyph from the MIT npm package, preserving the precise pixel language directly."
-    : "The reset keeps Material 3 geometry as the semantic benchmark, but the foundation glyphs are now hand-snapped before rasterization. Circles, boxes, arrows, counters, interior marks, and diagonals are placed explicitly on the 24dp canvas, then sampled into a 48-cell pixel texture so details stay readable without losing the pixel edge.";
+    : "The reset keeps platform geometry as the semantic benchmark, but the foundation glyphs are now hand-snapped before rasterization. Circles, boxes, arrows, counters, interior marks, and diagonals are placed explicitly on the 24dp canvas, then sampled into a 48-cell pixel texture so details stay readable without losing the pixel edge.";
   copy.append(label, title, text, math);
 
   const strip = document.createElement("div");

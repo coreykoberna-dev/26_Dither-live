@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex,nofollow" />
+    <title>Admin | Dither Wizard</title>
+    <link rel="stylesheet" href="styles.css?v=20260510-auth-flow" />
+  </head>
+  <body class="account-body admin-body" data-bg-texture="matrix-micro" data-logo-variant="figma-lockup">
+    <div class="matrix-field" aria-hidden="true"></div>
+    <div class="system-shell account-shell admin-shell">
+      <main class="system-page account-page admin-page" aria-labelledby="admin-title">
+        <div class="system-inner account-inner admin-inner">
+          <section class="system-hero account-hero admin-hero">
+            <div class="account-hero-copy">
+              <p class="system-kicker">private / disabled</p>
+              <h1 class="system-title" id="admin-title">Admin Disabled</h1>
+              <p class="account-lede">The public static build does not include client-side admin access. Operations require a private backend.</p>
+            </div>
+            <dl class="account-signal-strip" aria-label="Admin access state">
+              <div>
+                <dt>Access</dt>
+                <dd id="adminHeroAccess">Disabled</dd>
+              </div>
+              <div>
+                <dt>Plans</dt>
+                <dd id="adminHeroPlans">0</dd>
+              </div>
+              <div>
+                <dt>GA4</dt>
+                <dd id="adminHeroGa4">Local</dd>
+              </div>
+            </dl>
+          </section>
+
+          <section class="account-module admin-module secret-admin-module" aria-labelledby="adminDashboardTitle">
+            <div class="section-head">
+              <h2 id="adminDashboardTitle">Admin Dashboard</h2>
+              <span class="state-chip" id="adminStateChip">Locked</span>
+            </div>
+
+            <div class="inline-alert admin-user-block" id="adminUserBlock" role="status" hidden>
+              User account session detected. Sign out of the user account before opening admin operations.
+              <a class="account-inline-link" href="contact.html">Contact</a>
+            </div>
+
+            <div class="admin-grid">
+              <form class="auth-form-panel admin-login-panel" id="adminLoginForm">
+                <div class="specimen-head">
+                  <h3>Admin access</h3>
+                  <p>Admin access is disabled in production until server-side authentication exists.</p>
+                </div>
+                <label class="field-group">
+                  <span class="field-label">Username</span>
+                  <input class="text-input" id="adminUsername" type="text" autocomplete="username" required />
+                </label>
+                <label class="field-group">
+                  <span class="field-label">Password</span>
+                  <input class="text-input" id="adminPassword" type="password" autocomplete="current-password" required />
+                </label>
+                <button type="submit" disabled>
+                  <span class="pixel-icon-slot" data-pixel-icon="Shield" aria-hidden="true"></span>
+                  <span>Backend Required</span>
+                </button>
+                <div class="inline-alert" id="adminStatus" role="status">Admin operations are disabled in the public static build.</div>
+              </form>
+
+              <div class="admin-dashboard is-locked" id="adminDashboard" aria-live="polite">
+                <div class="admin-metric-grid">
+                  <article>
+                    <span class="token-name">users</span>
+                    <strong id="adminTotalUsers">0</strong>
+                    <p>Local account records</p>
+                  </article>
+                  <article>
+                    <span class="token-name">subscriptions</span>
+                    <strong id="adminActiveSubs">0</strong>
+                    <p>Active yearly plans</p>
+                  </article>
+                  <article>
+                    <span class="token-name">page views</span>
+                    <strong id="adminPageViews">0</strong>
+                    <p>Local traffic log</p>
+                  </article>
+                  <article>
+                    <span class="token-name">sessions</span>
+                    <strong id="adminSessions">0</strong>
+                    <p>Local visitor sessions</p>
+                  </article>
+                  <article>
+                    <span class="token-name">exports</span>
+                    <strong id="adminExports">0</strong>
+                    <p>Browser export meter</p>
+                  </article>
+                  <article>
+                    <span class="token-name">gate hits</span>
+                    <strong id="adminGateHits">0</strong>
+                    <p>Fifth-export prompts</p>
+                  </article>
+                  <article>
+                    <span class="token-name">ga4</span>
+                    <strong id="adminGaSessions">--</strong>
+                    <p>Analytics placeholder</p>
+                  </article>
+                </div>
+                <div class="admin-ledger-table" role="table" aria-label="Subscription ledger">
+                  <div role="row">
+                    <span role="columnheader">User</span>
+                    <span role="columnheader">Plan</span>
+                    <span role="columnheader">Status</span>
+                    <span role="columnheader">Method</span>
+                  </div>
+                  <div id="adminLedgerRows"></div>
+                </div>
+                <div class="admin-insight-grid" aria-label="Analytics overview">
+                  <section class="admin-insight-panel">
+                    <div class="specimen-head">
+                      <h3>Traffic</h3>
+                      <p>Local page views captured by the shared navigation shell.</p>
+                    </div>
+                    <div class="admin-ledger-table admin-traffic-table" role="table" aria-label="Traffic by page">
+                      <div role="row">
+                        <span role="columnheader">Page</span>
+                        <span role="columnheader">Views</span>
+                      </div>
+                      <div id="adminTrafficRows"></div>
+                    </div>
+                  </section>
+                  <section class="admin-insight-panel">
+                    <div class="specimen-head">
+                      <h3>Recent Events</h3>
+                      <p>Authentication, subscription, and page-view events from this browser.</p>
+                    </div>
+                    <div class="admin-event-stream" id="adminEventStream" aria-label="Recent analytics events"></div>
+                  </section>
+                </div>
+                <div class="admin-action-row">
+                  <button type="button" id="adminRestorePlan">Restore Active</button>
+                  <button type="button" id="adminMarkPastDue">Mark Past Due</button>
+                  <button type="button" id="adminSetLimit">Set Limit</button>
+                  <button type="button" id="adminResetExports">Reset Exports</button>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+      </main>
+    </div>
+
+    <script src="assets/vendor/pixelarticons/pixelarticons-data.js?v=20260504-pixelarticons-install"></script>
+    <script src="system.js?v=20260510-account-commerce"></script>
+    <script src="admin.js?v=20260510-auth-flow"></script>
+  </body>
+</html>

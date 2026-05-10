@@ -4,8 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Wizardly Design System</title>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=block" />
-    <link rel="stylesheet" href="styles.css?v=20260509-sizzle-slideshow-components" />
+    <link rel="stylesheet" href="styles.css?v=20260510-main-mage" />
   </head>
   <body class="system-doc-body" data-logo-variant="figma-lockup" data-system-monitor="ghost-stars">
     <div class="matrix-field" aria-hidden="true"></div>
@@ -51,12 +50,12 @@
               <section class="system-section" id="color" aria-labelledby="color-title">
                 <p class="system-label">01 / foundation</p>
                 <h2 id="color-title">Color roles</h2>
-                <p>The role names anchor the surface map. Dither Wizard maps them into live cinematic surfaces and lets uploaded or edited artwork seed Material 3-style runtime roles.</p>
+                <p>The role names anchor the surface map. Dither Wizard maps them into live cinematic surfaces and lets uploaded or edited artwork seed runtime color roles.</p>
                 <div class="color-role-overview" aria-label="Color role overview">
                   <article class="color-role-intro">
                     <span class="token-name">role model</span>
                     <h3>Seeded roles, not loose swatches</h3>
-                    <p>The section starts with the live product roles, then shows the generated Material-style implementation below. Baseline neutrals are preserved as ancestry, but the active site color comes from the current primary tonal palette.</p>
+                    <p>The section starts with the live product roles, then shows the generated local implementation below. Baseline neutrals are preserved as ancestry, but the active site color comes from the current primary tonal palette.</p>
                     <div class="color-role-flow" aria-label="Color role flow">
                       <span>seed</span>
                       <span>tones</span>
@@ -133,9 +132,9 @@
                 <div class="dynamic-color-lab" id="dynamicColorLab" aria-label="Dynamic color laboratory">
                   <div class="dynamic-lab-head">
                     <div>
-                      <span class="token-name">material dynamic color / local implementation</span>
+                      <span class="token-name">dynamic color / local implementation</span>
                       <h3>Seed to tonal palettes to site roles</h3>
-                      <p>Material's free model gives the system a repeatable path: derive tonal palettes from a seed, assign tones to semantic roles, expose those roles as CSS custom properties, then map product components to the roles instead of hard-coded colors.</p>
+                      <p>The local role model gives the system a repeatable path: derive tonal palettes from a seed, assign tones to semantic roles, expose those roles as CSS custom properties, then map product components to the roles instead of hard-coded colors.</p>
                     </div>
                     <div class="seed-control-stack">
                       <span class="token-name">local implementation examples</span>
@@ -147,7 +146,7 @@
                       <article><span class="token-name">01 source</span><strong>Image or brand seed</strong><p>Upload source, rendered output, or chosen preset.</p></article>
                       <article><span class="token-name">02 palettes</span><strong>13-tone ladders</strong><p>Primary, secondary, tertiary, error, neutral, neutral variant.</p></article>
                       <article><span class="token-name">03 roles</span><strong>Light and dark schemes</strong><p>Primary, on-primary, containers, surface, outline, inverse.</p></article>
-                      <article><span class="token-name">04 product</span><strong>Dither Wizard tokens</strong><p>Canvas glow, pane material, focus, controls, sprite pixels.</p></article>
+                      <article><span class="token-name">04 product</span><strong>Dither Wizard tokens</strong><p>Canvas glow, pane surface, focus, controls, sprite pixels.</p></article>
                     </div>
                     <div class="dynamic-site-preview" id="dynamicSitePreview" aria-label="Website dynamic color preview">
                       <div class="preview-topbar">
@@ -189,7 +188,7 @@
                   </details>
                   <details class="dynamic-lab-details">
                     <summary>Product token map</summary>
-                    <div class="site-token-map" id="siteTokenMap" aria-label="Material role to Dither token map"></div>
+                    <div class="site-token-map" id="siteTokenMap" aria-label="Runtime role to Dither token map"></div>
                   </details>
                 </div>
               </section>
@@ -360,16 +359,16 @@
                 <section class="brand-subsection" id="brand-pixel-mark" aria-labelledby="brand-pixel-title">
                   <span class="token-name">brand subsection / animated pixel mark</span>
                   <h3 id="brand-pixel-title">Animated pixel mark</h3>
-                  <p>The Dither Wizard mark is not a raster logo and not a smooth-vector mascot. It is an SVG pixel sprite generated from approved directional PNG anchors, rendered as individual rectangle cells, and recolored through the same dynamic roles as the product interface.</p>
+                  <p>The Dither Wizard mage mark is not a raster logo and not a smooth-vector mascot. It is an SVG pixel sprite generated from approved directional mage anchors, rendered as individual rectangle cells, and recolored through the same dynamic roles as the product interface.</p>
 
                   <div class="brand-mark-layout">
                     <article class="brand-character-specimen">
                       <span class="token-name">header sequence</span>
                       <div class="brand-character-stage" aria-hidden="true">
-                        <span class="wizard-vector-sprite" data-wizard-vector data-wizard-state="header" aria-hidden="true"></span>
+                        <span class="mage-vector-sprite" data-mage-vector data-mage-state="header" aria-hidden="true"></span>
                       </div>
                       <strong>Live header mark</strong>
-                      <p>Cycles through right, up, left, and down walk states, then plays orb and burst casts. Hover or focus cycles through elemental summon casts in the wizard's current facing direction.</p>
+                      <p>Cycles through right, up, left, and down walk states, then plays orb and burst casts. Hover or focus cycles through elemental summon casts in the mage's current facing direction.</p>
                     </article>
                     <div class="brand-detail-grid" aria-label="Animated pixel mark contract">
                       <article class="brand-detail-card">
@@ -379,13 +378,13 @@
                       </article>
                       <article class="brand-detail-card">
                         <span class="token-name">logical grid</span>
-                        <strong>48 by 56 cells</strong>
+                        <strong>72 by 84 cells</strong>
                         <p>The encoder crops each anchor, fits it into the logical frame, quantizes the palette, and emits compact character rows.</p>
                       </article>
                       <article class="brand-detail-card">
                         <span class="token-name">renderer</span>
                         <strong>SVG rect pixels</strong>
-                        <p><code>dither-wizard-vector.js</code> converts every nontransparent cell to a <code>rect</code>, applies a <code>wizard-px-*</code> class, and animates by offsetting pixels.</p>
+                        <p><code>dither-mage-vector.js</code> converts every nontransparent cell to a <code>rect</code>, applies a <code>mage-px-*</code> class, and animates by offsetting pixels.</p>
                       </article>
                       <article class="brand-detail-card">
                         <span class="token-name">motion contract</span>
@@ -395,11 +394,11 @@
                     </div>
                   </div>
 
-                  <div class="sprite-inspector" data-wizard-inspector data-wizard-inspector-mode="summon" data-wizard-inspector-element="fire" data-wizard-inspector-direction="south" data-wizard-inspector-level="10" aria-label="Dither Wizard sprite inspector">
+                  <div class="sprite-inspector" data-wizard-inspector data-wizard-inspector-mode="summon" data-wizard-inspector-element="fire" data-wizard-inspector-direction="south" data-wizard-inspector-level="10" aria-label="Dither Wizard mage sprite inspector">
                     <div class="sprite-inspector-stage">
                       <span class="token-name">live sprite inspector</span>
                       <div class="sprite-inspector-frame" aria-hidden="true">
-                        <span class="wizard-vector-sprite" data-wizard-vector data-wizard-inspector-preview data-wizard-state="cast-fire-south-l10" aria-hidden="true"></span>
+                        <span class="mage-vector-sprite" data-mage-vector data-wizard-inspector-preview data-mage-state="cast-fire-south-l10" aria-hidden="true"></span>
                       </div>
                       <strong data-wizard-inspector-title>Fire summon, south</strong>
                       <p data-wizard-inspector-readout>cast-fire-south-l10 / 12fps / 8 frames</p>
@@ -466,7 +465,7 @@
                     <article>
                       <span class="token-name">coverage</span>
                       <strong>One live render, full state access</strong>
-                      <p>The design system no longer mounts the entire sprite wall. The inspector above renders a single wizard and routes every state through the same vector-pixel engine used by the header.</p>
+                      <p>The design system no longer mounts the entire sprite wall. The inspector above renders a single mage and routes every state through the same vector-pixel engine used by the header.</p>
                     </article>
                     <article>
                       <span class="token-name">summon matrix</span>
@@ -477,34 +476,34 @@
 
                   <div class="sprite-build-grid">
                     <article class="sprite-build-step"><span class="token-name">01 anchors</span><strong>Approved PNG identity sources</strong><p>South, north, east, and west anchors are the canonical sources for silhouette, robe palette, staff placement, and direction-specific reads.</p></article>
-                    <article class="sprite-build-step"><span class="token-name">02 encoder</span><strong>Raster to logical pixel rows</strong><p><code>tools/build-wizard-vector-data.py</code> crops each anchor, fits it into a 48 by 56 frame, quantizes colors to the sprite palette, and writes compact rows.</p></article>
-                    <article class="sprite-build-step"><span class="token-name">03 data</span><strong>Tokenized frame source</strong><p><code>assets/sprites/dither-wizard-vector-data.js</code> stores base frames, palette ids, animation names, frame rates, and the header sequence.</p></article>
-                    <article class="sprite-build-step"><span class="token-name">04 renderer</span><strong>SVG rect pixels</strong><p><code>assets/sprites/dither-wizard-vector.js</code> renders cells, offsets walk and cast frames, observes busy state, and respects reduced motion.</p></article>
+                    <article class="sprite-build-step"><span class="token-name">02 encoder</span><strong>Raster to logical pixel rows</strong><p>The mage data source crops each anchor, fits it into a 72 by 84 frame, quantizes colors to the sprite palette, and writes compact rows.</p></article>
+                    <article class="sprite-build-step"><span class="token-name">03 data</span><strong>Tokenized frame source</strong><p><code>assets/sprites/dither-mage-vector-data.js</code> stores base frames, palette ids, animation names, frame rates, and the header sequence.</p></article>
+                    <article class="sprite-build-step"><span class="token-name">04 renderer</span><strong>SVG rect pixels</strong><p><code>assets/sprites/dither-mage-vector.js</code> renders cells, offsets walk and cast frames, observes busy state, and respects reduced motion.</p></article>
                   </div>
 
                   <div class="sprite-token-board" aria-label="Animated pixel mark token mapping">
-                    <article style="--sprite-token-swatch: var(--wizard-px-robe-dark)"><span></span><strong>robe-dark</strong><code>primary + scrim</code></article>
-                    <article style="--sprite-token-swatch: var(--wizard-px-robe-mid)"><span></span><strong>robe-mid</strong><code>primary + secondary</code></article>
-                    <article style="--sprite-token-swatch: var(--wizard-px-gold)"><span></span><strong>gold trim</strong><code>warning role</code></article>
-                    <article style="--sprite-token-swatch: var(--wizard-px-purple)"><span></span><strong>hands / crystal</strong><code>tertiary role</code></article>
-                    <article style="--sprite-token-swatch: var(--wizard-px-spell)"><span></span><strong>spell pixels</strong><code>tertiary role</code></article>
-                    <article style="--sprite-token-swatch: var(--wizard-px-fire)"><span></span><strong>fire pixels</strong><code>error + warning</code></article>
-                    <article style="--sprite-token-swatch: var(--wizard-px-earth)"><span></span><strong>earth pixels</strong><code>primary + warning</code></article>
-                    <article style="--sprite-token-swatch: var(--wizard-px-water)"><span></span><strong>water pixels</strong><code>secondary role</code></article>
-                    <article style="--sprite-token-swatch: var(--wizard-px-electric)"><span></span><strong>electric pixels</strong><code>secondary + warning</code></article>
-                    <article style="--sprite-token-swatch: var(--wizard-px-void)"><span></span><strong>face void</strong><code>surface + scrim</code></article>
+                    <article style="--sprite-token-swatch: var(--mage-px-robe-dark)"><span></span><strong>robe-dark</strong><code>primary + scrim</code></article>
+                    <article style="--sprite-token-swatch: var(--mage-px-robe-mid)"><span></span><strong>robe-mid</strong><code>primary + secondary</code></article>
+                    <article style="--sprite-token-swatch: var(--mage-px-gold)"><span></span><strong>gold trim</strong><code>warning role</code></article>
+                    <article style="--sprite-token-swatch: var(--mage-px-purple)"><span></span><strong>hands / crystal</strong><code>tertiary role</code></article>
+                    <article style="--sprite-token-swatch: var(--mage-px-spell)"><span></span><strong>spell pixels</strong><code>tertiary role</code></article>
+                    <article style="--sprite-token-swatch: var(--mage-px-fire)"><span></span><strong>fire pixels</strong><code>error + warning</code></article>
+                    <article style="--sprite-token-swatch: var(--mage-px-earth)"><span></span><strong>earth pixels</strong><code>primary + warning</code></article>
+                    <article style="--sprite-token-swatch: var(--mage-px-water)"><span></span><strong>water pixels</strong><code>secondary role</code></article>
+                    <article style="--sprite-token-swatch: var(--mage-px-electric)"><span></span><strong>electric pixels</strong><code>secondary + warning</code></article>
+                    <article style="--sprite-token-swatch: var(--mage-px-void)"><span></span><strong>face void</strong><code>surface + scrim</code></article>
                   </div>
 
                   <div class="brand-mapping-grid" aria-label="Animated pixel mark implementation mapping">
-                    <article><span class="token-name">robe ramp</span><p><code>--wizard-px-robe-shadow</code>, <code>--wizard-px-robe-dark</code>, <code>--wizard-px-robe-mid</code>, and <code>--wizard-px-robe-light</code> derive from primary, secondary, and scrim roles.</p></article>
-                    <article><span class="token-name">trim and staff</span><p><code>--wizard-px-gold</code>, <code>--wizard-px-staff-mid</code>, and <code>--wizard-px-staff-gold</code> derive from warning roles so the trim stays readable in light and dark themes.</p></article>
-                    <article><span class="token-name">magic channel</span><p><code>--wizard-px-purple</code>, <code>--wizard-px-spell</code>, and <code>--wizard-px-spell-core</code> derive from tertiary roles and generated effect pixels.</p></article>
+                    <article><span class="token-name">robe ramp</span><p><code>--mage-px-robe-shadow</code>, <code>--mage-px-robe-dark</code>, <code>--mage-px-robe-mid</code>, and <code>--mage-px-robe-light</code> derive from primary, secondary, and scrim roles.</p></article>
+                    <article><span class="token-name">trim and staff</span><p><code>--mage-px-gold</code>, <code>--mage-px-staff-mid</code>, and <code>--mage-px-staff-gold</code> derive from warning roles so the trim stays readable in light and dark themes.</p></article>
+                    <article><span class="token-name">magic channel</span><p><code>--mage-px-purple</code>, <code>--mage-px-spell</code>, and <code>--mage-px-spell-core</code> derive from tertiary roles and generated effect pixels.</p></article>
                     <article><span class="token-name">elemental channel</span><p>The inspector routes <code>fire</code>, <code>earth</code>, <code>water</code>, and <code>electric</code> token ramps through one live vector-pixel preview so each effect stays theme-aware without mounting the full matrix.</p></article>
                     <article><span class="token-name">access</span><p>Reduced motion freezes each sprite at the current state's first frame. The mark remains decorative in the header and specimens so assistive tech reads the product name once.</p></article>
                   </div>
 
                   <div class="system-note">
-                    To change the mark safely: edit or replace an approved directional anchor, rerun the encoder, inspect every state here, then tune only the <code>--wizard-px-*</code> role mappings or animation offsets. Do not redraw the header mark independently from this pipeline.
+                    To change the mark safely: edit or replace an approved directional anchor, rerun the mage data source, inspect every state here, then tune only the <code>--mage-px-*</code> role mappings or animation offsets. Do not redraw the header mark independently from this pipeline.
                   </div>
                 </section>
 
@@ -516,8 +515,8 @@
                   <div class="brand-detail-grid" aria-label="Logo type rules">
                     <article class="brand-detail-card"><span class="token-name">type construction</span><strong>Outlined source</strong><p>The source lockup began as GT Standard Mono in Figma and now ships as outlined vector geometry, preserving the exact row weight and edge profile.</p></article>
                     <article class="brand-detail-card"><span class="token-name">geometry</span><strong>229 x 54 source</strong><p>Both words share the same row width. The lockup uses the Figma outlined geometry directly so the corners and counters stay crisp.</p></article>
-                    <article class="brand-detail-card"><span class="token-name">lockup relationship</span><strong>Mark plus type</strong><p>The Pixel Wizard remains the only mark. The wordmark sits to its right without dividers, icons, subtitles, or secondary labels inside the logo type.</p></article>
-                    <article class="brand-detail-card"><span class="token-name">texture mapping</span><strong>Tool-matched cutout</strong><p>The logotype samples Dither Magic into a tiny canvas, runs it through the active tool algorithm, settings, palette, and effects stack, then clips that processed source through the outlined lockup.</p></article>
+                    <article class="brand-detail-card"><span class="token-name">lockup relationship</span><strong>Mark plus type</strong><p>The mage pixel mark is the only character mark. The wordmark sits to its right without dividers, icons, subtitles, or secondary labels inside the logo type.</p></article>
+                    <article class="brand-detail-card"><span class="token-name">texture mapping</span><strong>Tool-matched cutout</strong><p>The logotype samples Dither Magic into a tiny canvas, mirrors the active tool stack, then renders with logo-only contrast, Bias, Epsilon Glow, and source-tone guards for legibility.</p></article>
                   </div>
 
                   <div class="brand-logotype-grid-study" aria-label="Logo type grid construction">
@@ -654,7 +653,7 @@
                 <div class="motion-board">
                   <article><span class="token-name">sweep</span><strong>attention</strong><p>Used for scanning diagnostics and dynamic-color proof only.</p></article>
                   <article><span class="token-name">scan</span><strong>processing</strong><p>Progress, loading, hover feedback, and export estimation can scan while layout stays fixed.</p></article>
-                  <article><span class="token-name">cast</span><strong>brand reaction</strong><p>The wizard mark reacts on hover, focus, click, and busy state.</p></article>
+                  <article><span class="token-name">cast</span><strong>brand reaction</strong><p>The mage mark reacts on hover, focus, click, and busy state.</p></article>
                 </div>
               </section>
 
@@ -715,14 +714,14 @@
       </footer>
     </div>
 
-    <script src="assets/sprites/dither-wizard-vector-data.js?v=20260509-fluid-wizard-motion"></script>
-    <script src="site-header.js?v=20260509-logotype-tool-match"></script>
-    <script src="assets/sprites/dither-wizard-vector.js?v=20260509-fluid-wizard-motion"></script>
+    <script src="assets/sprites/dither-mage-vector-data.js?v=20260510-main-mage"></script>
+    <script src="site-header.js?v=20260510-contact-nav-order"></script>
+    <script src="assets/sprites/dither-mage-vector.js?v=20260510-main-mage"></script>
     <script src="assets/vendor/pixelarticons/pixelarticons-data.js?v=20260504-pixelarticons-explorer-only"></script>
-    <script src="system.js?v=20260509-sprite-inspector"></script>
-    <script src="design-system-sizzle.js?v=20260509-sizzle-slideshow-components"></script>
-    <script src="design-system-components.js?v=20260509-component-m3-commerce-disclosure"></script>
-    <script src="design-system-nav.js?v=20260509-component-m3-commerce-disclosure"></script>
-    <script src="footer.js?v=20260504-pixelarticons-explorer-only"></script>
+    <script src="system.js?v=20260510-main-mage"></script>
+    <script src="design-system-sizzle.js?v=20260509-sizzle-five-options"></script>
+    <script src="design-system-components.js?v=20260510-component-polish-pass-2"></script>
+    <script src="design-system-nav.js?v=20260510-runtime-role-copy"></script>
+    <script src="footer.js?v=20260510-login-route"></script>
   </body>
 </html>

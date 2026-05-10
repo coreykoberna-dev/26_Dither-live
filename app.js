@@ -11,6 +11,7 @@ const video = document.getElementById("videoElement");
 const $ = (id) => document.getElementById(id);
 const DEFAULT_SAMPLE_URL = "assets/images/dither-wizard-default.png";
 const DEFAULT_SAMPLE_NAME = "dither-wizard-default.png";
+const RANDOM_SOURCE_LAST_KEY = "ditherWizardLastRandomSource";
 const IDLE_THEME_INTERVAL = 110;
 const ANIMATED_THEME_INTERVAL = 520;
 const MOTION_SOURCE_THEME_INTERVAL = 3600;
@@ -36,7 +37,8 @@ const GIF_PALETTE_SAMPLE_PIXELS = 90000;
 const GIF_DISPOSAL_NONE = 0;
 const GIF_SOURCE_DEFAULT_DELAY = 0.1;
 const GIF_SOURCE_MIN_DELAY = 0.02;
-
+const EXPORT_FREE_LIMIT = 5;
+const EXPORT_COUNT_KEY = "ditherWizardExportCount";
 const els = {
   fileInput: $("fileInput"),
   loadButton: $("loadButton"),
@@ -49,7 +51,6 @@ const els = {
   processBatchButton: $("processBatchButton"),
   canvasFrame: $("canvasFrame"),
   algorithmSelect: $("algorithmSelect"),
-  algorithmSearch: $("algorithmSearch"),
   adjustmentControls: $("adjustmentControls"),
   paletteSelect: $("paletteSelect"),
   palettePicker: $("palettePicker"),
@@ -72,6 +73,7 @@ const els = {
   downloadGifButton: $("downloadGifButton"),
   exportIconButton: $("exportIconButton"),
   recordWebmButton: $("recordWebmButton"),
+  recordMp4Button: $("recordMp4Button"),
   lastExportLink: $("lastExportLink"),
   timelineSlider: $("timelineSlider"),
   timeReadout: $("timeReadout"),
@@ -88,6 +90,14 @@ const els = {
   exportPreview: $("exportPreview"),
   exportPreviewFormat: $("exportPreviewFormat"),
   exportPreviewDetails: $("exportPreviewDetails"),
+  exportEntitlement: $("exportEntitlement"),
+  exportEntitlementTitle: $("exportEntitlementTitle"),
+  exportEntitlementMeter: $("exportEntitlementMeter"),
+  exportEntitlementFill: $("exportEntitlementFill"),
+  exportGate: $("exportGate"),
+  exportGateTitle: $("exportGateTitle"),
+  exportGateDetail: $("exportGateDetail"),
+  exportGateDismiss: $("exportGateDismiss"),
   wizardSignalButton: $("wizardSignalButton"),
   exportFileName: $("exportFileName"),
   fileSizeMeter: $("fileSizeMeter"),
@@ -358,6 +368,7 @@ const PALETTES = {
   adaptive: { name: "Adaptive RGB", colors: null },
   phosphor: {
     name: "Phosphor Mono",
+    themeScheme: "monochrome",
     colors: [
       [8, 18, 14],
       [25, 72, 38],
@@ -367,6 +378,7 @@ const PALETTES = {
   },
   vectorBlack: {
     name: "Black Vector",
+    themeScheme: "monochrome",
     colors: [
       [16, 18, 17],
       [229, 236, 220],
@@ -374,6 +386,7 @@ const PALETTES = {
   },
   gameboy: {
     name: "Game Console",
+    themeScheme: "monochrome",
     colors: [
       [15, 56, 15],
       [48, 98, 48],
@@ -443,6 +456,7 @@ const PALETTES = {
   },
   macpaint: {
     name: "MacPaint",
+    themeScheme: "monochrome",
     colors: [
       [20, 22, 21],
       [235, 236, 226],
@@ -450,6 +464,7 @@ const PALETTES = {
   },
   blueprint: {
     name: "Blueprint Cyan",
+    themeScheme: "monochrome",
     colors: [
       [5, 10, 18],
       [17, 55, 96],
@@ -460,6 +475,7 @@ const PALETTES = {
   },
   amberCrt: {
     name: "Amber CRT",
+    themeScheme: "monochrome",
     colors: [
       [17, 12, 5],
       [82, 45, 10],
@@ -480,6 +496,7 @@ const PALETTES = {
   },
   signalRed: {
     name: "Signal Red",
+    themeScheme: "monochrome",
     colors: [
       [12, 8, 9],
       [73, 16, 25],
@@ -500,6 +517,7 @@ const PALETTES = {
   },
   lunarLab: {
     name: "Lunar Lab",
+    themeScheme: "monochrome",
     colors: [
       [20, 22, 24],
       [78, 86, 91],
@@ -544,7 +562,7 @@ const PRESETS = [
     detail: "JJN / cmyk",
     algorithm: "jjn",
     palette: "cmyk",
-    settings: { cell: 1, levels: 5, contrast: 16, brightness: 2, gamma: 0.92, noise: 3, threshold: 132, temporal: 8 },
+    settings: { cell: 2, levels: 5, contrast: 16, brightness: 2, gamma: 0.92, noise: 3, threshold: 132, temporal: 8 },
     effects: [{ id: "epsilon-glow", strength: 12, enabled: true }],
   },
   {
@@ -588,7 +606,7 @@ const PRESETS = [
 ];
 
 const ADJUSTMENTS = [
-  { id: "cell", label: "Cell", min: 1, max: 12, step: 1 },
+  { id: "cell", label: "Cell", min: 2, max: 12, step: 1 },
   { id: "levels", label: "Levels", min: 2, max: 16, step: 1 },
   { id: "threshold", label: "Gate", min: 0, max: 255, step: 1 },
   { id: "contrast", label: "Contrast", min: -100, max: 100, step: 1 },
@@ -671,6 +689,8 @@ const DITHER_TEXT_SELECTOR = [
   ".file-size-head strong",
   ".file-size-list dt",
   ".file-size-list dd",
+  ".export-entitlement strong",
+  ".export-entitlement span",
   ".export-preview span",
   ".export-gif-button",
   ".export-grid button",
@@ -682,6 +702,47 @@ const DITHER_TEXT_SELECTOR = [
 const LOGOTYPE_TEXTURE_WIDTH = 229;
 const LOGOTYPE_TEXTURE_HEIGHT = 54;
 const LOGOTYPE_SURFACE_SELECTOR = ".brand-logotype-art";
+const LOGOTYPE_CONTRAST_CEILING = -21;
+const LOGOTYPE_BIAS_FLOOR = -25;
+const LOGOTYPE_EPSILON_GLOW_FLOOR = 52;
+const CLARITY_SPECIAL_ALGORITHMS = new Set([
+  "cmyk-halftone",
+  "newsprint",
+  "riso-grain",
+  "vector-hatch",
+  "threshold-bloom",
+]);
+const CLARITY_EFFECT_POOL = [
+  { id: "epsilon-glow", weight: 6, min: 16, max: 38 },
+  { id: "scanlines", weight: 5, min: 10, max: 24 },
+  { id: "posterize", weight: 4, min: 8, max: 22 },
+  { id: "noise", weight: 3, min: 4, max: 16 },
+  { id: "chromatic-aberration", weight: 2, min: 6, max: 16 },
+  { id: "cmyk-shift", weight: 2, min: 6, max: 14 },
+];
+const RANDOM_SOURCE_CLARITY_ALGORITHMS = [
+  { id: "atkinson", weight: 9 },
+  { id: "floyd-steinberg", weight: 8 },
+  { id: "sierra-lite", weight: 7 },
+  { id: "burkes", weight: 6 },
+  { id: "bayer-4", weight: 5 },
+  { id: "blue-noise", weight: 5 },
+  { id: "newsprint", weight: 3 },
+  { id: "riso-grain", weight: 2 },
+  { id: "cmyk-halftone", weight: 2 },
+];
+const RANDOM_SOURCE_CLARITY_PALETTES = [
+  { id: "adaptive", weight: 24 },
+  { id: "riso", weight: 4 },
+  { id: "cmyk", weight: 3 },
+  { id: "heat", weight: 3 },
+  { id: "c64", weight: 2 },
+];
+const RANDOM_SOURCE_CLARITY_EFFECTS = [
+  { id: "epsilon-glow", weight: 5, min: 8, max: 16 },
+  { id: "scanlines", weight: 4, min: 6, max: 12 },
+  { id: "posterize", weight: 2, min: 5, max: 10 },
+];
 
 const WIZARD_SIGNAL_PALETTES = [
   ["rgb(7,18,17)", "rgb(33,74,50)", "rgb(190,218,120)", "rgb(240,174,76)", "rgb(236,92,134)"],
@@ -702,6 +763,7 @@ let exportStatusTimer = 0;
 let errorDiffusionBuffer = new Float32Array(0);
 let logotypeRaf = 0;
 let logotypeSurfaces = [];
+const unavailableRandomSourceIds = new Set();
 const luminanceSortedPaletteCache = new WeakMap();
 const themeCanvas = document.createElement("canvas");
 const themeCtx = themeCanvas.getContext("2d", { willReadFrequently: true });
@@ -779,6 +841,63 @@ function rgbToHsl(r, g, b) {
   return { hue: normalizeHue(hue), saturation, lightness };
 }
 
+function themeSeedScheme(seed) {
+  if (!seed || typeof seed !== "object") return null;
+  if (seed.scheme === "monochrome" || seed.monochrome === true) return "monochrome";
+  return null;
+}
+
+function isMonochromaticColorSet(colors) {
+  if (!Array.isArray(colors) || colors.length < 2) return false;
+  const samples = [];
+  let saturationTotal = 0;
+
+  colors.forEach((color) => {
+    if (!Array.isArray(color) || color.length < 3) return;
+    const hsl = rgbToHsl(color[0], color[1], color[2]);
+    saturationTotal += hsl.saturation;
+    if (hsl.saturation <= 0.12 || hsl.lightness <= 0.06 || hsl.lightness >= 0.94) return;
+    const midtoneWeight = 1 - Math.min(0.7, Math.abs(hsl.lightness - 0.52) * 1.25);
+    samples.push({ hue: hsl.hue, weight: Math.max(0.2, hsl.saturation) * midtoneWeight });
+  });
+
+  if (!samples.length) return saturationTotal / colors.length < 0.12;
+  if (samples.length === 1) return true;
+
+  const vector = samples.reduce(
+    (acc, sample) => {
+      const radians = (sample.hue * Math.PI) / 180;
+      acc.x += Math.cos(radians) * sample.weight;
+      acc.y += Math.sin(radians) * sample.weight;
+      return acc;
+    },
+    { x: 0, y: 0 },
+  );
+  const meanHue = normalizeHue((Math.atan2(vector.y, vector.x) * 180) / Math.PI);
+  const maxSpread = Math.max(...samples.map((sample) => hueDistance(sample.hue, meanHue)));
+  return maxSpread <= 24;
+}
+
+function paletteThemeScheme(id = state.palette, colors = getPalettePreviewColors(id)) {
+  if (id === "adaptive") return null;
+  const configured = id !== "custom" ? PALETTES[id]?.themeScheme : null;
+  if (configured === "monochrome") return configured;
+  return isMonochromaticColorSet(colors) ? "monochrome" : null;
+}
+
+function withPaletteThemeMetadata(seed, paletteId = state.palette, colors = getPalettePreviewColors(paletteId), label = "palette") {
+  if (!seed || paletteId === "adaptive") return seed;
+  const paletteName = paletteId === "custom" ? "Custom palette" : PALETTES[paletteId]?.name;
+  if (!paletteName) return seed;
+  const scheme = paletteThemeScheme(paletteId, colors);
+  return {
+    ...seed,
+    id: `home-palette-${paletteId}`,
+    name: `${paletteName} ${label}`,
+    ...(scheme ? { scheme, monochrome: scheme === "monochrome" } : {}),
+  };
+}
+
 function oklch(lightness, chroma, hue, alpha = 1) {
   const l = clamp(lightness, 0, 100).toFixed(1);
   const c = Math.max(0, chroma).toFixed(3);
@@ -845,12 +964,19 @@ function buildMaterialWebAliases(roles) {
 
 function buildMaterialTheme(seed, mode) {
   const hue = normalizeHue(seed.hue);
-  const chroma = clamp(0.08 + seed.saturation * 0.17, 0.1, 0.23);
-  const secondaryHue = normalizeHue(hue + 22);
-  const tertiaryHue = normalizeHue(hue + 64);
-  const neutralHue = normalizeHue(hue + 5);
-  const neutralChroma = clamp(0.01 + seed.saturation * 0.03, 0.012, 0.048);
-  const variantChroma = clamp(0.024 + seed.saturation * 0.058, 0.034, 0.09);
+  const monochrome = themeSeedScheme(seed) === "monochrome";
+  const chroma = monochrome
+    ? clamp(0.045 + seed.saturation * 0.13, 0.035, 0.18)
+    : clamp(0.08 + seed.saturation * 0.17, 0.1, 0.23);
+  const secondaryHue = monochrome ? hue : normalizeHue(hue + 22);
+  const tertiaryHue = monochrome ? hue : normalizeHue(hue + 64);
+  const neutralHue = monochrome ? hue : normalizeHue(hue + 5);
+  const neutralChroma = monochrome
+    ? clamp(0.008 + seed.saturation * 0.018, 0.01, 0.034)
+    : clamp(0.01 + seed.saturation * 0.03, 0.012, 0.048);
+  const variantChroma = monochrome
+    ? clamp(0.018 + seed.saturation * 0.035, 0.022, 0.064)
+    : clamp(0.024 + seed.saturation * 0.058, 0.034, 0.09);
   const lightNeutralChroma = clamp(neutralChroma * 1.35, 0.018, 0.065);
   const lightVariantChroma = clamp(variantChroma * 1.18, 0.044, 0.105);
 
@@ -1118,12 +1244,29 @@ function extractArtworkSeed(canvas) {
   };
 }
 
-function blendSeeds(base, overlay, amount) {
-  return {
+function blendSeeds(base, overlay, amount, options = {}) {
+  const next = {
     hue: mixHue(base.hue, overlay.hue, amount),
     saturation: clamp01(lerp(base.saturation, overlay.saturation, amount)),
     rgb: base.rgb.map((value, index) => Math.round(lerp(value, overlay.rgb[index], amount))),
   };
+  const metadataSource = themeSeedScheme(overlay) ? overlay : options.preserveBaseScheme && themeSeedScheme(base) ? base : null;
+  if (metadataSource) {
+    if (metadataSource.id) next.id = metadataSource.id;
+    if (metadataSource.name) next.name = metadataSource.name;
+    const scheme = themeSeedScheme(metadataSource);
+    if (scheme) {
+      next.scheme = scheme;
+      next.monochrome = scheme === "monochrome";
+    }
+  }
+  return next;
+}
+
+function syncLogotypeSourceTone(seed = state.sourceThemeSeed || state.themeSeed) {
+  if (!seed?.rgb?.length) return;
+  document.documentElement.style.setProperty("--logotype-source-tone", rgbCss(seed.rgb));
+  document.documentElement.style.setProperty("--logotype-source-tone-alpha", "0.15");
 }
 
 function applyThemeSeed(seed, force = false, smoothing = 0.28) {
@@ -1131,17 +1274,21 @@ function applyThemeSeed(seed, force = false, smoothing = 0.28) {
   if (state.themeSeed && !force) {
     nextSeed = blendSeeds(state.themeSeed, seed, smoothing);
   }
+  const currentScheme = themeSeedScheme(state.themeSeed);
+  const nextScheme = themeSeedScheme(nextSeed);
   const shouldApply =
     !state.themeSeed ||
     force ||
+    currentScheme !== nextScheme ||
     hueDistance(state.themeSeed.hue, nextSeed.hue) > 1 ||
     Math.abs(state.themeSeed.saturation - nextSeed.saturation) > 0.012;
   state.themeSeed = nextSeed;
   state.lastThemeAt = performance.now();
+  syncLogotypeSourceTone(state.sourceThemeSeed || nextSeed);
   if (shouldApply) {
     applyDynamicThemeRoles(nextSeed);
     window.DitherColorRuntime?.recordPageSeed(
-      { ...nextSeed, id: "home-artwork", name: "Home artwork" },
+      { ...nextSeed, id: nextSeed.id || "home-artwork", name: nextSeed.name || "Home artwork" },
       { page: "home" },
     );
   }
@@ -1153,11 +1300,14 @@ function updateDynamicThemeFromCanvas(canvas, force = false, options = {}) {
   const lastThemeUpdateAt = options.source ? state.lastSourceThemeAt : options.deferApply ? state.lastEditThemeAt : state.lastThemeAt;
   if (!force && now - lastThemeUpdateAt < minInterval) return;
   if (!options.source && !state.editThemeActive && !options.allowInactive) return;
-  const sampledSeed = extractArtworkSeed(canvas);
+  const sampledSeed = options.source
+    ? extractArtworkSeed(canvas)
+    : withPaletteThemeMetadata(extractArtworkSeed(canvas), state.palette, getPalettePreviewColors(state.palette), "output");
 
   if (options.source) {
     state.sourceThemeSeed = sampledSeed;
     state.sourceViewThemeSeed = sampledSeed;
+    syncLogotypeSourceTone(sampledSeed);
     state.lastSourceThemeAt = now;
     state.lastSourceViewThemeAt = now;
     if (options.resetEdit) {
@@ -1175,7 +1325,9 @@ function updateDynamicThemeFromCanvas(canvas, force = false, options = {}) {
   state.editThemeSeed = sampledSeed;
   state.lastEditThemeAt = now;
   const sourceAnchor = options.sourceAnchor ?? 0.08;
-  const seed = state.sourceThemeSeed ? blendSeeds(sampledSeed, state.sourceThemeSeed, sourceAnchor) : sampledSeed;
+  const seed = state.sourceThemeSeed
+    ? blendSeeds(sampledSeed, state.sourceThemeSeed, sourceAnchor, { preserveBaseScheme: true })
+    : sampledSeed;
   state.ditherViewThemeSeed = seed;
   if (options.deferApply) return;
   applyThemeSeed(seed, force, options.smoothing ?? 0.42);
@@ -1276,7 +1428,7 @@ function clearAnimatedImageSource() {
   state.animatedImage = null;
 }
 
-function paletteThemeSeed(colors = getPalettePreviewColors(state.palette)) {
+function paletteThemeSeed(colors = getPalettePreviewColors(state.palette), paletteId = state.palette) {
   const palette = colors?.length ? colors : ADAPTIVE_PALETTE_PREVIEW;
   let winner = null;
   for (const color of palette) {
@@ -1286,12 +1438,18 @@ function paletteThemeSeed(colors = getPalettePreviewColors(state.palette)) {
     const weight = midtoneWeight * colorWeight;
     if (!winner || weight > winner.weight) winner = { color, hsl, weight };
   }
-  if (!winner || winner.weight < 0.05) return { hue: 148, saturation: 0.42, rgb: [112, 122, 118] };
-  return {
+  if (!winner || winner.weight < 0.05) {
+    return withPaletteThemeMetadata(
+      { hue: 148, saturation: 0.42, rgb: [112, 122, 118] },
+      paletteId,
+      palette,
+    );
+  }
+  return withPaletteThemeMetadata({
     hue: winner.hsl.hue,
     saturation: clamp01(Math.max(winner.hsl.saturation, 0.38)),
     rgb: winner.color,
-  };
+  }, paletteId, palette);
 }
 
 function applyPaletteTheme(force = false, smoothing = 0.2) {
@@ -1307,6 +1465,7 @@ function applyMotionPaletteTheme(force = false, options = {}) {
   if (shouldApply) applyThemeSeed(seed, force, force ? 1 : 0.2);
   state.sourceThemeSeed = seed;
   state.ditherViewThemeSeed = seed;
+  syncLogotypeSourceTone(seed);
   state.pendingSourceThemeReset = false;
   state.lastSourceThemeAt = performance.now();
   return true;
@@ -1329,7 +1488,9 @@ function syncSourceCanvasForTheme() {
 function currentDitherViewThemeSeed() {
   if (state.ditherViewThemeSeed) return state.ditherViewThemeSeed;
   if (sourceHasNativeMotion()) return state.sourceThemeSeed || paletteThemeSeed();
-  if (state.editThemeSeed && state.sourceThemeSeed) return blendSeeds(state.editThemeSeed, state.sourceThemeSeed, 0.08);
+  if (state.editThemeSeed && state.sourceThemeSeed) {
+    return blendSeeds(state.editThemeSeed, state.sourceThemeSeed, 0.08, { preserveBaseScheme: true });
+  }
   return state.editThemeSeed || state.sourceThemeSeed || state.themeSeed || paletteThemeSeed();
 }
 
@@ -1757,11 +1918,67 @@ function setExportButtonsDisabled(disabled) {
     els.downloadSvgButton,
     els.wizardSignalButton,
     els.recordWebmButton,
+    els.recordMp4Button,
     els.recordButton,
     els.exportPaletteButton,
   ].forEach((button) => {
     if (button) button.disabled = disabled;
   });
+}
+
+function readLocalNumber(key) {
+  try {
+    const value = Number(localStorage.getItem(key));
+    return Number.isFinite(value) && value > 0 ? Math.floor(value) : 0;
+  } catch {
+    return 0;
+  }
+}
+
+function writeLocalNumber(key, value) {
+  try {
+    localStorage.setItem(key, String(Math.max(0, Math.floor(value))));
+  } catch {
+    return false;
+  }
+  return true;
+}
+
+function syncExportEntitlement() {
+  if (!els.exportEntitlement) return;
+  const exportCount = readLocalNumber(EXPORT_COUNT_KEY);
+  const used = Math.min(exportCount, EXPORT_FREE_LIMIT);
+  const remaining = Math.max(0, EXPORT_FREE_LIMIT - exportCount);
+  const percent = Math.min(100, (used / EXPORT_FREE_LIMIT) * 100);
+  els.exportEntitlement.dataset.state = "preview";
+  if (els.exportEntitlementTitle) {
+    els.exportEntitlementTitle.textContent = remaining > 0
+      ? `${remaining} preview ${remaining === 1 ? "export" : "exports"} left`
+      : "Preview meter reached";
+  }
+  if (els.exportEntitlementMeter) {
+    els.exportEntitlementMeter.textContent = `${used} / ${EXPORT_FREE_LIMIT}`;
+  }
+  if (els.exportEntitlementFill) els.exportEntitlementFill.style.width = `${percent}%`;
+}
+
+function showExportGate(format = "export") {
+  if (!els.exportGate) return;
+  const label = String(format || "export").toUpperCase();
+  if (els.exportGateTitle) els.exportGateTitle.textContent = `${label} available`;
+  if (els.exportGateDetail) els.exportGateDetail.textContent = "The public static build tracks preview usage locally but does not block exports.";
+  els.exportGate.hidden = false;
+  setExportStatus("preview meter", "warning", 2400);
+  syncExportEntitlement();
+}
+
+function canStartMeteredExport() {
+  return true;
+}
+
+function recordMeteredExport() {
+  writeLocalNumber(EXPORT_COUNT_KEY, readLocalNumber(EXPORT_COUNT_KEY) + 1);
+  syncExportEntitlement();
 }
 
 function setExportResult(blob, format) {
@@ -1903,6 +2120,10 @@ function exportPreviewData(format) {
     webm: {
       label: "WebM Loop",
       details: `${size} / ${WEBM_EXPORT_FPS} fps / ${formatExportDuration(Math.min(duration, WEBM_EXPORT_MAX_SECONDS))} max / high bitrate`,
+    },
+    mp4: {
+      label: "MP4 Loop",
+      details: `${size} / ${WEBM_EXPORT_FPS} fps / ${formatExportDuration(Math.min(duration, WEBM_EXPORT_MAX_SECONDS))} max / browser encoded`,
     },
   };
   return previews[format] || previews.gif;
@@ -2464,6 +2685,44 @@ function pixelateCanvasSource(source, work, workContext, scratch, scratchContext
   workContext.drawImage(scratch, 0, 0, smallW, smallH, 0, 0, work.width, work.height);
 }
 
+function withLogotypeRenderSettings(render) {
+  const currentSettings = state.settings;
+  const currentEffects = state.effects;
+  const contrast = Number(currentSettings.contrast || 0);
+  const brightness = Number(currentSettings.brightness || 0);
+  let hasEpsilonGlow = false;
+
+  state.settings = {
+    ...currentSettings,
+    contrast: Math.min(contrast, LOGOTYPE_CONTRAST_CEILING),
+    brightness: Math.max(brightness, LOGOTYPE_BIAS_FLOOR),
+  };
+
+  state.effects = currentEffects.map((effect) => {
+    if (effect.id !== "epsilon-glow") return effect;
+    hasEpsilonGlow = true;
+    return {
+      ...effect,
+      enabled: true,
+      strength: Math.max(Number(effect.strength || 0), LOGOTYPE_EPSILON_GLOW_FLOOR),
+    };
+  });
+
+  if (!hasEpsilonGlow) {
+    state.effects = [
+      ...state.effects,
+      { id: "epsilon-glow", strength: LOGOTYPE_EPSILON_GLOW_FLOOR, enabled: true },
+    ];
+  }
+
+  try {
+    render();
+  } finally {
+    state.settings = currentSettings;
+    state.effects = currentEffects;
+  }
+}
+
 function processCanvasWithCurrentLook(source, target, time) {
   if (!logotypeWorkCtx || !logotypePipelineCtx) return;
   const targetCtx = target.getContext("2d", { willReadFrequently: true });
@@ -2471,18 +2730,20 @@ function processCanvasWithCurrentLook(source, target, time) {
   const width = target.width || source.width || LOGOTYPE_TEXTURE_WIDTH;
   const height = target.height || source.height || LOGOTYPE_TEXTURE_HEIGHT;
 
-  setCanvasDimensions(logotypeWorkCanvas, width, height);
-  pixelateCanvasSource(source, logotypeWorkCanvas, logotypeWorkCtx, logotypePipelineCanvas, logotypePipelineCtx);
+  withLogotypeRenderSettings(() => {
+    setCanvasDimensions(logotypeWorkCanvas, width, height);
+    pixelateCanvasSource(source, logotypeWorkCanvas, logotypeWorkCtx, logotypePipelineCanvas, logotypePipelineCtx);
 
-  const imageData = logotypeWorkCtx.getImageData(0, 0, width, height);
-  applyBaseAdjustments(imageData.data, imageData.width, imageData.height, time);
-  applyAlgorithm(imageData, time);
-  for (const effect of state.effects) applyDataEffect(imageData, effect, time);
+    const imageData = logotypeWorkCtx.getImageData(0, 0, width, height);
+    applyBaseAdjustments(imageData.data, imageData.width, imageData.height, time);
+    applyAlgorithm(imageData, time);
+    for (const effect of state.effects) applyDataEffect(imageData, effect, time);
 
-  targetCtx.clearRect(0, 0, width, height);
-  targetCtx.putImageData(imageData, 0, 0);
-  setCanvasDimensions(logotypePipelineCanvas, width, height);
-  applyCanvasEffectsToCanvas(target, targetCtx, logotypePipelineCanvas, logotypePipelineCtx, time);
+    targetCtx.clearRect(0, 0, width, height);
+    targetCtx.putImageData(imageData, 0, 0);
+    setCanvasDimensions(logotypePipelineCanvas, width, height);
+    applyCanvasEffectsToCanvas(target, targetCtx, logotypePipelineCanvas, logotypePipelineCtx, time);
+  });
 }
 
 function renderLogotypeSurfaces() {
@@ -2737,24 +2998,15 @@ function setCanvasView(view) {
   applyPreviewViewTheme(view, true);
 }
 
-function populateAlgorithms(filter = "") {
-  const query = filter.trim().toLowerCase();
+function populateAlgorithms() {
   els.algorithmSelect.innerHTML = "";
-  const groups = new Map();
   ALGORITHMS.forEach((algorithm) => {
-    const haystack = `${algorithm.name} ${algorithm.group}`.toLowerCase();
-    if (query && !haystack.includes(query)) return;
-    if (!groups.has(algorithm.group)) {
-      const group = document.createElement("optgroup");
-      group.label = algorithm.group;
-      groups.set(algorithm.group, group);
-      els.algorithmSelect.appendChild(group);
-    }
     const option = document.createElement("option");
+    option.className = "tool-list-row";
     option.value = algorithm.id;
     option.textContent = algorithm.name;
     option.selected = algorithm.id === state.algorithm;
-    groups.get(algorithm.group).appendChild(option);
+    els.algorithmSelect.appendChild(option);
   });
 }
 
@@ -2902,14 +3154,14 @@ function renderPalettePickerOptions() {
   getPaletteOptions().forEach(({ id, name }) => {
     const disabled = !isPaletteOptionAvailable(id);
     const option = document.createElement("button");
-    option.className = "palette-option";
+    option.className = "palette-option tool-list-row";
     option.type = "button";
     option.disabled = disabled;
     option.dataset.paletteOption = id;
     option.setAttribute("role", "option");
     option.setAttribute("aria-disabled", String(disabled));
     const label = document.createElement("span");
-    label.className = "palette-option-name";
+    label.className = "palette-option-name tool-list-label";
     label.textContent = name;
     const preview = document.createElement("span");
     preview.className = "palette-preview";
@@ -2952,16 +3204,22 @@ function selectPalette(id, options = {}) {
   if (!isPaletteOptionAvailable(id)) return;
   state.palette = id;
   syncPaletteSelect(options);
+  const paletteSeed = applyPaletteTheme(true);
   if (state.view === "source") applySourceViewTheme(true);
   else if (sourceHasNativeMotion()) applyMotionPaletteTheme(true);
+  window.DitherColorRuntime?.recordPageSeed(paletteSeed, { page: "home" });
   updateStatus();
   scheduleEditRender();
 }
 
 function randomizePaletteSource() {
-  const options = getPaletteOptions().filter(({ id }) => id !== state.palette && isPaletteOptionAvailable(id));
+  const options = getPaletteOptions().filter(({ id }) => (
+    id !== state.palette &&
+    isPaletteOptionAvailable(id) &&
+    paletteVisibilityWeight(id) > 0
+  ));
   if (!options.length) return;
-  const next = options[Math.floor(Math.random() * options.length)];
+  const next = weightedRandom(options, ({ id }) => paletteVisibilityWeight(id));
   selectPalette(next.id, { reveal: true });
   pulseDiceButton(els.randomizePaletteButton);
 }
@@ -2972,12 +3230,51 @@ function pulseDiceButton(button) {
   window.setTimeout(() => button.classList.remove("is-cycling"), 460);
 }
 
+function randomInt(min, max) {
+  return min + Math.floor(Math.random() * (max - min + 1));
+}
+
+function randomFloat(min, max) {
+  return min + Math.random() * (max - min);
+}
+
+function weightedRandom(items, weightFor) {
+  const total = items.reduce((sum, item) => sum + Math.max(0, weightFor(item) || 0), 0);
+  if (!items.length) return null;
+  if (total <= 0) return items[Math.floor(Math.random() * items.length)];
+  let cursor = Math.random() * total;
+  for (const item of items) {
+    cursor -= Math.max(0, weightFor(item) || 0);
+    if (cursor <= 0) return item;
+  }
+  return items[items.length - 1];
+}
+
+function paletteVisibilityWeight(id) {
+  if (id === "custom") return state.customPalette?.length >= 4 ? 9 : 0;
+  const colors = PALETTES[id]?.colors;
+  if (colors === null) return 10;
+  if (!colors || colors.length < 4) return 0;
+  return Math.min(8, colors.length) + (id === "phosphor" ? 1 : 0);
+}
+
+function algorithmVisibilityWeight(algorithm) {
+  if (!algorithm) return 0;
+  if (algorithm.type === "error") return 9;
+  if (algorithm.type === "ordered") return algorithm.id === "bayer-2" ? 5 : 8;
+  if (CLARITY_SPECIAL_ALGORITHMS.has(algorithm.id)) return 4;
+  return 0;
+}
+
 function randomizeAlgorithm() {
-  const options = ALGORITHMS.filter((algorithm) => algorithm.id !== state.algorithm);
+  const options = ALGORITHMS.filter((algorithm) => (
+    algorithm.id !== state.algorithm &&
+    algorithmVisibilityWeight(algorithm) > 0
+  ));
   if (!options.length) return;
-  const algorithm = options[Math.floor(Math.random() * options.length)];
+  const algorithm = weightedRandom(options, algorithmVisibilityWeight);
   state.algorithm = algorithm.id;
-  populateAlgorithms(els.algorithmSearch.value);
+  populateAlgorithms();
   updateStatus();
   updateDitherTextTexture();
   scheduleEditRender();
@@ -3009,6 +3306,7 @@ function populateEffects() {
   els.effectSelect.innerHTML = "";
   EFFECTS.forEach((effect) => {
     const option = document.createElement("option");
+    option.className = "tool-list-row";
     option.value = effect.id;
     option.textContent = effect.name;
     option.selected = effect.id === state.effects[0]?.id;
@@ -3037,7 +3335,7 @@ function renderEffects() {
   state.effects.forEach((effect, index) => {
     const meta = EFFECTS.find((item) => item.id === effect.id);
     const item = document.createElement("li");
-    item.className = "effect-item";
+    item.className = "effect-item tool-list-row";
 
     const title = document.createElement("label");
     title.className = "effect-title";
@@ -3050,6 +3348,7 @@ function renderEffects() {
       scheduleEditRender();
     });
     const name = document.createElement("span");
+    name.className = "tool-list-label";
     name.textContent = meta?.name || effect.id;
     title.append(enabled, name);
 
@@ -3113,15 +3412,16 @@ function moveEffect(index, delta) {
 }
 
 function randomizeEffectsStack() {
-  const pool = [...EFFECTS];
-  const count = Math.min(pool.length, 1 + Math.floor(Math.random() * 4));
+  const pool = CLARITY_EFFECT_POOL.filter((preset) => EFFECTS.some((effect) => effect.id === preset.id));
+  const count = Math.min(pool.length, Math.random() > 0.78 ? 3 : 1 + Math.floor(Math.random() * 2));
   state.effects = Array.from({ length: count }, () => {
-    const index = Math.floor(Math.random() * pool.length);
-    const [effect] = pool.splice(index, 1);
+    const effect = weightedRandom(pool, (preset) => preset.weight);
+    const index = pool.findIndex((preset) => preset.id === effect.id);
+    if (index >= 0) pool.splice(index, 1);
     return {
       id: effect.id,
-      strength: 12 + Math.floor(Math.random() * 78),
-      enabled: Math.random() > 0.12,
+      strength: randomInt(effect.min, effect.max),
+      enabled: true,
     };
   });
   if (state.effects[0]) els.effectSelect.value = state.effects[0].id;
@@ -3168,11 +3468,13 @@ function renderPresets() {
   els.presetGrid.innerHTML = "";
   PRESETS.forEach((preset) => {
     const button = document.createElement("button");
-    button.className = "preset-button";
+    button.className = "preset-button tool-list-row";
     button.type = "button";
     const name = document.createElement("strong");
+    name.className = "tool-list-label";
     name.textContent = preset.name;
     const detail = document.createElement("span");
+    detail.className = "tool-list-meta";
     detail.textContent = preset.detail;
     button.append(name, detail);
     button.addEventListener("click", () => applyPreset(preset));
@@ -3186,7 +3488,7 @@ function applyPreset(preset) {
   state.palette = preset.palette;
   state.settings = { ...state.settings, ...preset.settings };
   state.effects = preset.effects.map((effect) => ({ ...effect }));
-  populateAlgorithms(els.algorithmSearch.value);
+  populateAlgorithms();
   syncPaletteSelect();
   renderAdjustmentControls();
   renderEffects();
@@ -3403,6 +3705,114 @@ async function loadDefaultSample() {
   }
 }
 
+function getRandomSourceLibrary() {
+  return Array.isArray(window.DITHER_RANDOM_SOURCE_LIBRARY)
+    ? window.DITHER_RANDOM_SOURCE_LIBRARY.filter((asset) => (
+      asset?.src &&
+      asset?.filename &&
+      !unavailableRandomSourceIds.has(randomSourceKey(asset))
+    ))
+    : [];
+}
+
+function randomSourceKey(asset) {
+  return asset?.id || asset?.filename || asset?.src || "";
+}
+
+function pickRandomSourceAsset(excludedIds = new Set()) {
+  const library = getRandomSourceLibrary().filter((asset) => !excludedIds.has(randomSourceKey(asset)));
+  if (!library.length) return null;
+  let lastSourceId = "";
+  try {
+    lastSourceId = localStorage.getItem(RANDOM_SOURCE_LAST_KEY) || "";
+  } catch {
+    lastSourceId = "";
+  }
+  const pool = library.length > 1 ? library.filter((asset) => asset.id !== lastSourceId) : library;
+  const asset = pool[Math.floor(Math.random() * pool.length)] || library[0];
+  try {
+    localStorage.setItem(RANDOM_SOURCE_LAST_KEY, randomSourceKey(asset));
+  } catch {
+    // Local storage can be unavailable in strict browser modes.
+  }
+  return asset;
+}
+
+function clearObjectUrlSource() {
+  if (!objectUrl) return;
+  URL.revokeObjectURL(objectUrl);
+  objectUrl = "";
+}
+
+function prepareRandomSourceLoad(asset, options = {}) {
+  clearObjectUrlSource();
+  state.sourceName = asset.label || asset.filename.replace(/\.[^.]+$/, "");
+  setExportSource({
+    name: asset.filename,
+    bytes: asset.bytes,
+    format: formatFromName(asset.filename, asset.mime),
+  });
+  state.pendingSourceThemeReset = true;
+  state.sourceViewThemeSeed = null;
+  state.ditherViewThemeSeed = null;
+  state.lastSourceViewThemeAt = 0;
+  if (options.seedFromOutput) state.pendingOutputThemeSeed = true;
+}
+
+async function fetchRandomSourceFile(asset) {
+  const response = await fetch(asset.src);
+  if (!response.ok) throw new Error(`Random source request failed: ${response.status}`);
+  const blob = await response.blob();
+  return new File([blob], asset.filename, { type: asset.mime || blob.type || "" });
+}
+
+async function loadRandomSourceAsset(asset, options = {}) {
+  if (!asset) return false;
+  prepareRandomSourceLoad(asset, options);
+  try {
+    if (asset.kind === "video" || asset.mime?.startsWith("video/")) {
+      await loadVideo(asset.src, options);
+    } else if (asset.kind === "gif" || /\.gif$/i.test(asset.filename)) {
+      try {
+        const file = await fetchRandomSourceFile(asset);
+        const loadedAnimatedGif = await loadAnimatedGif(file, options);
+        if (!loadedAnimatedGif) await loadImage(asset.src, file, options);
+      } catch {
+        await loadImage(asset.src, asset, options);
+      }
+    } else {
+      await loadImage(asset.src, asset, options);
+    }
+    if (sourceHasNativeMotion()) setPlaying(!prefersReducedMotion());
+    updateStatus();
+    scheduleRender();
+    return true;
+  } catch (error) {
+    console.warn("Random source load failed.", error);
+    unavailableRandomSourceIds.add(randomSourceKey(asset));
+    return false;
+  }
+}
+
+async function loadRandomLibrarySource(options = {}) {
+  const tried = new Set();
+  const maxAttempts = getRandomSourceLibrary().length;
+  for (let attempt = 0; attempt < maxAttempts; attempt++) {
+    const asset = pickRandomSourceAsset(tried);
+    if (!asset) return false;
+    tried.add(randomSourceKey(asset));
+    const loaded = await loadRandomSourceAsset(asset, options);
+    if (loaded) return true;
+  }
+  return false;
+}
+
+async function loadStartupSource() {
+  const loaded = await loadRandomLibrarySource({ deferSourceTheme: true, seedFromOutput: true });
+  if (!loaded) await loadDefaultSample();
+  applyRandomSourceClarityLook({ startup: true });
+}
+
 async function loadFile(file, options = {}) {
   if (!file) return;
   if (objectUrl) URL.revokeObjectURL(objectUrl);
@@ -3605,6 +4015,7 @@ function extractPalette() {
   state.customPalette = colors.length ? colors : PALETTES.phosphor.colors;
   state.palette = "custom";
   syncPaletteSelect({ reveal: true });
+  applyPaletteTheme(true);
   updateStatus();
   scheduleEditRender();
 }
@@ -3651,6 +4062,7 @@ function importPalette(file) {
         .filter((color) => color.length === 3);
       state.palette = "custom";
       syncPaletteSelect({ reveal: true });
+      applyPaletteTheme(true);
       updateStatus();
       scheduleEditRender();
     } catch {
@@ -3995,6 +4407,7 @@ async function renderFullQualityFrameAt(time) {
 
 async function exportGIF() {
   if (state.isExporting || state.isRecording) return;
+  if (!canStartMeteredExport("GIF")) return;
   const filename = exportFilename("gif", "loop");
   const wasPlaying = state.playing;
   const originalTime = state.time;
@@ -4041,6 +4454,7 @@ async function exportGIF() {
       return;
     }
     const result = await saveBlob(blob, filename, target.handle);
+    recordMeteredExport();
     setExportStatus(result, "saved", 1600);
   } catch (error) {
     console.error(error);
@@ -4061,6 +4475,7 @@ async function downloadCanvas(type) {
   if (state.isExporting || state.isRecording) return;
   const ext = type === "image/jpeg" ? "jpg" : "png";
   const format = type === "image/jpeg" ? "JPG" : "PNG";
+  if (!canStartMeteredExport(format)) return;
   const description = type === "image/jpeg" ? "JPG image" : "PNG image";
   const filename = exportFilename(ext);
   const wasPlaying = state.playing;
@@ -4081,6 +4496,7 @@ async function downloadCanvas(type) {
       return;
     }
     const result = await saveBlob(blob, filename, target.handle);
+    recordMeteredExport();
     setExportStatus(result, "saved", 1600);
   } catch (error) {
     console.error(error);
@@ -4094,6 +4510,7 @@ async function downloadCanvas(type) {
 
 async function exportSVG() {
   if (state.isExporting || state.isRecording) return;
+  if (!canStartMeteredExport("SVG")) return;
   const filename = exportFilename("svg", "vector");
   const wasPlaying = state.playing;
   if (wasPlaying) setPlaying(false);
@@ -4124,6 +4541,7 @@ async function exportSVG() {
       return;
     }
     const result = await saveBlob(blob, filename, target.handle);
+    recordMeteredExport();
     setExportStatus(result, "saved", 1600);
   } catch (error) {
     console.error(error);
@@ -4141,18 +4559,40 @@ function getWebmMimeType() {
   )) || "";
 }
 
-function getWebmBitrate(width, height) {
+function getMp4MimeType() {
+  return [
+    'video/mp4;codecs="avc1.42E01E"',
+    "video/mp4;codecs=avc1.42E01E",
+    "video/mp4;codecs=avc1.640028",
+    "video/mp4;codecs=h264",
+    "video/mp4",
+  ].find((type) => MediaRecorder.isTypeSupported(type)) || "";
+}
+
+function getRecordingMimeType(format) {
+  return format === "mp4" ? getMp4MimeType() : getWebmMimeType();
+}
+
+function getRecordingBitrate(width, height) {
   const estimated = width * height * WEBM_EXPORT_FPS * WEBM_EXPORT_BITS_PER_PIXEL;
   return Math.round(clamp(estimated, WEBM_EXPORT_MIN_BITRATE, WEBM_EXPORT_MAX_BITRATE));
 }
 
-async function recordWebm() {
+async function recordVideoExport(format = "webm") {
+  const extension = format === "mp4" ? "mp4" : "webm";
+  const label = extension.toUpperCase();
   if (state.isRecording || state.isExporting) return;
+  if (!canStartMeteredExport(label)) return;
   if (!outputCanvas.captureStream || !window.MediaRecorder) {
     setExportStatus("unavailable", "error", 2400);
     return;
   }
-  const filename = exportFilename("webm", "loop");
+  const mimeType = getRecordingMimeType(extension);
+  if (extension === "mp4" && !mimeType) {
+    setExportStatus("mp4 unsupported", "error", 2400);
+    return;
+  }
+  const filename = exportFilename(extension, "loop");
   state.isRecording = true;
   setExportButtonsDisabled(true);
   setExportStatus("recording", "recording");
@@ -4162,9 +4602,8 @@ async function recordWebm() {
     if (wasPlaying) setPlaying(false);
     renderNow({ forceFullQuality: true, skipExportMetrics: true });
     stream = outputCanvas.captureStream(WEBM_EXPORT_FPS);
-    const mimeType = getWebmMimeType();
     const recorderOptions = {
-      videoBitsPerSecond: getWebmBitrate(outputCanvas.width, outputCanvas.height),
+      videoBitsPerSecond: getRecordingBitrate(outputCanvas.width, outputCanvas.height),
     };
     if (mimeType) recorderOptions.mimeType = mimeType;
     const recorder = new MediaRecorder(stream, recorderOptions);
@@ -4174,10 +4613,11 @@ async function recordWebm() {
     };
     recorder.onstop = async () => {
       try {
-        const blob = validateExportBlob(new Blob(chunks, { type: mimeType || "video/webm" }), "WebM");
-        setExportResult(blob, "WEBM");
+        const blob = validateExportBlob(new Blob(chunks, { type: mimeType || "video/webm" }), label);
+        setExportResult(blob, label);
         setExportStatus("saving", "saving");
         const result = await saveBlob(blob, filename);
+        recordMeteredExport();
         setExportStatus(result, "saved", 1600);
       } catch (error) {
         console.error(error);
@@ -4211,6 +4651,14 @@ async function recordWebm() {
   }
 }
 
+function recordWebm() {
+  return recordVideoExport("webm");
+}
+
+function recordMp4() {
+  return recordVideoExport("mp4");
+}
+
 function renderBatchList() {
   els.batchList.innerHTML = "";
   if (!state.batchFiles.length) {
@@ -4237,6 +4685,8 @@ function renderBatchList() {
 
 async function processBatch() {
   if (!state.batchFiles.length) return;
+  if (!canStartMeteredExport("BATCH")) return;
+  let exportedAny = false;
   for (let i = 0; i < state.batchFiles.length; i++) {
     const status = $(`batch-status-${i}`);
     if (status) status.textContent = "open";
@@ -4248,22 +4698,26 @@ async function processBatch() {
     }));
     if (status) status.textContent = "export";
     await new Promise((resolve) => outputCanvas.toBlob((blob) => {
-      if (blob) void downloadBlob(blob, `batch-${i + 1}-${state.batchFiles[i].name.replace(/\.[^.]+$/, "")}.png`);
+      if (blob) {
+        exportedAny = true;
+        void downloadBlob(blob, `batch-${i + 1}-${state.batchFiles[i].name.replace(/\.[^.]+$/, "")}.png`);
+      }
       resolve();
     }, "image/png"));
     if (status) status.textContent = "done";
   }
+  if (exportedAny) recordMeteredExport();
 }
 
 function randomizeAdjustmentValues() {
-  state.settings.cell = 1 + Math.floor(Math.random() * 8);
-  state.settings.levels = 2 + Math.floor(Math.random() * 8);
-  state.settings.threshold = 92 + Math.floor(Math.random() * 80);
-  state.settings.contrast = -10 + Math.floor(Math.random() * 70);
-  state.settings.brightness = -20 + Math.floor(Math.random() * 40);
-  state.settings.gamma = Number((0.75 + Math.random() * 0.75).toFixed(2));
-  state.settings.noise = Math.floor(Math.random() * 38);
-  state.settings.temporal = Math.floor(Math.random() * 100);
+  state.settings.cell = randomInt(2, 4);
+  state.settings.levels = randomInt(5, 10);
+  state.settings.threshold = randomInt(112, 144);
+  state.settings.contrast = randomInt(-12, 28);
+  state.settings.brightness = randomInt(-6, 18);
+  state.settings.gamma = Number(randomFloat(0.88, 1.18).toFixed(2));
+  state.settings.noise = randomInt(0, 18);
+  state.settings.temporal = randomInt(8, 54);
 }
 
 function randomizeAdjustments() {
@@ -4277,26 +4731,80 @@ function randomizeAdjustments() {
 }
 
 function randomizeLook() {
-  const algorithm = ALGORITHMS[Math.floor(Math.random() * ALGORITHMS.length)];
-  const paletteKeys = Object.keys(PALETTES);
+  const algorithmOptions = ALGORITHMS.filter((item) => algorithmVisibilityWeight(item) > 0);
+  const algorithm = weightedRandom(algorithmOptions, algorithmVisibilityWeight) || ALGORITHMS[0];
+  const paletteKeys = Object.keys(PALETTES).filter((id) => paletteVisibilityWeight(id) > 0);
   state.algorithm = algorithm.id;
-  state.palette = paletteKeys[Math.floor(Math.random() * paletteKeys.length)];
+  state.palette = weightedRandom(paletteKeys, paletteVisibilityWeight) || "adaptive";
   randomizeAdjustmentValues();
   renderAdjustmentControls();
-  populateAlgorithms(els.algorithmSearch.value);
+  populateAlgorithms();
   syncPaletteSelect();
   updateStatus();
   updateDitherTextTexture();
   scheduleEditRender();
 }
 
-function summonWizardSignal() {
+function applyRandomSourceClarityLook(options = {}) {
+  const startup = Boolean(options.startup);
+  const algorithmPool = RANDOM_SOURCE_CLARITY_ALGORITHMS.filter((preset) => (
+    ALGORITHMS.some((algorithm) => algorithm.id === preset.id)
+  ));
+  const palettePool = RANDOM_SOURCE_CLARITY_PALETTES.filter((preset) => isPaletteOptionAvailable(preset.id));
+  const algorithm = startup ? { id: "atkinson" } : weightedRandom(algorithmPool, (preset) => preset.weight);
+  const palette = startup ? { id: "adaptive" } : weightedRandom(palettePool, (preset) => preset.weight);
+
+  state.algorithm = algorithm?.id || "atkinson";
+  state.palette = palette?.id || "adaptive";
+  state.settings = {
+    ...state.settings,
+    cell: startup ? 2 : randomInt(2, 3),
+    levels: startup ? 9 : randomInt(7, 11),
+    threshold: startup ? 128 : randomInt(120, 136),
+    contrast: startup ? 10 : randomInt(6, 18),
+    brightness: startup ? 4 : randomInt(0, 10),
+    gamma: startup ? 1 : Number(randomFloat(0.92, 1.08).toFixed(2)),
+    noise: startup ? 2 : randomInt(0, 6),
+    temporal: startup ? 14 : randomInt(10, 24),
+  };
+
+  if (startup) {
+    state.effects = [
+      { id: "epsilon-glow", strength: 10, enabled: true },
+      { id: "scanlines", strength: 8, enabled: true },
+    ];
+  } else {
+    const effectPool = RANDOM_SOURCE_CLARITY_EFFECTS.filter((preset) => EFFECTS.some((effect) => effect.id === preset.id));
+    const effectCount = Math.random() > 0.72 ? 2 : 1;
+    state.effects = Array.from({ length: effectCount }, () => {
+      const effect = weightedRandom(effectPool, (preset) => preset.weight);
+      const index = effectPool.findIndex((preset) => preset.id === effect?.id);
+      if (index >= 0) effectPool.splice(index, 1);
+      return {
+        id: effect?.id || "epsilon-glow",
+        strength: randomInt(effect?.min || 8, effect?.max || 14),
+        enabled: true,
+      };
+    });
+  }
+
+  populateAlgorithms();
+  syncPaletteSelect();
+  renderAdjustmentControls();
+  renderEffects();
+  updateStatus();
+  updateDitherTextTexture();
+  scheduleEditRender();
+}
+
+async function summonWizardSignal() {
   if (state.isExporting || state.isRecording) return;
-  drawWizardSignal();
-  randomizeLook();
+  els.wizardSignalButton?.classList.add("is-casting");
+  const loaded = await loadRandomLibrarySource({ seedFromOutput: true });
+  if (!loaded) drawWizardSignal();
+  applyRandomSourceClarityLook();
   setCanvasView("processed");
   setExportPreview("gif");
-  els.wizardSignalButton?.classList.add("is-casting");
   window.setTimeout(() => els.wizardSignalButton?.classList.remove("is-casting"), 700);
 }
 
@@ -4336,7 +4844,6 @@ function bindEvents() {
   });
   els.dropZone.addEventListener("drop", (event) => loadFile(event.dataTransfer.files[0]));
 
-  els.algorithmSearch.addEventListener("input", () => populateAlgorithms(els.algorithmSearch.value));
   els.algorithmSelect.addEventListener("change", () => {
     if (!els.algorithmSelect.value) return;
     state.algorithm = els.algorithmSelect.value;
@@ -4372,6 +4879,7 @@ function bindEvents() {
   els.stepForwardButton.addEventListener("click", () => stepTimeline(1 / 12));
   els.recordButton.addEventListener("click", recordWebm);
   els.recordWebmButton.addEventListener("click", recordWebm);
+  els.recordMp4Button?.addEventListener("click", recordMp4);
   els.loopToggle.addEventListener("change", () => {
     video.loop = els.loopToggle.checked;
   });
@@ -4398,6 +4906,12 @@ function bindEvents() {
   els.downloadGifButton.addEventListener("click", exportGIF);
   els.exportIconButton?.addEventListener("click", exportGIF);
   els.downloadSvgButton.addEventListener("click", exportSVG);
+  els.exportGateDismiss?.addEventListener("click", () => {
+    if (els.exportGate) els.exportGate.hidden = true;
+  });
+  window.addEventListener("storage", (event) => {
+    if (event.key === EXPORT_COUNT_KEY) syncExportEntitlement();
+  });
   els.wizardSignalButton?.addEventListener("click", summonWizardSignal);
   [
     els.exportIconButton,
@@ -4406,12 +4920,14 @@ function bindEvents() {
     els.downloadJpgButton,
     els.downloadSvgButton,
     els.recordWebmButton,
+    els.recordMp4Button,
   ].forEach((button) => {
     if (!button) return;
     const previewFormat = button.dataset.exportFormat;
     button.addEventListener("mouseenter", () => setExportPreview(previewFormat));
     button.addEventListener("focus", () => setExportPreview(previewFormat));
   });
+  syncExportEntitlement();
   setExportPreview(state.exportPreviewFormat);
   els.batchInputButton.addEventListener("click", () => els.batchInput.click());
   els.batchInput.addEventListener("change", () => {
@@ -4460,9 +4976,10 @@ async function init() {
   renderBatchList();
   updateDitherTextTexture();
   syncDitherTextSurfaces();
+  window.DitherSharedLogotype?.stop?.();
   initLogotypeSurfaces();
   bindEvents();
-  await loadDefaultSample();
+  await loadStartupSource();
   renderNow();
 }
 

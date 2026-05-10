@@ -1,0 +1,238 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Account Preview | Dither Wizard</title>
+    <link rel="stylesheet" href="styles.css?v=20260510-auth-flow" />
+  </head>
+  <body class="account-body" data-bg-texture="matrix-micro" data-logo-variant="figma-lockup">
+    <div class="matrix-field" aria-hidden="true"></div>
+    <div class="system-shell account-shell">
+      <div data-site-header></div>
+
+      <main class="system-page account-page" aria-labelledby="account-title">
+        <div class="system-inner account-inner">
+          <section class="system-hero account-hero">
+            <div class="account-hero-copy">
+              <p class="system-kicker">account / preview</p>
+              <h1 class="system-title" id="account-title">Account Preview</h1>
+              <p class="account-lede">A production-safe shell for future account, plan, and export-access workflows. No credentials or payment details are accepted in this static build.</p>
+            </div>
+            <dl class="account-signal-strip" aria-label="Current account access">
+              <div>
+                <dt>Plan</dt>
+                <dd id="accountHeroPlan">Free</dd>
+              </div>
+              <div>
+                <dt>Exports</dt>
+                <dd id="accountHeroExports">0 / 4</dd>
+              </div>
+              <div>
+                <dt>Status</dt>
+                <dd>Backend pending</dd>
+              </div>
+            </dl>
+          </section>
+
+          <div class="account-section-nav-slot">
+            <nav class="account-section-nav" aria-label="Account sections">
+              <div class="account-section-links" aria-label="Account sections">
+                <a href="#checkout" data-account-nav="checkout">
+                  <span class="pixel-icon-slot" data-pixel-icon="Credit Card" aria-hidden="true"></span>
+                  <span>Preview</span>
+                </a>
+                <a href="#manage" data-account-nav="manage">
+                  <span class="pixel-icon-slot" data-pixel-icon="User" aria-hidden="true"></span>
+                  <span>Manage</span>
+                </a>
+              </div>
+            </nav>
+          </div>
+
+          <div class="account-layout">
+            <aside class="account-summary-panel" aria-label="Account summary">
+              <div class="account-avatar" id="accountAvatar">DW</div>
+              <div class="account-summary-copy">
+                <span class="token-name">current user</span>
+                <strong id="accountUserReadout">Signed out</strong>
+                <span id="accountEmailReadout">No account connected</span>
+              </div>
+              <div class="account-meter-block">
+                <div class="ledger-row">
+                  <span>Free exports used</span>
+                  <strong id="accountExportCount">0 / 4</strong>
+                </div>
+                <div class="usage-meter account-usage-meter" aria-hidden="true">
+                  <span id="accountExportMeterFill"></span>
+                </div>
+                <p id="accountExportRemaining">Four free exports remain before the yearly plan is required.</p>
+              </div>
+              <div class="account-summary-actions">
+                <a class="account-link-button" href="#checkout">
+                  <span class="pixel-icon-slot" data-pixel-icon="Credit Card" aria-hidden="true"></span>
+                  <span>Preview Plan</span>
+                </a>
+                <a class="account-link-button" href="index.html">
+                  <span class="pixel-icon-slot" data-pixel-icon="Image" aria-hidden="true"></span>
+                  <span>Open Tool</span>
+                </a>
+              </div>
+            </aside>
+
+            <div class="account-flow-stack">
+              <section class="account-module" id="checkout" aria-labelledby="checkout-title">
+                <div class="section-head">
+                  <h2 id="checkout-title">Subscription Preview</h2>
+                  <span class="state-chip is-warning" id="subscriptionStateChip">Free</span>
+                </div>
+                <div class="account-checkout-grid">
+                  <form class="checkout-panel account-checkout-form" id="checkoutForm">
+                    <div class="checkout-stepper" aria-label="Checkout steps">
+                      <span id="checkoutStepAccount" class="is-complete">Account</span>
+                      <span class="is-current">Backend</span>
+                      <span>Review</span>
+                    </div>
+                    <label class="field-group">
+                      <span class="field-label">Contact email</span>
+                      <input class="text-input" id="checkoutEmail" type="email" autocomplete="email" placeholder="disabled in public preview" readonly />
+                    </label>
+                    <div class="inline-alert" role="status">Payments are disabled until server-side checkout is connected.</div>
+                    <label class="field-group">
+                      <span class="field-label">Plan interest</span>
+                      <input class="text-input" id="billingName" type="text" autocomplete="off" placeholder="disabled in public preview" />
+                    </label>
+                    <label class="field-group">
+                      <span class="field-label">Notes</span>
+                      <input class="text-input" id="billingZip" autocomplete="off" placeholder="disabled in public preview" />
+                    </label>
+                    <button type="submit">
+                      <span class="pixel-icon-slot" data-pixel-icon="Lock" aria-hidden="true"></span>
+                      <span>Backend Required</span>
+                    </button>
+                  </form>
+
+                  <aside class="cart-ledger account-plan-ledger" aria-label="Plan summary">
+                    <div class="specimen-head">
+                      <h3>Dither Wizard Yearly</h3>
+                      <p>Future server-side account and checkout model. The current public build keeps exports local and available.</p>
+                    </div>
+                    <div class="ledger-row">
+                      <span>Annual subscription</span>
+                      <strong>Planned</strong>
+                    </div>
+                    <div class="ledger-row">
+                      <span>Due today</span>
+                      <strong>$0.00</strong>
+                    </div>
+                    <div class="ledger-row">
+                      <span>Renewal</span>
+                      <strong id="renewalDate">In one year</strong>
+                    </div>
+                    <div class="ledger-row is-total">
+                      <span>Total</span>
+                      <strong>$0.00</strong>
+                    </div>
+                    <div class="inline-alert" id="checkoutStatus" role="status">Account preview ready.</div>
+                  </aside>
+                </div>
+              </section>
+
+              <section class="account-module" id="manage" aria-labelledby="manage-title">
+                <div class="section-head">
+                  <h2 id="manage-title">Manage Account</h2>
+                  <span class="state-chip is-selected" id="manageStateChip">Ready</span>
+                </div>
+                <div class="account-board account-manage-board">
+                  <aside class="account-menu-demo" aria-label="Account menu">
+                    <div class="account-avatar" id="manageAvatar">DW</div>
+                    <strong id="manageName">Dither User</strong>
+                    <span id="manageEmail">No email saved</span>
+                    <nav>
+                      <a href="#profile">Profile</a>
+                      <a href="#security">Security</a>
+                      <a href="#billing">Billing</a>
+                      <a href="#activity">Activity</a>
+                    </nav>
+                    <button type="button" id="signOutButton">Sign Out</button>
+                  </aside>
+
+                  <div class="settings-stack account-settings-stack">
+                    <div class="settings-row" id="profile">
+                      <div>
+                        <strong>Profile</strong>
+                        <span id="profileSummary">Display name and email are ready for backend sync.</span>
+                      </div>
+                      <button type="button" id="saveProfileButton">Save</button>
+                    </div>
+                    <div class="settings-row" id="security">
+                      <div>
+                        <strong>Security</strong>
+                        <span>Password reset, session review, and two-step verification path.</span>
+                      </div>
+                      <button type="button" id="securityButton">Review</button>
+                    </div>
+                    <div class="settings-row" id="billing">
+                      <div>
+                        <strong>Subscription</strong>
+                        <span id="billingSummary">Preview only; server-side plans are not connected.</span>
+                      </div>
+                      <button type="button" id="renewButton">Renew</button>
+                    </div>
+                    <div class="settings-row">
+                      <div>
+                        <strong>Payment Method</strong>
+                        <span id="paymentSummary">No payment method is accepted in this build.</span>
+                      </div>
+                      <a class="account-inline-link" href="#checkout">Update</a>
+                    </div>
+                    <div class="settings-row" id="activity">
+                      <div>
+                        <strong>Activity</strong>
+                        <span id="activitySummary">No exports recorded in this browser.</span>
+                      </div>
+                      <button type="button" id="resetExportsButton">Reset Meter</button>
+                    </div>
+                    <div class="settings-row is-danger">
+                      <div>
+                        <strong>Cancel plan</strong>
+                        <span>Keep account access and return to the free export meter.</span>
+                      </div>
+                      <button type="button" id="cancelPlanButton">Cancel</button>
+                    </div>
+                    <div class="inline-alert" id="accountStatus" role="status">Account settings ready.</div>
+                  </div>
+                </div>
+              </section>
+
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <footer class="site-footer" id="siteFooter">
+        <div class="site-footer-inner">
+          <div class="footer-brand" aria-label="Dither Wizard">
+            <strong>Dither Wizard<sup class="footer-trademark" aria-label="trademark">&trade;</sup><time class="footer-year" datetime="2026" data-current-year>2026</time></strong>
+            <a class="footer-credit" href="https://coreykoberna.com/" target="_blank" rel="noreferrer"><span>Built by Corey Koberna</span></a>
+          </div>
+          <nav class="footer-section" aria-label="Footer navigation">
+            <ul class="footer-link-list">
+              <li><a class="footer-link" href="index.html"><span>Home</span></a></li>
+              <li><a class="footer-link" href="design-system.html"><span>Wizardry</span></a></li>
+              <li><a class="footer-link" href="contact.html"><span>Contact</span></a></li>
+            </ul>
+          </nav>
+        </div>
+      </footer>
+    </div>
+
+    <script src="assets/sprites/dither-mage-vector-data.js?v=20260510-main-mage"></script>
+    <script src="site-header.js?v=20260510-contact-nav-order"></script>
+    <script src="assets/sprites/dither-mage-vector.js?v=20260510-main-mage"></script>
+    <script src="assets/vendor/pixelarticons/pixelarticons-data.js?v=20260504-pixelarticons-install"></script>
+    <script src="system.js?v=20260510-main-mage"></script>
+    <script src="account.js?v=20260510-auth-flow"></script>
+    <script src="footer.js?v=20260510-auth-flow"></script>
+  </body>
+</html>

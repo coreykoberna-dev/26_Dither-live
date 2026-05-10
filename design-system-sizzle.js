@@ -71,11 +71,17 @@
   const modes = [
     {
       id: "foundations",
-      title: "Foundations",
-      phases: ["color roles", "type roles", "state matrix", "motion tokens"],
+      title: "Token Reactor",
+      phases: ["palette roles", "type specimen", "state stack", "motion curve"],
       html: `
-        <article class="sizzle-reel sizzle-option sizzle-atlas" aria-label="Foundations sizzle option">
+        <article class="sizzle-reel sizzle-option sizzle-atlas" aria-label="Token Reactor sizzle option">
           ${mapGrid}
+          <div class="sizzle-option-identity" aria-hidden="true"><span>01</span><b>token reactor</b></div>
+          <div class="sizzle-palette-core" aria-hidden="true">
+            <span>primary</span><span>secondary</span><span>tertiary</span><span>surface</span><span>outline</span><span>warning</span><span>error</span><span>success</span>
+          </div>
+          <div class="sizzle-type-tower" aria-hidden="true"><span>DISPLAY</span><span>LABEL</span><span>BODY</span><span>DATA</span></div>
+          <div class="sizzle-motion-rings" aria-hidden="true"><span></span><span></span><span></span></div>
           <div class="sizzle-compass" aria-hidden="true"><span></span><i></i><i></i></div>
           <div class="sizzle-tick-strip" aria-hidden="true">${tickMarks}</div>
           <div class="sizzle-dither-sample" aria-hidden="true">
@@ -107,11 +113,18 @@
     },
     {
       id: "components",
-      title: "Component Catalog",
+      title: "Component Sequencer",
       phases: ["button states", "text inputs", "data table", "doc rail"],
       html: `
-        <article class="sizzle-reel sizzle-option sizzle-cartography" aria-label="Component Catalog sizzle option">
+        <article class="sizzle-reel sizzle-option sizzle-cartography" aria-label="Component Sequencer sizzle option">
           ${mapGrid}
+          <div class="sizzle-option-identity" aria-hidden="true"><span>02</span><b>component sequencer</b></div>
+          <div class="sizzle-component-sequencer" aria-hidden="true">
+            <section><b>Button</b><span></span><span class="is-hot"></span><span></span></section>
+            <section><b>Text field</b><i></i><i></i></section>
+            <section><b>Data table</b><em></em><em></em><em></em><em></em></section>
+            <section><b>Doc rail</b><small></small><small class="is-open"></small><small></small></section>
+          </div>
           <div class="sizzle-component-orbit" aria-hidden="true">
             <span></span><span></span><span></span><span></span><span></span><span></span>
           </div>
@@ -143,11 +156,16 @@
     },
     {
       id: "commerce",
-      title: "Account Commerce",
+      title: "Commerce Flow",
       phases: ["sign-in form", "account settings", "store product card", "billing recovery"],
       html: `
-        <article class="sizzle-reel sizzle-option sizzle-commerce-map" aria-label="Account Commerce sizzle option">
+        <article class="sizzle-reel sizzle-option sizzle-commerce-map" aria-label="Commerce Flow sizzle option">
           ${mapGrid}
+          <div class="sizzle-option-identity" aria-hidden="true"><span>03</span><b>commerce flow</b></div>
+          <div class="sizzle-commerce-flow" aria-hidden="true">
+            <span>sign in</span><span>account</span><span>store</span><span>checkout</span><span>recovery</span>
+          </div>
+          <div class="sizzle-plan-plate" aria-hidden="true"><b>Dither Wizard Pro</b><span>$38</span><i></i><i></i></div>
           <div class="sizzle-payment-thread" aria-hidden="true">
             <span>auth</span><span>plan</span><span>cart</span><span>receipt</span><span>retry</span>
           </div>
@@ -178,11 +196,13 @@
     },
     {
       id: "workbench",
-      title: "Dither Workbench",
+      title: "Workbench Signal",
       phases: ["dropzone", "preview canvas", "timeline transport", "export meter"],
       html: `
-        <article class="sizzle-reel sizzle-option sizzle-workbench-map" aria-label="Dither Workbench sizzle option">
+        <article class="sizzle-reel sizzle-option sizzle-workbench-map" aria-label="Workbench Signal sizzle option">
           ${mapGrid}
+          <div class="sizzle-option-identity" aria-hidden="true"><span>04</span><b>workbench signal</b></div>
+          <div class="sizzle-signal-stack" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></div>
           <section class="sizzle-workbench-frame" aria-hidden="true">
             <div class="sizzle-pane-left"><b>dropzone</b><i></i><i></i><i></i></div>
             <div class="sizzle-pane-center"><div class="sizzle-signal-preview"></div><span></span></div>
@@ -198,11 +218,13 @@
     },
     {
       id: "governance",
-      title: "System Governance",
+      title: "Governance Radar",
       phases: ["source files", "access gates", "qa gates", "handoff"],
       html: `
-        <article class="sizzle-reel sizzle-option sizzle-governance-map" aria-label="System Governance sizzle option">
+        <article class="sizzle-reel sizzle-option sizzle-governance-map" aria-label="Governance Radar sizzle option">
           ${mapGrid}
+          <div class="sizzle-option-identity" aria-hidden="true"><span>05</span><b>governance radar</b></div>
+          <div class="sizzle-radar-field" aria-hidden="true"><span></span><span></span><span></span><i></i></div>
           <div class="sizzle-system-spine" aria-hidden="true">
             <span>design.md</span><span>tokens</span><span>css</span><span>html</span>
           </div>

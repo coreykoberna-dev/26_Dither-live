@@ -5,7 +5,7 @@
   const CONTACT_CONTENT = "signal-ledger";
   const CONTACT_VARIANT_PANEL_KEY = "dither-wizard-feature-monitor-panel";
   const CONTACT_LAYOUT = "offset-stack";
-  const CONTACT_WINDOW_STATE_KEY = "dither-wizard-contact-window-state-three-window";
+  const CONTACT_WINDOW_STATE_KEY = "dither-wizard-contact-window-state-ledger-readable";
   const CONTACT_VARIANTS = [
     ["terminal-deck", "Rule Stack", "matrix-micro"],
     ["archive-console", "Slow Afterimage", "matrix-micro"],
@@ -45,11 +45,14 @@
   const windowModules = Array.from(document.querySelectorAll(".contact-window"));
   const form = document.getElementById("contactForm");
   const copyButton = document.getElementById("copyEmailButton");
+  const emailComposeLinks = Array.from(document.querySelectorAll("[data-email-compose]"));
+  const messageField = form?.querySelector("[name='message']");
+  const subjectSelect = document.querySelector("[data-contact-subject-select]");
   const status = document.getElementById("contactStatus");
   let beaconCharge = 0;
   let keyBuffer = "";
   let focusedWindowZ = 20;
-  const dragIgnoreSelector = "input, textarea, select, button, a, label, [contenteditable='true']";
+  const dragIgnoreSelector = "input, textarea, select, button, a, label, .field-group, [contenteditable='true']";
 
   function setStatus(message, state) {
     if (!status) return;
@@ -59,6 +62,121 @@
 
   function fieldValue(formData, name) {
     return String(formData.get(name) || "").trim();
+  }
+
+  function emailIntentUrl({ subject = "Dither Wizard inquiry", body = "" } = {}) {
+    const params = [];
+    if (subject) params.push(`subject=${encodeURIComponent(subject)}`);
+    if (body) params.push(`body=${encodeURIComponent(body)}`);
+    const query = params.join("&");
+    return `mailto:${emailAddress}${query ? `?${query}` : ""}`;
+  }
+
+  function requestEmailClient(url) {
+    setStatus("email client requested", "sent");
+    window.location.href = url;
+  }
+
+  function focusEmailComposer() {
+    form?.scrollIntoView({ block: "center", behavior: "smooth" });
+    window.requestAnimationFrame(() => {
+      messageField?.focus({ preventScroll: true });
+    });
+    setStatus("message ready", "ready");
+  }
+
+  function initContactSubjectSelect() {
+    if (!subjectSelect) return;
+    const trigger = subjectSelect.querySelector("[data-contact-subject-trigger]");
+    const label = subjectSelect.querySelector("[data-contact-subject-label]");
+    const valueInput = subjectSelect.querySelector("[data-contact-subject-value]");
+    const menu = subjectSelect.querySelector("[data-contact-subject-menu]");
+    const options = Array.from(subjectSelect.querySelectorAll("[data-contact-subject-option]"));
+    if (!trigger || !label || !valueInput || !menu || !options.length) return;
+
+    let activeIndex = Math.max(0, options.findIndex((option) => option.dataset.value === valueInput.value));
+
+    function optionValue(option) {
+      return option.dataset.value || option.textContent.trim();
+    }
+
+    function optionLabel(option) {
+      return option.querySelector("[data-contact-subject-option-label]")?.textContent.trim() || optionValue(option);
+    }
+
+    function setOpen(isOpen, focusActive = false) {
+      subjectSelect.dataset.state = isOpen ? "open" : "closed";
+      trigger.setAttribute("aria-expanded", String(isOpen));
+      menu.hidden = !isOpen;
+      if (isOpen && focusActive) {
+        options[activeIndex]?.focus({ preventScroll: true });
+      }
+    }
+
+    function focusOption(index) {
+      activeIndex = (index + options.length) % options.length;
+      options[activeIndex].focus({ preventScroll: true });
+    }
+
+    function selectOption(option, focusTrigger = true) {
+      const nextValue = optionValue(option);
+      activeIndex = options.indexOf(option);
+      valueInput.value = nextValue;
+      valueInput.setAttribute("value", nextValue);
+      label.textContent = optionLabel(option);
+      options.forEach((item) => item.setAttribute("aria-selected", String(item === option)));
+      setOpen(false);
+      if (focusTrigger) trigger.focus({ preventScroll: true });
+    }
+
+    options.forEach((option, index) => {
+      option.tabIndex = -1;
+      option.addEventListener("click", () => selectOption(option));
+      option.addEventListener("keydown", (event) => {
+        if (event.key === "ArrowDown") {
+          focusOption(index + 1);
+        } else if (event.key === "ArrowUp") {
+          focusOption(index - 1);
+        } else if (event.key === "Home") {
+          focusOption(0);
+        } else if (event.key === "End") {
+          focusOption(options.length - 1);
+        } else if (event.key === "Enter" || event.key === " ") {
+          selectOption(option);
+        } else if (event.key === "Escape") {
+          setOpen(false);
+          trigger.focus({ preventScroll: true });
+        } else {
+          return;
+        }
+        event.preventDefault();
+      });
+    });
+
+    trigger.addEventListener("click", () => setOpen(menu.hidden, true));
+    trigger.addEventListener("keydown", (event) => {
+      if (event.key === "ArrowDown" || event.key === "Enter" || event.key === " ") {
+        setOpen(true, true);
+      } else if (event.key === "ArrowUp") {
+        setOpen(true, false);
+        focusOption(options.length - 1);
+      } else {
+        return;
+      }
+      event.preventDefault();
+    });
+
+    document.addEventListener("pointerdown", (event) => {
+      if (!subjectSelect.contains(event.target)) setOpen(false);
+    });
+
+    subjectSelect.addEventListener("focusout", () => {
+      window.requestAnimationFrame(() => {
+        if (!subjectSelect.contains(document.activeElement)) setOpen(false);
+      });
+    });
+
+    selectOption(options[activeIndex], false);
   }
 
   function readStoredValue(key) {
@@ -276,6 +394,7 @@
   setPanelCollapsed(readStoredValue(CONTACT_VARIANT_PANEL_KEY) === "collapsed", { persist: false });
   setPulseLine();
   setContactLayout(CONTACT_LAYOUT, { resetOffsets: false });
+  initContactSubjectSelect();
 
   variantButtons.forEach((button) => {
     button.addEventListener("click", () => {
@@ -630,6 +749,14 @@
       resizeHandle.setAttribute("aria-label", `Resize ${moduleKey(module)} window`);
       module.appendChild(resizeHandle);
     }
+    if (!resizeHandle.querySelector("[data-pixel-icon]")) {
+      const resizeIcon = document.createElement("span");
+      resizeIcon.className = "contact-resize-icon pixel-icon-slot";
+      resizeIcon.dataset.pixelIcon = "Scale";
+      resizeIcon.setAttribute("aria-hidden", "true");
+      resizeHandle.appendChild(resizeIcon);
+      window.DitherIconSystem?.hydrate(resizeIcon);
+    }
     let dragState = null;
     let resizeState = null;
 
@@ -690,12 +817,12 @@
       const compactResize = boundary ? boundary.width < 921 : false;
       const minimums = compactResize
         ? {
-            intro: { width: 300, height: 255 },
+            intro: { width: 330, height: 345 },
             monitor: { width: 210, height: 285 },
             form: { width: 360, height: 285 },
           }
         : {
-            intro: { width: 420, height: 255 },
+            intro: { width: 430, height: 345 },
             monitor: { width: 250, height: 285 },
             form: { width: 520, height: 260 },
           };
@@ -897,11 +1024,16 @@
         `Reply: ${email}`,
       ].join("\n");
 
-      const mailto = `mailto:${emailAddress}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-      setStatus("email client requested", "sent");
-      window.location.href = mailto;
+      requestEmailClient(emailIntentUrl({ subject, body }));
     });
   }
+
+  emailComposeLinks.forEach((link) => {
+    link.addEventListener("click", (event) => {
+      event.preventDefault();
+      focusEmailComposer();
+    });
+  });
 
   if (copyButton) {
     copyButton.addEventListener("click", async () => {

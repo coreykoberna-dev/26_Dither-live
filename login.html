@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Login Preview | Dither Wizard</title>
+    <link rel="stylesheet" href="styles.css?v=20260510-auth-flow" />
+  </head>
+  <body class="account-body login-body" data-bg-texture="matrix-micro" data-logo-variant="figma-lockup">
+    <div class="matrix-field" aria-hidden="true"></div>
+    <div class="system-shell account-shell login-shell">
+      <div data-site-header></div>
+
+      <main class="system-page login-page" aria-labelledby="login-page-title">
+        <div class="system-inner login-inner">
+          <section class="login-focus-stage" aria-label="Log in">
+            <div class="login-focus-copy">
+              <p class="system-kicker">Dither Wizard</p>
+              <h1 class="system-title" id="login-page-title">Login Preview</h1>
+              <p>Backend authentication is not connected in the public static build.</p>
+            </div>
+
+            <form class="auth-form-panel login-form-panel" id="loginPageForm">
+              <div class="login-form-head">
+                <div>
+                  <h2>Future Sign-In Flow</h2>
+                  <p>No credentials are accepted or stored here.</p>
+                </div>
+              </div>
+              <div class="google-auth-render-slot" id="loginPageGoogleSlot" hidden></div>
+              <button class="sso-button google-auth-button" type="button" id="loginPageGoogleButton">
+                <span class="google-logo-wrap" aria-hidden="true">
+                  <svg class="google-logo" viewBox="0 0 48 48" focusable="false">
+                    <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"></path>
+                    <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"></path>
+                    <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"></path>
+                    <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"></path>
+                    <path fill="none" d="M0 0h48v48H0z"></path>
+                  </svg>
+                </span>
+                <span>Google disabled</span>
+              </button>
+              <div class="auth-divider" aria-hidden="true"><span>or</span></div>
+              <label class="field-group">
+                <span class="field-label">Email</span>
+                <input class="text-input" id="loginPageEmail" type="email" autocomplete="email" placeholder="you@example.com" required />
+              </label>
+              <label class="field-group">
+                <span class="field-label">Password</span>
+                <input class="text-input" id="loginPagePassword" type="password" autocomplete="off" placeholder="disabled in public preview" />
+              </label>
+              <div class="form-support-row">
+                <label><input id="loginPageRemember" type="checkbox" disabled /> Remember me</label>
+                <button type="button" class="account-text-button" id="loginPageResetButton">Reset password</button>
+              </div>
+              <button type="submit">
+                <span>Backend Required</span>
+              </button>
+              <p class="account-auth-footer">Need access? <a class="account-inline-link" href="contact.html">Contact</a></p>
+              <div class="inline-alert" id="loginPageStatus" role="status">Login is disabled in the public preview.</div>
+            </form>
+          </section>
+        </div>
+      </main>
+
+      <footer class="site-footer" id="siteFooter">
+        <div class="site-footer-inner">
+          <div class="footer-brand" aria-label="Dither Wizard">
+            <strong>Dither Wizard<sup class="footer-trademark" aria-label="trademark">&trade;</sup><time class="footer-year" datetime="2026" data-current-year>2026</time></strong>
+            <a class="footer-credit" href="https://coreykoberna.com/" target="_blank" rel="noreferrer"><span>Built by Corey Koberna</span></a>
+          </div>
+          <nav class="footer-section" aria-label="Footer navigation">
+            <ul class="footer-link-list">
+              <li><a class="footer-link" href="index.html"><span>Home</span></a></li>
+              <li><a class="footer-link" href="design-system.html"><span>Wizardry</span></a></li>
+              <li><a class="footer-link" href="contact.html"><span>Contact</span></a></li>
+            </ul>
+          </nav>
+        </div>
+      </footer>
+    </div>
+
+    <script src="assets/sprites/dither-mage-vector-data.js?v=20260510-main-mage"></script>
+    <script src="site-header.js?v=20260510-contact-nav-order"></script>
+    <script src="assets/sprites/dither-mage-vector.js?v=20260510-main-mage"></script>
+    <script src="assets/vendor/pixelarticons/pixelarticons-data.js?v=20260504-pixelarticons-install"></script>
+    <script src="system.js?v=20260510-main-mage"></script>
+    <script src="auth-google.js?v=20260510-auth-flow"></script>
+    <script src="login.js?v=20260510-auth-flow"></script>
+    <script src="footer.js?v=20260510-auth-flow"></script>
+  </body>
+</html>

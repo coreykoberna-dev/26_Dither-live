@@ -24,6 +24,55 @@
     east: "east",
     west: "west",
   };
+  const storyboardElements = ["fire", "earth", "electric", "water"];
+  const storyboardDirections = {
+    south: "down",
+    north: "up",
+    east: "right",
+    west: "left",
+  };
+  const storyboardForms = {
+    fire: 10,
+    earth: 10,
+    electric: 10,
+    water: 10,
+  };
+  const effectBounds = {
+    minX: -Math.round(width * 0.58),
+    maxX: width + Math.round(width * 0.58),
+    minY: -Math.round(height * 0.3),
+    maxY: height + Math.round(height * 0.34),
+  };
+
+  function registerStoryboardAnimations() {
+    storyboardElements.forEach((element) => {
+      Object.entries(storyboardDirections).forEach(([base, direction]) => {
+        const frames = [];
+        for (let index = 0; index < 10; index += 1) {
+          const frame = {
+            base,
+            kind: "elemental-cast",
+            element,
+            direction,
+            phase: index,
+            expression: 10,
+            form: storyboardForms[element] || 10,
+          };
+          frames.push(frame);
+          data.animations[`storyboard-${element}-${base}-f${String(index + 1).padStart(2, "0")}`] = {
+            fps: 1,
+            frames: [frame],
+          };
+        }
+        data.animations[`storyboard-${element}-${base}`] = {
+          fps: 10,
+          frames,
+        };
+      });
+    });
+  }
+
+  registerStoryboardAnimations();
 
   function readBasePixels(name) {
     if (basePixelCache.has(name)) return basePixelCache.get(name);
@@ -74,16 +123,16 @@
   }
 
   function castPhase(phase) {
-    return Math.max(0, Number(phase) || 0) % 8;
+    return Math.max(0, Number(phase) || 0) % 10;
   }
 
   function castMotion(phase) {
     const stage = castPhase(phase);
     return {
       stage,
-      lift: [0, -1, -2, -2, -1, 0, 1, 0][stage],
-      thrust: [0, -1, -1, 1, 2, 2, 1, 0][stage],
-      release: stage >= 3 && stage <= 6,
+      lift: [0, -1, -2, -3, -2, -1, 0, 1, 0, 0][stage],
+      thrust: [0, -1, -1, 0, 1, 2, 3, 2, 1, 0][stage],
+      release: stage >= 4 && stage <= 8,
     };
   }
 
@@ -121,7 +170,7 @@
 
   function castOffset(x, y, token, spec) {
     const phase = castMotion(spec.phase);
-    const lift = spec.kind === "elemental-cast" ? phase.lift : [0, 0, -1, -2, -2, -1, 0, 0][castPhase(spec.phase)] || 0;
+    const lift = spec.kind === "elemental-cast" ? 0 : [0, 0, -1, -2, -2, -1, 0, 0][castPhase(spec.phase)] || 0;
     let dx = 0;
     let dy = 0;
 
@@ -130,23 +179,10 @@
     if (spec.kind === "cast-burst" && x < width / 2 && y < upperBodyY) dx -= spec.phase > 2 ? 1 : 0;
     if (spec.kind === "elemental-cast") {
       const vector = directionVector(spec.direction);
-      const upperBody = y < lowerBodyY;
-      const lowerBody = y >= lowerBodyY && y < footPlantY;
-      const footPlant = y >= footPlantY;
       const lean = phase.thrust;
 
-      if (upperBody) {
-        dx += vector.x * lean;
-        dy += vector.y * Math.max(-1, Math.min(1, lean));
-      }
-
-      if (lowerBody && !footPlant) {
-        dx += vector.x * Math.trunc(lean / 2);
-        dy += phase.stage === 4 ? -1 : 0;
-      }
-
       if (isStaffToken(token) && y < upperBodyY) {
-        dx += vector.x * (phase.release ? 2 : -1);
+        dx += vector.x * (phase.release ? 2 : Math.sign(lean));
         dy += vector.y * (phase.release ? 2 : 0);
       }
       if (isMagicToken(token) && phase.release) {
@@ -243,8 +279,8 @@
     addEffectLine(pixels, cx + Math.floor(radius * 0.7), cy - Math.floor(radius * 0.45), cx - Math.floor(radius * 0.7), cy + Math.floor(radius * 0.45), tokens.mid);
   }
 
-  const spellTravelByPhase = [0, 1, 4, 8, 12, 15, 18, 20];
-  const spellRadiusByPhase = [1, 2, 4, 6, 8, 10, 7, 4];
+  const spellTravelByPhase = [0, 1, 3, 6, 10, 14, 18, 21, 23, 24];
+  const spellRadiusByPhase = [1, 2, 4, 6, 8, 10, 12, 10, 7, 4];
 
   function normalVector(vector) {
     return { x: -vector.y, y: vector.x };
@@ -428,11 +464,17 @@
       addEffectBurst(pixels, target.x, target.y, radius + 5, tokens);
       addEffectDiamond(pixels, target.x, target.y, Math.max(2, radius - 2), tokens);
     } else {
-      addOrientedLine(pixels, target, vector, -radius, -radius - 4, -radius - 7, -1, "fire");
-      addOrientedLine(pixels, target, vector, -radius - 7, -1, -radius, 4, "fire-core");
-      addOrientedLine(pixels, target, vector, -radius, radius + 4, -radius - 7, 1, "fire");
-      addOrientedLine(pixels, target, vector, -radius - 7, 1, -radius, -4, "fire-core");
-      addEffectDiamond(pixels, target.x, target.y, 3, tokens);
+      const ballRadius = Math.max(3, Math.floor(radius * 0.72));
+      addOrientedLine(pixels, origin, vector, Math.max(0, travel - radius - 5), 0, travel, 0, "fire-core");
+      addOrientedLine(pixels, origin, vector, Math.max(0, travel - radius - 7), -2, travel - 1, -2, "fire");
+      addOrientedLine(pixels, origin, vector, Math.max(0, travel - radius - 6), 2, travel - 1, 2, "fire-shadow");
+      addEffectDiamond(pixels, target.x, target.y, ballRadius, tokens);
+      if (stage >= 6) addEffectBurst(pixels, target.x, target.y, radius + 3, tokens);
+      for (let index = 0; index < 10; index += 1) {
+        const along = -ballRadius - 2 - ((index * 2 + phase) % 7);
+        const side = ((index * 5 + phase) % (ballRadius * 2 + 1)) - ballRadius;
+        addOrientedPixel(pixels, target, vector, along, side, index % 3 === 0 ? "fire-core" : index % 2 ? "fire" : "fire-shadow");
+      }
     }
 
     addSpellFragments(pixels, target, vector, radius + 4, tokens, phase, 8 + form);
@@ -492,10 +534,17 @@
       addEffectBurst(pixels, target.x, target.y, radius + 5, tokens);
       addEffectDiamond(pixels, target.x, target.y, Math.max(3, radius - 1), tokens);
     } else {
-      addOrientedBlock(pixels, target, vector, 0, 0, 5, 7, "earth");
-      for (let side = -5; side <= 5; side += 2) addOrientedBlock(pixels, target, vector, -6, side, 7, 2, "earth-shadow");
-      addOrientedBlock(pixels, target, vector, 4, -5, 5, 2, "earth-core");
-      addOrientedBlock(pixels, target, vector, 4, 5, 5, 2, "earth-core");
+      addOrientedLine(pixels, origin, vector, 1, 0, travel, 0, "earth-core");
+      addOrientedLine(pixels, origin, vector, 3, -1, travel - 1, -1, "earth-shadow");
+      addOrientedLine(pixels, origin, vector, 4, 1, travel - 2, 1, "earth");
+      for (let index = 0; index < 7; index += 1) {
+        const side = -6 + index * 2;
+        const spikeHeight = 3 + ((index + phase) % 4);
+        addOrientedLine(pixels, target, vector, -2, side, -spikeHeight - 3, side - Math.sign(side || 1) * 2, "earth-shadow");
+        addOrientedLine(pixels, target, vector, -spikeHeight - 3, side - Math.sign(side || 1) * 2, 1, side, "earth-core");
+        addOrientedBlock(pixels, target, vector, 0, side, 2, 2, index % 2 ? "earth" : "earth-shadow");
+      }
+      if (stage >= 7) addEffectBurst(pixels, target.x, target.y, radius + 3, tokens);
     }
 
     addSpellFragments(pixels, target, vector, radius + 4, tokens, phase, 8 + form);
@@ -556,9 +605,16 @@
       addEffectBurst(pixels, target.x, target.y, radius + 5, tokens);
       addOrientedLine(pixels, target, vector, -radius, radius, radius, radius + 3, "water-shadow");
     } else {
-      addOrientedPolyline(pixels, target, vector, [[-radius, radius], [-4, 1], [0, -radius], [5, -2], [radius + 2, radius - 2]], "water");
-      addOrientedPolyline(pixels, target, vector, [[-radius + 2, radius - 1], [-2, 0], [1, -radius + 2], [6, 0], [radius + 3, radius - 3]], "water-core");
-      addEffectDiamond(pixels, target.x, target.y, 2, tokens);
+      addOrientedPolyline(pixels, origin, vector, [[0, 0], [4, -3], [8, 3], [12, -4], [travel, 1]], "water");
+      addOrientedPolyline(pixels, origin, vector, [[2, 1], [6, -2], [10, 4], [travel, 0]], "water-core");
+      addEffectRing(pixels, target.x, target.y, radius + 4, tokens);
+      addEffectRing(pixels, target.x, target.y, Math.max(3, radius - 2), tokens);
+      if (stage >= 6) addEffectBurst(pixels, target.x, target.y, radius + 2, tokens);
+      for (let index = 0; index < 12; index += 1) {
+        const along = ((index * 3 + phase) % (radius + 8)) - Math.floor(radius / 2);
+        const side = ((index * 5 + phase * 2) % (radius * 2 + 5)) - radius - 2;
+        addOrientedPixel(pixels, target, vector, along, side, index % 3 === 0 ? "water-core" : "water");
+      }
     }
 
     addSpellFragments(pixels, target, vector, radius + 4, tokens, phase, 8 + form);
@@ -618,11 +674,16 @@
       addEffectBurst(pixels, target.x, target.y, radius + 5, tokens);
       addOrientedPolyline(pixels, target, vector, [[-radius, -radius], [0, 0], [radius, radius], [0, 0], [radius, -radius]], "electric-core");
     } else {
-      addOrientedLine(pixels, target, vector, -radius, -radius, radius, radius, "electric");
-      addOrientedLine(pixels, target, vector, -radius, radius, radius, -radius, "electric");
-      addOrientedLine(pixels, target, vector, 0, -radius - 4, 0, radius + 4, "electric-core");
-      addOrientedLine(pixels, target, vector, -radius - 4, 0, radius + 4, 0, "electric-core");
-      addEffectRing(pixels, target.x, target.y, radius + 3, tokens);
+      addOrientedPolyline(pixels, origin, vector, [[0, 0], [4, -5], [7, 4], [12, -3], [travel, 2]], "electric-core");
+      addOrientedPolyline(pixels, origin, vector, [[1, 1], [5, -3], [9, 5], [travel, -2]], "electric");
+      addOrientedPolyline(pixels, origin, vector, [[2, -1], [6, 2], [10, -5], [travel + 2, 0]], "electric-shadow");
+      for (let index = 0; index < 6; index += 1) {
+        const along = Math.max(4, travel - radius + index * 2);
+        const branch = index % 2 ? 1 : -1;
+        addOrientedLine(pixels, origin, vector, along, 0, along + 3, branch * (3 + (index % 3)), index % 3 === 0 ? "electric-core" : "electric");
+      }
+      if (stage >= 6) addEffectBurst(pixels, target.x, target.y, radius + 4, tokens);
+      addEffectRing(pixels, target.x, target.y, Math.max(4, radius), tokens);
     }
 
     addSpellFragments(pixels, target, vector, radius + 4, tokens, phase, 8 + form);
@@ -664,7 +725,7 @@
     }
 
     for (const pixel of effectPixels(spec)) {
-      if (pixel.x < 0 || pixel.x >= width || pixel.y < 0 || pixel.y >= height) continue;
+      if (pixel.x < effectBounds.minX || pixel.x >= effectBounds.maxX || pixel.y < effectBounds.minY || pixel.y >= effectBounds.maxY) continue;
       parts.push(rectMarkup(pixel.x, pixel.y, pixel.token, pixel.size || 1));
     }
 
@@ -707,9 +768,10 @@
   class DitherMageVector {
     constructor(root) {
       this.root = root;
+      this.isWide = root.hasAttribute("data-mage-wide");
       this.svg = document.createElementNS(SVG_NS, "svg");
       this.svg.classList.add("mage-vector");
-      this.svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
+      this.svg.setAttribute("viewBox", this.isWide ? `-${Math.round(width * 0.42)} -${Math.round(height * 0.18)} ${Math.round(width * 1.84)} ${Math.round(height * 1.42)}` : `0 0 ${width} ${height}`);
       this.svg.setAttribute("aria-hidden", "true");
       this.root.appendChild(this.svg);
 
@@ -721,12 +783,15 @@
       this.hoverSpellIndex = 0;
       this.facing = "south";
       this.once = null;
-      this.isVisible = true;
+      this.isStatic = root.hasAttribute("data-mage-static");
+      this.isVisible = !this.isStatic;
       this.root.__ditherMageVector = this;
 
-      this.bindInteractions();
-      this.observeBusyState();
-      this.observeVisibility();
+      if (!this.isStatic) {
+        this.bindInteractions();
+        this.observeBusyState();
+        this.observeVisibility();
+      }
       this.renderCurrentFrame();
     }
 
@@ -830,7 +895,7 @@
     }
 
     tick(now) {
-      if (reducedMotionQuery.matches || !this.isVisible) return;
+      if (this.isStatic || reducedMotionQuery.matches || !this.isVisible) return;
       const animation = this.currentAnimation();
       const frameDuration = 1000 / animation.fps;
       if (!this.lastFrameAt) {
@@ -869,8 +934,16 @@
         )
       : null;
 
+  function mountMageVector(root) {
+    if (!root || root.__ditherMageVector) return root?.__ditherMageVector || null;
+    const instance = new DitherMageVector(root);
+    instances.push(instance);
+    startAnimationLoop();
+    return instance;
+  }
+
   document.querySelectorAll("[data-mage-vector]").forEach((root) => {
-    instances.push(new DitherMageVector(root));
+    mountMageVector(root);
   });
 
   reducedMotionQuery.addEventListener("change", () => {
@@ -898,6 +971,12 @@
     },
     setRootState(root, state) {
       root?.__ditherMageVector?.setState(state);
+    },
+    mount(root) {
+      return mountMageVector(root);
+    },
+    hydrate(root = document) {
+      root.querySelectorAll?.("[data-mage-vector]")?.forEach((element) => mountMageVector(element));
     },
   };
 })();

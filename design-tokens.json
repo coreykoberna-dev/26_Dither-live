@@ -4,9 +4,9 @@
   "description": "Machine-readable design-system subset for the Dither Wizard local image-processing studio.",
   "color": {
     "model": {
-      "reference": "Material 3 dynamic color operating model, implemented locally with CSS custom properties and OKLCH approximations.",
+      "reference": "Local dynamic color role model, implemented with CSS custom properties and OKLCH approximations.",
       "source": "A seed color generates tonal palettes, tone selections become system roles, system roles map to Dither Wizard component tokens.",
-      "freeToolchain": ["Material Theme Builder", "material-color-utilities", "Material Web CSS custom properties"]
+      "freeToolchain": ["local seed presets", "OKLCH tonal utilities", "CSS custom properties"]
     },
     "tonalPalettes": {
       "tones": [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 95, 99, 100],
@@ -53,8 +53,8 @@
       }
     },
     "cssAliases": {
-      "materialWebPrefix": "--md-sys-color-*",
-      "runtimePrefix": "--m3-*",
+      "systemRolePrefix": "role:*",
+      "runtimePrefix": "runtime:*",
       "productPrefix": "--green, --bg, --panel, --line, --text, --muted"
     },
     "seedBehavior": {
@@ -63,6 +63,7 @@
       "edit": "rendered output canvas becomes active seed",
       "newMedia": "new media resets edit seed",
       "designSystemPage": "local implementation examples apply the chosen seed to the documentation shell; the base background is primary tone 10",
+      "monochromePalettes": "monochromatic home palettes mark the navigation seed with scheme=monochrome so primary, secondary, tertiary, neutral, and neutral-variant tonal palettes share one hue family",
       "guardrail": "semantic roles keep meaning after tinting"
     }
   },
@@ -75,7 +76,7 @@
       "extendedCaps": "Use widened all-caps Mono only for rare display specimens, brand proof, pane section labels, and major operational readouts.",
       "readingFallback": "Switch to GT Standard only for long-form copy around 45-72 characters per line.",
       "liveDitherText": "Home workbench headings, command labels, and telemetry readouts may carry a readable masked pixel overlay driven by active palette colors, selected algorithm type, adjustment density, and effects strength.",
-      "logotypeToolMatchedCutout": "The outlined Dither Wizard logotype samples assets/video/dither-magic.mp4 into a 229 x 54 canvas, runs it through the active algorithm, adjustments, palette, and effects stack, and clips that processed source through the full lockup as one continuous texture."
+      "logotypeToolMatchedCutout": "The outlined Dither Wizard logotype samples assets/video/dither-magic.mp4 into a 229 x 54 canvas, clips that processed source through the full lockup, uses the active tool stack on the homepage, uses a shared site-header renderer on documentation, account, contact, and lab pages, derives shared-page fill colors from page accents instead of text color, and renders with logo-only visibility guards that keep contrast below -20, Bias at or above -25, Epsilon Glow above 50, and a subtle extracted or page-primary source tone over the fill."
     },
     "roles": {
       "displayLarge": { "size": "120px", "lineHeight": "124px", "family": "GT Standard Mono", "tracking": "0.015em", "case": "uppercase", "usage": "system title" },
@@ -114,16 +115,16 @@
       "feedback": "Hover, focus, and pressed states respond immediately and resolve within roughly 80-150ms.",
       "signature": "Longer motion is reserved for local scan, lock, compile, and cast feedback.",
       "navigation": "The design-system documentation rail uses Bare Index as production: dechromed rule index, single-select active containment, and transform/opacity Trace Fold motion.",
-      "heroSizzle": "The design-system hero sizzle is a full-width automatic slideshow with the Wizardly Design System title embedded as the fixed lead object inside an open quiet field. The title field is an exclusion zone for readable labels, plotted paths, component panels, and state strips. Background texture is tertiary, midground structure carries sparse grids and token/type/state maps, and each phase reveals one real design-system or product primitive: foundations, components, commerce/account surfaces, workbench controls, or governance checks.",
+      "heroSizzle": "The design-system hero sizzle is a full-width automatic slideshow with the Wizardly Design System title embedded as the fixed lead object inside an open quiet field. The title field is an exclusion zone for readable labels, plotted paths, component panels, and state strips. Background texture is tertiary, midground structure carries sparse grids and token/type/state maps, and five visual options reveal real design-system or product primitives: Token Reactor, Component Sequencer, Commerce Flow, Workbench Signal, and Governance Radar.",
       "performance": "Animated preview may pace heavy frames so controls and navigation remain responsive.",
       "accessibility": "Reduced motion disables nonessential loops and scan sweeps."
     },
     "sizzleSections": {
-      "foundations": ["color roles", "type roles", "state matrix", "motion tokens"],
-      "componentCatalog": ["button states", "text inputs", "data table", "documentation rail"],
-      "accountCommerce": ["sign-in form", "account settings", "store product card", "billing recovery"],
-      "ditherWorkbench": ["dropzone", "preview canvas", "timeline transport", "export meter"],
-      "systemGovernance": ["source files", "access gates", "qa gates", "handoff"]
+      "tokenReactor": ["palette roles", "type specimen", "state stack", "motion curve"],
+      "componentSequencer": ["button states", "text inputs", "data table", "documentation rail"],
+      "commerceFlow": ["sign-in form", "account settings", "store product card", "billing recovery"],
+      "workbenchSignal": ["dropzone", "preview canvas", "timeline transport", "export meter"],
+      "governanceRadar": ["source files", "access gates", "qa gates", "handoff"]
     }
   },
   "states": {
@@ -138,8 +139,9 @@
   "components": {
     "records": {
       "requiredFields": ["visual specimen", "states", "variants or modes", "tokens", "accessibility", "Dither Wizard use"],
-      "disclosure": ["family tabs", "single open record", "deep-linked subsection records"],
-      "dataTableVariants": ["invoice ledger", "session list", "plan comparison", "entitlement cards", "team seats", "payment methods", "activity log", "order history", "usage meters", "refund queue"]
+      "disclosure": ["family tabs", "open specimen board", "quiet deep links", "normalized hairline rhythm", "full-row complex specimens", "accessible state and variant metadata"],
+      "dataTableVariants": ["invoice ledger", "session list", "plan comparison", "entitlement cards", "team seats", "payment methods", "activity log", "order history", "usage meters", "refund queue"],
+      "platformCoverage": ["button state matrix", "toolbar", "menu button", "command palette", "context menu", "menu bar", "popover", "split view", "collection grid", "inspector panel", "scroll area", "key-value list", "notification center", "permission prompt", "coach mark", "error boundary", "toggle button group", "color picker", "tree and outline view", "transfer list", "bulk selection bar", "tokenized input", "inline edit field", "address form", "form field group", "masked input"]
     },
     "forms": {
       "fieldHeight": "34px",
@@ -147,12 +149,12 @@
       "labelRole": "labelSmall",
       "valueRole": "bodySmall",
       "focusTreatment": "primary border plus soft primary halo",
-      "requiredSpecimens": ["search input", "single select", "dense menu", "selected option", "group label", "email login", "password field", "payment method field", "billing address"]
+      "requiredSpecimens": ["search input", "single select", "dense menu", "selected option", "group label", "email login", "password field", "tokenized input", "inline edit field", "masked input", "payment method field", "billing address"]
     },
     "commerce": {
       "families": ["auth", "account", "store", "billing"],
-      "pageKits": ["login and signup", "account management", "store and cart", "checkout and billing", "payment recovery"],
-      "requiredSpecimens": ["sign-in form", "sign-up form", "password field", "one-time code field", "validation summary", "account menu", "settings section", "settings row", "danger zone", "activity log", "subscription settings", "product listing", "product card", "price row", "plan selector", "cart drawer", "checkout stepper", "checkout shell", "payment provider frame", "payment method form", "tax and VAT fields", "invoice list", "billing ledger table", "payment failure recovery"],
+      "pageKits": ["login and signup", "account management", "store and cart", "checkout and billing", "payment recovery", "privacy and security", "license management", "support operations"],
+      "requiredSpecimens": ["sign-in form", "sign-up form", "password field", "one-time code field", "passkey prompt", "SSO option group", "consent and legal gate", "validation summary", "account menu", "settings section", "settings row", "danger zone", "activity log", "appearance settings", "connected accounts", "API key manager", "privacy controls", "data export request", "subscription settings", "product listing", "product card", "asset preview gallery", "license comparison", "compatibility matrix", "download manager", "price row", "plan selector", "cart drawer", "checkout stepper", "checkout shell", "payment provider frame", "payment method form", "payment method selector", "tax and VAT fields", "proration preview", "invoice list", "billing ledger table", "payment failure recovery", "dunning timeline", "refund status tracker", "usage limit alert"],
       "requiredStates": ["empty", "loading", "saving", "success", "warning", "error", "locked", "owned", "expired", "past due"],
       "guardrails": ["no placeholder-only labels", "prices and totals render as text", "payment errors include next action", "locked entitlements keep context visible", "security-sensitive actions require confirmation copy"]
     }
@@ -175,14 +177,14 @@
     "categories": ["Navigation", "Action", "Media", "File", "Communication", "Hardware", "Maps", "Time", "Data", "Text Formatting", "Weather", "General"]
   },
   "workflows": {
-    "upload": ["empty source", "dragging", "loading", "accepted", "error"],
-    "edit": ["preview", "inspector", "dynamic theme", "preset dirty", "undo"],
-    "animate": ["timeline", "frame count", "speed", "recording", "reduced motion"],
-    "batch": ["queued", "processing", "complete", "failed", "selected"],
-    "export": ["format", "dimensions", "file size", "saved bytes", "over-budget", "complete"],
-    "auth": ["sign in", "sign up", "verify", "reset password", "session expired"],
-    "account": ["profile", "security", "subscription", "team seats", "entitlements"],
-    "store": ["browse", "product detail", "cart", "checkout", "purchase confirmation"],
-    "billing": ["payment method", "billing address", "invoice", "receipt", "payment failure"]
+    "upload": ["empty source", "dragging", "loading", "accepted", "error", "source drop target", "upload review"],
+    "edit": ["preview", "inspector", "dynamic theme", "preset dirty", "undo", "parameter rack", "before after comparator", "clarity-biased randomize"],
+    "animate": ["timeline", "frame count", "speed", "recording", "reduced motion", "keyboard shortcut overlay"],
+    "batch": ["queued", "processing", "complete", "failed", "selected", "render job inspector"],
+    "export": ["format", "dimensions", "file size", "saved bytes", "over-budget", "complete", "export manifest"],
+    "auth": ["sign in", "sign up", "verify", "reset password", "session expired", "passkey", "SSO", "invite accept"],
+    "account": ["profile", "security", "subscription", "team seats", "entitlements", "privacy", "API keys", "data export"],
+    "store": ["browse", "product detail", "cart", "checkout", "purchase confirmation", "license comparison", "download manager"],
+    "billing": ["payment method", "billing address", "invoice", "receipt", "payment failure", "proration", "dunning", "refund status", "usage limit"]
   }
 }

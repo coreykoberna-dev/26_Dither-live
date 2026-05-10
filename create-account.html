@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Account Preview | Dither Wizard</title>
+    <link rel="stylesheet" href="styles.css?v=20260510-auth-flow" />
+  </head>
+  <body class="account-body signup-body" data-bg-texture="matrix-micro" data-logo-variant="figma-lockup">
+    <div class="matrix-field" aria-hidden="true"></div>
+    <div class="system-shell account-shell signup-shell">
+      <div data-site-header></div>
+
+      <main class="system-page account-page signup-page" aria-labelledby="signup-title">
+        <div class="system-inner account-inner signup-inner">
+          <section class="system-hero account-hero signup-hero">
+            <div class="account-hero-copy">
+              <p class="system-kicker">account / preview</p>
+              <h1 class="system-title" id="signup-title">Account Preview</h1>
+              <p class="account-lede">A shell for future account creation. The public static build does not accept or store credentials.</p>
+            </div>
+            <dl class="account-signal-strip" aria-label="Sign-up summary">
+              <div>
+                <dt>Free exports</dt>
+                <dd>4</dd>
+              </div>
+              <div>
+                <dt>Plan</dt>
+                <dd>$40 / year</dd>
+              </div>
+              <div>
+                <dt>Next step</dt>
+                <dd>Checkout</dd>
+              </div>
+            </dl>
+          </section>
+
+          <section class="signup-layout" aria-label="Create account">
+            <form class="auth-form-panel signup-form-panel" id="signupForm">
+              <div class="section-head signup-section-head">
+                <h2>Future Account Flow</h2>
+                <span class="state-chip" id="signupStateChip">Preview</span>
+              </div>
+              <div class="google-auth-render-slot" id="signupGoogleSlot" hidden></div>
+              <button class="sso-button google-auth-button" type="button" id="googleSignupButton">
+                <span class="google-logo-wrap" aria-hidden="true">
+                  <svg class="google-logo" viewBox="0 0 48 48" focusable="false">
+                    <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"></path>
+                    <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"></path>
+                    <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"></path>
+                    <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"></path>
+                    <path fill="none" d="M0 0h48v48H0z"></path>
+                  </svg>
+                </span>
+                <span>Google disabled</span>
+              </button>
+              <div class="auth-divider" aria-hidden="true"><span>or</span></div>
+              <label class="field-group">
+                <span class="field-label">Name</span>
+                <input class="text-input" id="signupName" type="text" autocomplete="name" placeholder="Display name" required />
+              </label>
+              <label class="field-group">
+                <span class="field-label">Email</span>
+                <input class="text-input" id="signupEmail" type="email" autocomplete="email" placeholder="you@example.com" required />
+              </label>
+              <div class="payment-field-row">
+                <label class="field-group">
+                  <span class="field-label">Password</span>
+                  <input class="text-input" id="signupPassword" type="password" autocomplete="off" placeholder="disabled in public preview" />
+                </label>
+                <label class="field-group">
+                  <span class="field-label">Confirm password</span>
+                  <input class="text-input" id="signupConfirm" type="password" autocomplete="off" placeholder="disabled in public preview" />
+                </label>
+              </div>
+              <label class="form-support-row signup-consent-row">
+                <span><input id="signupConsent" type="checkbox" /> Backend auth is required before this flow goes live.</span>
+              </label>
+              <button type="submit">
+                <span class="pixel-icon-slot" data-pixel-icon="User Plus" aria-hidden="true"></span>
+                <span>Backend Required</span>
+              </button>
+              <p class="account-auth-footer">Need access? <a class="account-inline-link" href="contact.html">Contact</a></p>
+              <div class="inline-alert" id="signupStatus" role="status">Account creation is disabled in the public preview.</div>
+            </form>
+
+            <aside class="cart-ledger signup-ledger" aria-label="Account and plan summary">
+              <div class="specimen-head">
+                <h3>Dither Wizard Access</h3>
+                <p>The free export meter stays available until the fifth export requires the yearly subscription.</p>
+              </div>
+              <div class="ledger-row">
+                <span>Account</span>
+                <strong>Free</strong>
+              </div>
+              <div class="ledger-row">
+                <span>Exports before plan</span>
+                <strong>4</strong>
+              </div>
+              <div class="ledger-row">
+                <span>Yearly plan</span>
+                <strong>$40.00</strong>
+              </div>
+              <div class="ledger-row is-total">
+                <span>Due now</span>
+                <strong>$0.00</strong>
+              </div>
+              <a class="account-link-button" href="contact.html">
+                <span class="pixel-icon-slot" data-pixel-icon="Login" aria-hidden="true"></span>
+                <span>Contact</span>
+              </a>
+            </aside>
+          </section>
+        </div>
+      </main>
+
+      <footer class="site-footer" id="siteFooter">
+        <div class="site-footer-inner">
+          <div class="footer-brand" aria-label="Dither Wizard">
+            <strong>Dither Wizard<sup class="footer-trademark" aria-label="trademark">&trade;</sup><time class="footer-year" datetime="2026" data-current-year>2026</time></strong>
+            <a class="footer-credit" href="https://coreykoberna.com/" target="_blank" rel="noreferrer"><span>Built by Corey Koberna</span></a>
+          </div>
+          <nav class="footer-section" aria-label="Footer navigation">
+            <ul class="footer-link-list">
+              <li><a class="footer-link" href="index.html"><span>Home</span></a></li>
+              <li><a class="footer-link" href="design-system.html"><span>Wizardry</span></a></li>
+              <li><a class="footer-link" href="contact.html"><span>Contact</span></a></li>
+            </ul>
+          </nav>
+        </div>
+      </footer>
+    </div>
+
+    <script src="assets/sprites/dither-mage-vector-data.js?v=20260510-main-mage"></script>
+    <script src="site-header.js?v=20260510-contact-nav-order"></script>
+    <script src="assets/sprites/dither-mage-vector.js?v=20260510-main-mage"></script>
+    <script src="assets/vendor/pixelarticons/pixelarticons-data.js?v=20260504-pixelarticons-install"></script>
+    <script src="system.js?v=20260510-main-mage"></script>
+    <script src="auth-google.js?v=20260510-auth-flow"></script>
+    <script src="signup.js?v=20260510-auth-flow"></script>
+    <script src="footer.js?v=20260510-auth-flow"></script>
+  </body>
+</html>

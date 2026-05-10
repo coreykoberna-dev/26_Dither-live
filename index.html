@@ -4,9 +4,9 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Dither Wizard</title>
-    <link rel="stylesheet" href="styles.css?v=20260509-effect-list-stack" />
+    <link rel="stylesheet" href="styles.css?v=20260510-base-hover" />
   </head>
-  <body data-bg-texture="matrix-fine" data-logo-variant="figma-lockup" data-drop-texture="rain-vortex-wide">
+  <body data-bg-texture="matrix-fine" data-logo-variant="figma-lockup" data-drop-texture="rain-vortex-wide" data-home-variant="04">
     <div class="matrix-field" aria-hidden="true"></div>
     <div class="app-shell">
       <div data-site-header></div>
@@ -29,7 +29,7 @@
             </label>
             <div class="media-actions source-actions">
               <button id="wizardSignalButton" class="wizard-source-button" type="button" aria-label="Summon a random wizard source image">
-                <span class="pixel-icon-slot" data-pixel-icon="Bolt" aria-hidden="true"></span>
+                <span class="pixel-icon-slot" data-pixel-icon="Dice" aria-hidden="true"></span>
                 <span class="wizard-source-main">Summon Random Image</span>
               </button>
               <button id="loadButton" type="button">Open File</button>
@@ -43,7 +43,7 @@
                 <span class="pixel-icon-slot" data-pixel-icon="Save" aria-hidden="true"></span>
               </button>
             </div>
-            <div class="preset-grid" id="presetGrid" aria-label="Preset looks"></div>
+            <div class="preset-grid tool-list" id="presetGrid" aria-label="Preset looks"></div>
           </section>
 
           <section class="pane-section export-section">
@@ -58,11 +58,6 @@
             </div>
             <div class="file-size-module" aria-live="polite">
               <div class="file-size-head">
-                <div class="file-size-icon" aria-hidden="true">
-                  <span></span>
-                  <span></span>
-                  <span></span>
-                </div>
                 <div>
                   <span class="field-label">File Size</span>
                   <strong id="exportFileName">procedural.png</strong>
@@ -100,6 +95,28 @@
                 </dl>
               </div>
             </div>
+            <div class="export-entitlement" id="exportEntitlement" data-state="free" aria-live="polite">
+              <div class="export-entitlement-head">
+                <div>
+                  <span class="field-label">Export Meter</span>
+                  <strong id="exportEntitlementTitle">5 preview exports left</strong>
+                </div>
+                <span id="exportEntitlementMeter">0 / 5</span>
+              </div>
+              <div class="usage-meter export-entitlement-meter" aria-hidden="true">
+                <span id="exportEntitlementFill"></span>
+              </div>
+            </div>
+            <div class="export-gate" id="exportGate" hidden>
+              <div>
+                <strong id="exportGateTitle">Exports available</strong>
+                <span id="exportGateDetail">The public static build tracks preview usage locally but does not block exports.</span>
+              </div>
+              <div class="export-gate-actions">
+                <a href="contact.html">Contact</a>
+                <button id="exportGateDismiss" type="button">Dismiss</button>
+              </div>
+            </div>
             <div id="exportPreview" class="export-preview" aria-live="polite">
               <span id="exportPreviewFormat">GIF Loop</span>
               <span id="exportPreviewDetails">Full resolution animated export</span>
@@ -110,6 +127,7 @@
               <button id="downloadJpgButton" type="button" data-export-format="jpg">Download JPG</button>
               <button id="downloadSvgButton" type="button" data-export-format="svg">Download SVG</button>
               <button id="recordWebmButton" type="button" data-export-format="webm">Record WebM</button>
+              <button id="recordMp4Button" type="button" data-export-format="mp4">Download MP4</button>
             </div>
             <a id="lastExportLink" class="export-fallback-link" href="#" download hidden>Download latest export</a>
           </section>
@@ -196,7 +214,7 @@
                 <label class="field-label" id="palettePickerLabel" for="paletteSelect">Palette source</label>
                 <select id="paletteSelect" class="palette-native-select" aria-label="Palette" tabindex="-1"></select>
                 <div class="palette-picker" id="palettePicker" aria-labelledby="palettePickerLabel">
-                  <div class="palette-picker-list" id="palettePickerList" role="listbox" aria-labelledby="palettePickerLabel"></div>
+                  <div class="palette-picker-list tool-list" id="palettePickerList" role="listbox" aria-labelledby="palettePickerLabel"></div>
                 </div>
               </div>
               <div class="swatch-row" id="swatchRow"></div>
@@ -213,18 +231,13 @@
             <div class="section-head">
               <h2>Algorithm</h2>
               <div class="section-tools">
-                <span class="count-pill">63</span>
                 <button class="icon-button" id="randomizeAlgorithmButton" type="button" title="Randomize algorithm" aria-label="Randomize algorithm">
                   <span class="pixel-icon-slot" data-pixel-icon="Dice" aria-hidden="true"></span>
                 </button>
               </div>
             </div>
             <div class="form-stack">
-              <div class="field-group">
-                <label class="field-label" for="algorithmSearch">Search algorithms</label>
-                <input id="algorithmSearch" class="text-input" type="search" placeholder="filter by name or group" autocomplete="off" spellcheck="false" />
-              </div>
-              <select id="algorithmSelect" class="menu-list" size="9" aria-label="Dithering algorithm"></select>
+              <select id="algorithmSelect" class="menu-list tool-list" size="9" aria-label="Dithering algorithm"></select>
             </div>
           </section>
 
@@ -247,14 +260,13 @@
             </div>
             <div class="field-group">
               <label class="field-label" for="effectSelect">Effect type</label>
-              <select id="effectSelect" class="menu-list effect-type-list" size="7" aria-label="Effect to add"></select>
+              <select id="effectSelect" class="menu-list tool-list effect-type-list" size="7" aria-label="Effect to add"></select>
             </div>
-            <ol class="effects-stack" id="effectsStack"></ol>
+            <ol class="effects-stack tool-list" id="effectsStack"></ol>
           </section>
 
         </aside>
       </main>
-
       <footer class="site-footer" id="siteFooter">
         <div class="site-footer-inner">
           <div class="footer-brand" aria-label="Dither Wizard">
@@ -275,12 +287,13 @@
     <video id="videoElement" playsinline muted aria-hidden="true"></video>
     <canvas id="workCanvas" aria-hidden="true"></canvas>
     <canvas id="pipelineCanvas" aria-hidden="true"></canvas>
-    <script src="assets/sprites/dither-wizard-vector-data.js?v=20260509-fluid-wizard-motion"></script>
-    <script src="site-header.js?v=20260509-logotype-tool-match"></script>
-    <script src="assets/sprites/dither-wizard-vector.js?v=20260509-fluid-wizard-motion"></script>
+    <script src="assets/sprites/dither-mage-vector-data.js?v=20260510-main-mage"></script>
+    <script src="site-header.js?v=20260510-contact-nav-order"></script>
+    <script src="assets/sprites/dither-mage-vector.js?v=20260510-main-mage"></script>
     <script src="assets/vendor/pixelarticons/pixelarticons-data.js?v=20260504-pixelarticons-install"></script>
-    <script src="system.js?v=20260509-sprite-inspector"></script>
-    <script src="app.js?v=20260509-source-view-theme"></script>
-    <script src="footer.js"></script>
+    <script src="system.js?v=20260510-main-mage"></script>
+    <script src="assets/random-sources/manifest.js?v=20260510-random-source-library-90"></script>
+    <script src="app.js?v=20260510-home-panel-04-export-cleanup"></script>
+    <script src="footer.js?v=20260510-login-route"></script>
   </body>
 </html>

@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Mage Motion Lab</title>
-    <link rel="stylesheet" href="styles.css?v=20260509-mage-lab-chamber" />
+    <link rel="stylesheet" href="styles.css?v=20260510-main-mage" />
   </head>
   <body class="system-doc-body mage-lab-body" data-logo-variant="figma-lockup" data-system-monitor="ghost-stars">
     <div class="matrix-field" aria-hidden="true"></div>
@@ -31,7 +31,7 @@
           <div class="mage-dungeon-shell">
             <canvas id="mageDungeonCanvas" class="mage-dungeon-canvas" width="1440" height="900" aria-label="Pixel dungeon movement stage"></canvas>
             <div class="mage-dungeon-actor" id="mageDungeonActor" aria-hidden="true">
-              <span class="mage-vector-sprite" data-mage-vector data-mage-state="idle-down" data-mage-dungeon-sprite aria-hidden="true"></span>
+              <span class="mage-vector-sprite" data-mage-vector data-mage-wide data-mage-state="idle-down" data-mage-dungeon-sprite aria-hidden="true"></span>
             </div>
             <div class="mage-dungeon-hud" aria-live="polite">
               <span data-mage-position-readout>cell 10 / 10</span>
@@ -100,12 +100,27 @@
                 <input id="mageSpellLevel" type="range" min="1" max="10" step="1" value="10" />
                 <output id="mageSpellLevelOutput">10</output>
               </label>
-              <button class="mage-primary-action" type="button" id="mageCastButton">
-                <span data-pixel-icon="Zap" aria-hidden="true"></span>
-                <span>Cast</span>
-              </button>
+              <div class="mage-action-row">
+                <button class="mage-primary-action" type="button" id="mageCastButton">
+                  <span data-pixel-icon="Zap" aria-hidden="true"></span>
+                  <span>Cast</span>
+                </button>
+                <button class="mage-primary-action mage-secondary-action" type="button" id="mageDemoButton">
+                  <span data-pixel-icon="Play" aria-hidden="true"></span>
+                  <span>Demo</span>
+                </button>
+              </div>
             </section>
           </aside>
+        </section>
+
+        <section class="mage-storyboard" data-mage-storyboard aria-labelledby="mage-storyboard-title">
+          <div class="mage-storyboard-head">
+            <span class="token-name">foundational sprite mapping</span>
+            <h2 id="mage-storyboard-title">Spell Cast Storyboard</h2>
+            <p>Four spell families, four directions, ten frozen cast frames per direction.</p>
+          </div>
+          <div class="mage-storyboard-output" data-mage-storyboard-output></div>
         </section>
 
         <section class="mage-system-matrix" aria-label="Mage micro design system status">
@@ -133,14 +148,12 @@
       </footer>
     </div>
 
-    <script src="assets/sprites/dither-wizard-vector-data.js?v=20260509-fluid-wizard-motion"></script>
-    <script src="site-header.js?v=20260509-logotype-tool-match"></script>
-    <script src="assets/sprites/dither-wizard-vector.js?v=20260509-fluid-wizard-motion"></script>
-    <script src="assets/sprites/dither-mage-vector-data.js?v=20260509-mage-lab"></script>
-    <script src="assets/sprites/dither-mage-vector.js?v=20260509-mage-lab"></script>
+    <script src="assets/sprites/dither-mage-vector-data.js?v=20260510-main-mage"></script>
+    <script src="site-header.js?v=20260510-contact-nav-order"></script>
+    <script src="assets/sprites/dither-mage-vector.js?v=20260510-main-mage"></script>
     <script src="assets/vendor/pixelarticons/pixelarticons-data.js?v=20260504-pixelarticons-install"></script>
-    <script src="system.js?v=20260509-mage-lab"></script>
-    <script src="mage-lab.js?v=20260509-mage-lab-chamber"></script>
-    <script src="footer.js"></script>
+    <script src="system.js?v=20260510-main-mage"></script>
+    <script src="mage-lab.js?v=20260509-room-plate-grounded-cast"></script>
+    <script src="footer.js?v=20260510-login-route"></script>
   </body>
 </html>

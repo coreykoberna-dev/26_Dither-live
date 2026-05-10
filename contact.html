@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Contact Dither Wizard</title>
-    <link rel="stylesheet" href="styles.css?v=20260509-contact-three-window-form" />
+    <link rel="stylesheet" href="styles.css?v=20260510-contact-subject-select-polish" />
   </head>
   <body class="contact-body" data-bg-texture="matrix-micro" data-logo-variant="figma-lockup" data-contact-variant="terminal-deck" data-contact-content="signal-ledger" data-contact-layout="offset-stack">
     <div class="matrix-field" aria-hidden="true"></div>
@@ -25,8 +25,11 @@
           <section class="contact-hero">
             <div class="contact-hero-copy contact-module contact-window contact-window-intro" data-contact-module="intro">
               <button class="contact-window-handle" type="button" aria-label="Move intro window">
-                <span>intro.signal</span>
-                <span>click + drag</span>
+                <span class="contact-window-title">
+                  <span class="contact-window-icon pixel-icon-slot" data-pixel-icon="Mail" aria-hidden="true"></span>
+                  <span>intro.signal</span>
+                </span>
+                <span class="contact-window-action">click + drag</span>
               </button>
               <div class="contact-intro-layout">
                 <div class="contact-intro-main">
@@ -34,7 +37,7 @@
                   <h2 class="system-title" id="contact-title">Contact</h2>
                   <p class="contact-lede">Send project notes, product feedback, design-system questions, or collaboration details.</p>
                   <div class="contact-actions" aria-label="Contact actions">
-                    <a class="contact-command" href="mailto:hello@ditherwizard.ai">
+                    <a class="contact-command" href="#contactForm" data-email-compose>
                       <span class="pixel-icon-slot" data-pixel-icon="Mail" aria-hidden="true"></span>
                       <span>Email</span>
                     </a>
@@ -63,9 +66,9 @@
                       <dt>Channel</dt>
                       <dd>Email</dd>
                     </div>
-                    <div>
+                    <div class="contact-signal-address-row">
                       <dt>Address</dt>
-                      <dd>hello@ditherwizard.ai</dd>
+                      <dd class="contact-signal-address">hello@ditherwizard.ai</dd>
                     </div>
                     <div>
                       <dt>Status</dt>
@@ -74,14 +77,20 @@
                   </dl>
                 </aside>
               </div>
+              <button class="contact-window-resize" type="button" aria-label="Resize intro window">
+                <span class="contact-resize-icon pixel-icon-slot" data-pixel-icon="Scale" aria-hidden="true"></span>
+              </button>
             </div>
           </section>
 
           <section class="contact-workflow" aria-label="Contact transmission">
             <form class="contact-form contact-module contact-window contact-window-form" id="contactForm" action="mailto:hello@ditherwizard.ai" method="post" enctype="text/plain" data-contact-module="form">
               <button class="contact-window-handle" type="button" aria-label="Move form window">
-                <span>transmission.form</span>
-                <span>click + drag</span>
+                <span class="contact-window-title">
+                  <span class="contact-window-icon pixel-icon-slot" data-pixel-icon="Send" aria-hidden="true"></span>
+                  <span>transmission.form</span>
+                </span>
+                <span class="contact-window-action">click + drag</span>
               </button>
               <div class="section-head">
                 <h2>Transmission</h2>
@@ -95,16 +104,35 @@
                 <span class="field-label">Email</span>
                 <input class="text-input" name="email" type="email" autocomplete="email" placeholder="you@example.com" required />
               </label>
-              <label class="field-group">
-                <span class="field-label">Subject</span>
-                <select name="subject" required>
-                  <option value="General inquiry">General inquiry</option>
-                  <option value="Dither Wizard support">Dither Wizard support</option>
-                  <option value="Design system feedback">Design system feedback</option>
-                  <option value="Collaboration">Collaboration</option>
-                </select>
-              </label>
-              <label class="field-group">
+              <div class="field-group contact-subject-field">
+                <span class="field-label" id="contactSubjectFieldLabel">Subject</span>
+                <div class="contact-subject-select" data-contact-subject-select data-state="closed">
+                  <input type="hidden" name="subject" value="General inquiry" data-contact-subject-value />
+                  <button class="contact-subject-trigger" type="button" aria-haspopup="listbox" aria-expanded="false" aria-controls="contactSubjectList" aria-labelledby="contactSubjectFieldLabel contactSubjectCurrent" data-contact-subject-trigger>
+                    <span id="contactSubjectCurrent" data-contact-subject-label>General inquiry</span>
+                    <span class="contact-subject-trigger-icon pixel-icon-slot" data-pixel-icon="Chevron Down" aria-hidden="true"></span>
+                  </button>
+                  <div class="contact-subject-menu" id="contactSubjectList" role="listbox" aria-labelledby="contactSubjectFieldLabel" data-contact-subject-menu hidden>
+                    <button class="contact-subject-option" type="button" role="option" aria-selected="true" data-contact-subject-option data-value="General inquiry">
+                      <span class="contact-subject-option-code">01</span>
+                      <span data-contact-subject-option-label>General inquiry</span>
+                    </button>
+                    <button class="contact-subject-option" type="button" role="option" aria-selected="false" data-contact-subject-option data-value="Dither Wizard support">
+                      <span class="contact-subject-option-code">02</span>
+                      <span data-contact-subject-option-label>Dither Wizard support</span>
+                    </button>
+                    <button class="contact-subject-option" type="button" role="option" aria-selected="false" data-contact-subject-option data-value="Design system feedback">
+                      <span class="contact-subject-option-code">03</span>
+                      <span data-contact-subject-option-label>Design system feedback</span>
+                    </button>
+                    <button class="contact-subject-option" type="button" role="option" aria-selected="false" data-contact-subject-option data-value="Collaboration">
+                      <span class="contact-subject-option-code">04</span>
+                      <span data-contact-subject-option-label>Collaboration</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <label class="field-group contact-message-field">
                 <span class="field-label">Message</span>
                 <textarea class="text-input contact-message-input" name="message" rows="7" placeholder="signal details" required></textarea>
               </label>
@@ -118,13 +146,19 @@
                   <span>Copy Email</span>
                 </button>
               </div>
+              <button class="contact-window-resize" type="button" aria-label="Resize transmission window">
+                <span class="contact-resize-icon pixel-icon-slot" data-pixel-icon="Scale" aria-hidden="true"></span>
+              </button>
             </form>
           </section>
 
           <aside class="context-dev-panel contact-dev-panel contact-feature-monitor contact-module contact-window contact-window-monitor" id="contactVariantPanel" aria-label="Feature monitor tool" data-contact-variant-panel data-contact-module="monitor">
             <button class="contact-window-handle" type="button" aria-label="Move feature monitor tool">
-              <span>feature.monitor</span>
-              <span>click + drag</span>
+              <span class="contact-window-title">
+                <span class="contact-window-icon pixel-icon-slot" data-pixel-icon="Monitor" aria-hidden="true"></span>
+                <span>feature.monitor</span>
+              </span>
+              <span class="contact-window-action">click + drag</span>
             </button>
             <div class="context-dev-head">
               <span>Feature Monitor</span>
@@ -201,6 +235,9 @@
                 <strong id="contactVariantReadout">Rule Stack</strong>
               </div>
             </div>
+            <button class="contact-window-resize" type="button" aria-label="Resize feature monitor window">
+              <span class="contact-resize-icon pixel-icon-slot" data-pixel-icon="Scale" aria-hidden="true"></span>
+            </button>
           </aside>
         </div>
       </main>
@@ -222,12 +259,12 @@
       </footer>
     </div>
 
-    <script src="assets/sprites/dither-wizard-vector-data.js?v=20260509-fluid-wizard-motion"></script>
-    <script src="site-header.js?v=20260509-logotype-tool-match"></script>
-    <script src="assets/sprites/dither-wizard-vector.js?v=20260509-fluid-wizard-motion"></script>
+    <script src="assets/sprites/dither-mage-vector-data.js?v=20260510-main-mage"></script>
+    <script src="site-header.js?v=20260510-contact-nav-order"></script>
+    <script src="assets/sprites/dither-mage-vector.js?v=20260510-main-mage"></script>
     <script src="assets/vendor/pixelarticons/pixelarticons-data.js?v=20260504-pixelarticons-install"></script>
-    <script src="system.js?v=20260509-sprite-inspector"></script>
-    <script src="contact.js?v=20260509-contact-three-window-form"></script>
-    <script src="footer.js"></script>
+    <script src="system.js?v=20260510-main-mage"></script>
+    <script src="contact.js?v=20260510-contact-subject-select-polish"></script>
+    <script src="footer.js?v=20260510-login-route"></script>
   </body>
 </html>

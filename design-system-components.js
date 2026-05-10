@@ -14,6 +14,14 @@
           product: "Process, export, reset, randomize, save preset, clear queue.",
         },
         {
+          name: "Button state matrix",
+          intent: "Canonical interaction contract for every button emphasis, including soft-disabled and long-label edge cases.",
+          states: ["default", "hover", "focus-visible", "pressed", "selected", "loading", "disabled", "soft-disabled", "destructive"],
+          tokens: "State layer opacity, focus ring, primary/secondary/error roles, disabled opacity, min target size.",
+          access: "Soft-disabled controls stay focusable only when discoverability matters and must explain why the action is unavailable.",
+          product: "Export buttons, checkout actions, account save rows, destructive billing recovery commands.",
+        },
+        {
           name: "Floating action button",
           intent: "Pinned high-emphasis command for the one action that should stay reachable while inspecting output.",
           states: ["default", "hover", "focus", "pressed", "loading", "disabled"],
@@ -54,6 +62,14 @@
           product: "Export PNG by default, open SVG, WebM, palette JSON, copy CSS.",
         },
         {
+          name: "Menu button",
+          intent: "Button-triggered command menu with anchored placement, typeahead, disabled items, and shortcut hints.",
+          states: ["closed", "open", "highlighted", "selected", "disabled", "overflow"],
+          tokens: "Button roles, menu surface, active row, shortcut text, elevation level 2.",
+          access: "Trigger exposes aria-haspopup and aria-expanded; menu supports arrows, Home, End, Escape, and typeahead.",
+          product: "Export format menu, account actions, effect row options, billing invoice actions.",
+        },
+        {
           name: "Action group",
           intent: "Toolbar cluster for tightly related controls with one visual rhythm.",
           states: ["default", "selected", "focus", "overflow", "disabled"],
@@ -84,6 +100,22 @@
           tokens: "Primary role, focus ring, active glow, reduced-motion safe scan.",
           access: "Avoid covering canvas controls or status text.",
           product: "Capture frame, cast preview, run batch, record loop.",
+        },
+        {
+          name: "Toolbar",
+          intent: "Dense horizontal command strip for repeated production tasks, with grouped actions, overflow, and disabled explanations.",
+          states: ["default", "focused group", "overflow", "disabled item", "sticky", "compact"],
+          tokens: "Open row surface, separator rules, icon button states, tooltip delay, overflow menu surface.",
+          access: "Use role toolbar where appropriate, preserve logical order, and keep every icon action labelled.",
+          product: "Canvas tools, batch actions, checkout review actions, account security controls.",
+        },
+        {
+          name: "Command palette trigger",
+          intent: "Global keyboard-first entry point for commands without making the topbar carry every action.",
+          states: ["idle", "hover", "focus", "open", "result selected", "no result"],
+          tokens: "Field surface, shortcut hint, command result row, focus ring, overlay surface.",
+          access: "Expose shortcut text, return focus on close, and keep results navigable by arrow keys.",
+          product: "Jump to algorithm, run export, open invoices, find packs, switch theme.",
         },
       ],
     },
@@ -123,6 +155,14 @@
           tokens: "Inverse surface, small mono type, 4px radius.",
           access: "Do not hide required instructions in tooltips.",
           product: "Icon-only canvas controls, timeline transport, palette lock.",
+        },
+        {
+          name: "Tooltip state matrix",
+          intent: "Rules for simple labels, rich explanations, keyboard hints, disabled reasons, and collision-safe placement.",
+          states: ["hover", "focus", "long press", "rich", "disabled reason", "collision flipped"],
+          tokens: "Tooltip surface, inverse text, delay timing, placement offset, pointer-safe dismissal.",
+          access: "Tooltip text supplements visible UI and never contains the only required instruction.",
+          product: "Icon-only buttons, dense checkout icons, billing table actions, preview controls.",
         },
         {
           name: "Progress indicator",
@@ -171,6 +211,46 @@
           tokens: "Surface tint, scan motion, reduced-motion static block.",
           access: "Use aria-busy on the owning region and avoid focusable skeleton content.",
           product: "Store listing load, invoice history load, entitlement sync.",
+        },
+        {
+          name: "Toast stack",
+          intent: "Ordered transient feedback queue when multiple confirmations occur close together.",
+          states: ["queued", "visible", "actionable", "collapsing", "dismissed"],
+          tokens: "Inverse surface, stack offset, action color, polite live-region timing.",
+          access: "Do not interrupt focus. Actions remain keyboard reachable while visible.",
+          product: "Batch exports completed, presets saved, copied CSS, purchase confirmation handoff.",
+        },
+        {
+          name: "Notification center",
+          intent: "Persistent inbox for system, billing, team, and processing events that outlive a snackbar.",
+          states: ["empty", "unread", "read", "filtered", "loading", "error"],
+          tokens: "List rows, unread marker, status chips, timestamp text, section dividers.",
+          access: "Unread counts are text and every event exposes type, time, and next action.",
+          product: "Failed render, expiring card, team invite, completed batch, pack update.",
+        },
+        {
+          name: "Permission prompt",
+          intent: "Clear system-style request for access to files, camera, notifications, or local storage.",
+          states: ["request", "granted", "denied", "blocked", "retry", "learn more"],
+          tokens: "Dialog or inline alert surface, primary/secondary actions, warning/info roles.",
+          access: "Explain what changes and preserve a no-thanks path without hiding core content.",
+          product: "Camera capture, drag-drop folders, notification opt-in, persistent local workspace.",
+        },
+        {
+          name: "Coach mark",
+          intent: "Contextual first-run callout for complex tools without creating a tour overlay.",
+          states: ["hidden", "anchored", "next", "dismissed", "reduced motion"],
+          tokens: "Popover surface, anchor rule, progress chip, small action row.",
+          access: "Must be dismissible, non-blocking unless required, and associated with the target control.",
+          product: "Timeline introduction, algorithm filter tip, payment recovery explanation.",
+        },
+        {
+          name: "Error boundary",
+          intent: "Recoverable failure surface for a broken panel, failed render path, or crashed data region.",
+          states: ["recoverable", "retrying", "diagnostic open", "reported", "fatal"],
+          tokens: "Error role, diagnostic disclosure, retry action, compact stack metadata.",
+          access: "Expose a plain-language cause, retry path, and support/report action.",
+          product: "Render worker failure, invoice sync error, store feed outage, corrupted preset.",
         },
       ],
     },
@@ -236,6 +316,14 @@
           product: "Cart drawer, menu, checkout review, payment recovery, dialogs.",
         },
         {
+          name: "Popover",
+          intent: "Anchored temporary surface for compact controls, explanations, and chooser panels.",
+          states: ["closed", "opening", "open", "flipped", "dismissed", "modal fallback"],
+          tokens: "Popover surface, anchor offset, elevation level 2, focus ring, collision padding.",
+          access: "Close on Escape, restore focus to trigger, and keep nonmodal popovers out of the tab trap.",
+          product: "Color role inspector, export settings, shortcut explanations, receipt actions.",
+        },
+        {
           name: "Details and accordion",
           intent: "Progressive disclosure for dense documentation or advanced controls.",
           states: ["closed", "opening", "open", "focus", "disabled"],
@@ -274,6 +362,46 @@
           tokens: "Rule-separated rows, header labels, status chips, row actions.",
           access: "Use real table semantics or equivalent grid roles when rows are interactive.",
           product: "Invoice list, active sessions, team seats, store order history.",
+        },
+        {
+          name: "Collection grid",
+          intent: "Responsive repeated object layout for cards, thumbnails, icons, products, and presets.",
+          states: ["default", "selected", "loading", "empty", "filtered", "virtualized"],
+          tokens: "Grid gaps, item surface, selected outline, skeleton placeholders, density tokens.",
+          access: "Preserve source order, expose selected count, and avoid visual-only product metadata.",
+          product: "Preset library, store packs, icon browser, batch thumbnails, palette galleries.",
+        },
+        {
+          name: "Split view",
+          intent: "Master-detail or workbench split that adapts from rail and detail to stacked mobile regions.",
+          states: ["default", "resized", "collapsed", "detail empty", "mobile stacked"],
+          tokens: "Pane surface, divider handle, sticky header, breakpoint rules, safe-area padding.",
+          access: "Resizable dividers need keyboard equivalents or predefined density choices.",
+          product: "Account settings, store browse/detail, design-system rail/detail, editor pane model.",
+        },
+        {
+          name: "Inspector panel",
+          intent: "Right-side property editor for selected objects with stable sections and dirty-state controls.",
+          states: ["nothing selected", "selected", "dirty", "saving", "error", "read-only"],
+          tokens: "Panel rules, field groups, save bar, status chip, sticky footer actions.",
+          access: "Selected object name is exposed and save/cancel controls remain in predictable order.",
+          product: "Effect parameters, asset metadata, team member role, billing method details.",
+        },
+        {
+          name: "Scroll area",
+          intent: "Contained scrolling region with visible boundaries, sticky affordances, and overflow hints.",
+          states: ["at start", "scrolling", "at end", "overflowing", "reduced motion"],
+          tokens: "Scroll shadow, sticky rule, scrollbar color, safe padding.",
+          access: "Keyboard users can enter and scroll the region without trapping page focus.",
+          product: "Algorithm lists, invoices, activity logs, long checkout summaries.",
+        },
+        {
+          name: "Key-value list",
+          intent: "Dense metadata readout for technical values, payment facts, and export measurements.",
+          states: ["default", "highlighted", "warning", "editable", "empty"],
+          tokens: "Label/value typography, row dividers, semantic text roles, tabular numerals.",
+          access: "Labels and values read in pairs, not as disconnected columns.",
+          product: "File dimensions, invoice totals, plan limits, session metadata, license terms.",
         },
         {
           name: "Settings row",
@@ -371,6 +499,38 @@
           product: "Icon library search, algorithm filter, preset finder.",
         },
         {
+          name: "Command palette",
+          intent: "Global modal search for navigation, commands, recent assets, and account destinations.",
+          states: ["closed", "open", "typing", "highlighted", "no results", "executing"],
+          tokens: "Overlay surface, search field, result rows, shortcut hints, selected row.",
+          access: "Trap focus only while open, support arrows and Enter, restore focus to the launcher.",
+          product: "Run export, find algorithm, open billing, switch theme, search store packs.",
+        },
+        {
+          name: "Context menu",
+          intent: "Object-scoped actions for rows, thumbnails, timeline frames, and account entities.",
+          states: ["closed", "open", "submenu", "disabled item", "danger zone"],
+          tokens: "Menu surface, row height, shortcut hint, separator, destructive text role.",
+          access: "Opens from keyboard context key or explicit button and keeps items reachable by arrows.",
+          product: "Effect row actions, batch item menu, invoice menu, product card actions.",
+        },
+        {
+          name: "Menu bar",
+          intent: "Desktop-grade command map for large-product workflows and power-user navigation.",
+          states: ["default", "menu open", "submenu open", "disabled item", "current command"],
+          tokens: "Topbar menu text, menu surface, separators, shortcut hints, focus ring.",
+          access: "Support arrows between menus, Escape close, and visible shortcut alternatives.",
+          product: "Future Dither desktop-style workspace with File, Edit, View, Export, Account.",
+        },
+        {
+          name: "Pagination",
+          intent: "Stable movement through large result sets when infinite scroll would damage orientation.",
+          states: ["first page", "middle", "last page", "loading", "disabled", "compact"],
+          tokens: "Button states, count readout, active page chip, disabled state.",
+          access: "Expose current page, total count, and next/previous labels.",
+          product: "Icon catalog pages, invoice history, activity log, store result pages.",
+        },
+        {
           name: "Footer",
           intent: "Compact persistent route and repo access at document end.",
           states: ["default", "hover", "focus"],
@@ -408,6 +568,14 @@
           tokens: "Track surface, primary thumb, text label.",
           access: "Label states in text when meaning is not obvious.",
           product: "Motion dither, lock seed, invert, transparency.",
+        },
+        {
+          name: "Toggle button group",
+          intent: "Multi-state command or filter group when a segmented control is too exclusive or too high-level.",
+          states: ["off", "on", "mixed", "focus", "disabled", "overflow"],
+          tokens: "Button state layer, selected fill, outline, tooltip label, group spacing.",
+          access: "Use aria-pressed and visible group labels for icon-only toggles.",
+          product: "Layer visibility, preview overlays, billing filters, asset type filters.",
         },
         {
           name: "Slider",
@@ -457,6 +625,38 @@
           access: "Each swatch has a text name or value.",
           product: "Dynamic theme seed, limited palette, print palette.",
         },
+        {
+          name: "Color picker",
+          intent: "Precise color selection with swatches, numeric channels, alpha, and contrast warnings.",
+          states: ["default", "sampling", "editing", "invalid contrast", "locked", "disabled"],
+          tokens: "Swatch, field group, contrast warning role, focus ring, alpha track.",
+          access: "Expose color value as text and do not rely on hue alone for state.",
+          product: "Theme seed override, palette editing, print ramp tuning, account accent color.",
+        },
+        {
+          name: "Tree and outline view",
+          intent: "Hierarchical selection for nested objects, docs sections, preset folders, and team libraries.",
+          states: ["collapsed", "expanded", "selected", "loading branch", "empty branch"],
+          tokens: "Indent scale, disclosure glyph, selected row, focus ring, branch connector.",
+          access: "Use tree semantics or native disclosure groups with keyboard expansion.",
+          product: "Effect stacks with child settings, design-system outline, team asset folders.",
+        },
+        {
+          name: "Transfer list",
+          intent: "Move selected objects between available and assigned sets without losing selection context.",
+          states: ["empty", "selected", "moving", "all assigned", "error"],
+          tokens: "List rows, selected chips, action buttons, count readout, warning role.",
+          access: "Provide non-drag move controls and announce updated counts.",
+          product: "Assign packs to seats, add files to batch, grant team permissions.",
+        },
+        {
+          name: "Bulk selection bar",
+          intent: "Temporary action rail that appears after multi-select without hiding the collection.",
+          states: ["hidden", "visible", "partial selection", "all selected", "processing"],
+          tokens: "Sticky bar surface, selected count, action buttons, warning/destructive roles.",
+          access: "Selected count is announced and bulk actions remain keyboard reachable.",
+          product: "Batch delete, export selected files, assign team seats, refund selected orders.",
+        },
       ],
     },
     {
@@ -505,6 +705,14 @@
           product: "Billing address, country and region, command palette, store search.",
         },
         {
+          name: "Search suggestion list",
+          intent: "Structured search results with category headers, recent items, empty results, and keyboard highlight.",
+          states: ["empty", "recent", "typing", "highlighted", "no results", "loading"],
+          tokens: "Search field, result row, category label, shortcut hint, status text.",
+          access: "Combobox/listbox relationships must keep active descendant and result count accurate.",
+          product: "Algorithm search, command palette, store search, icon library lookup.",
+        },
+        {
           name: "Number field and stepper",
           intent: "Precise numeric input with bounded increments.",
           states: ["default", "focus", "stepping", "invalid", "disabled"],
@@ -535,6 +743,46 @@
           tokens: "Field surface, helper text, warning/error roles, icon button slot.",
           access: "Keep a visible label, autocomplete attribute, and textual password requirements.",
           product: "Sign in, sign up, password reset, sensitive account changes.",
+        },
+        {
+          name: "Tokenized input",
+          intent: "Free-entry field that converts selected values into removable tokens.",
+          states: ["empty", "typing", "token added", "duplicate", "invalid token", "max reached"],
+          tokens: "Text field, input chip, remove icon, helper/error text, focus ring.",
+          access: "Each token has a remove button with a descriptive label and supports backspace behavior.",
+          product: "Invite emails, tag filters, allowed domains, batch labels.",
+        },
+        {
+          name: "Inline edit field",
+          intent: "Read-to-edit value that preserves context and reveals save/cancel only while editing.",
+          states: ["read", "editing", "dirty", "saving", "saved", "error"],
+          tokens: "Text field, action row, focus ring, success/error status chip.",
+          access: "Enter and Escape behavior is documented by labels or hints, and focus returns predictably.",
+          product: "Preset names, team member labels, invoice memo, product pack nickname.",
+        },
+        {
+          name: "Address form",
+          intent: "Country-aware billing and shipping address group with autocomplete, tax-region, and validation states.",
+          states: ["empty", "partial", "country changed", "validating", "invalid", "saved"],
+          tokens: "Field group, select field, helper text, error links, section label.",
+          access: "Autocomplete attributes and visible labels remain stable when fields change by country.",
+          product: "Billing address, tax calculation, invoice records, commercial license profile.",
+        },
+        {
+          name: "Form field group",
+          intent: "Related fields with legend, helper text, save state, and group-level validation.",
+          states: ["default", "dirty", "saving", "saved", "group error", "read-only"],
+          tokens: "Group rule, legend label, helper text, validation summary, status chip.",
+          access: "Use fieldset/legend or equivalent programmatic grouping for related choices.",
+          product: "Profile, billing address, checkout payment, export settings.",
+        },
+        {
+          name: "Masked input",
+          intent: "Format-constrained entry for codes, payment-adjacent values, dates, and dimensions.",
+          states: ["empty", "partial", "complete", "invalid", "pasted", "disabled"],
+          tokens: "Field surface, mono data text, helper text, error role, focus ring.",
+          access: "Mask formatting must not block paste or screen reader comprehension.",
+          product: "One-time codes, tax IDs, dimensions, license keys, postal codes.",
         },
         {
           name: "One-time code field",
@@ -606,6 +854,38 @@
           tokens: "Panel rule, lock glyph, primary/secondary actions, warning or info role.",
           access: "Provide a clear action path and keep locked controls disabled with readable labels.",
           product: "Paid export formats, pack downloads, team presets, account-only history.",
+        },
+        {
+          name: "Passkey prompt",
+          intent: "Passwordless authentication surface with fallback, device availability, and recovery affordances.",
+          states: ["available", "prompting", "not available", "fallback", "verified", "failed"],
+          tokens: "Dialog/sheet surface, security icon, primary action, fallback link, status chip.",
+          access: "Do not assume biometric availability. Provide a keyboard and password fallback path.",
+          product: "Fast sign-in, sensitive billing changes, team owner verification.",
+        },
+        {
+          name: "SSO option group",
+          intent: "Organization or provider sign-in choices without overpowering the native email path.",
+          states: ["default", "loading provider", "provider error", "locked domain", "success"],
+          tokens: "Button group, provider icon slot, helper text, error role, focus ring.",
+          access: "Provider buttons include provider names and do not rely on logos alone.",
+          product: "Studio teams, enterprise license access, managed account domains.",
+        },
+        {
+          name: "Consent and legal gate",
+          intent: "Explicit acceptance for terms, marketing, data processing, and commercial license constraints.",
+          states: ["unchecked", "checked", "required error", "version changed", "read-only"],
+          tokens: "Checkbox, inline links, helper/error text, audit timestamp.",
+          access: "Consent is a real checkbox and linked policy text is reachable before submission.",
+          product: "Signup, checkout, team invite, commercial asset download.",
+        },
+        {
+          name: "Invite accept flow",
+          intent: "Join team or shared-library invitation with role, owner, expiry, and account choice.",
+          states: ["valid invite", "expired", "already joined", "switch account", "accepted", "declined"],
+          tokens: "Access gate, account menu, status chip, primary/secondary actions.",
+          access: "Role and owner are text, and expired invitations provide a direct request-new-invite path.",
+          product: "Team seats, shared preset libraries, studio licenses.",
         },
       ],
     },
@@ -694,6 +974,46 @@
           access: "Rows expose event, actor, timestamp, and affected object as text.",
           product: "Security history, payment changes, store downloads, team invites.",
         },
+        {
+          name: "Appearance settings",
+          intent: "Theme, density, motion, contrast, and seed-color preferences for account-backed products.",
+          states: ["system", "custom", "saving", "saved", "invalid contrast", "reduced motion"],
+          tokens: "Theme roles, density tokens, switch rows, status chip, preview swatch.",
+          access: "Respect system preferences and expose reduced-motion and contrast choices as text.",
+          product: "Dark/light lab mode, compact catalog density, motion reduction, saved seed behavior.",
+        },
+        {
+          name: "Connected accounts",
+          intent: "External identity, payment, storage, and publishing connections with revoke and reconnect states.",
+          states: ["connected", "disconnected", "expired", "reconnecting", "revoking", "error"],
+          tokens: "List row, provider mark, status chip, destructive action, warning role.",
+          access: "Provider name and permission scope are readable without relying on a logo.",
+          product: "Payment provider, GitHub export, cloud storage, identity provider.",
+        },
+        {
+          name: "API key manager",
+          intent: "Create, reveal-once, copy, rotate, scope, and revoke machine credentials.",
+          states: ["empty", "created", "copied", "rotating", "revoked", "expired"],
+          tokens: "Data table, masked token text, copy button, danger action, warning chip.",
+          access: "Never expose full secrets after creation and label copy/revoke actions by key name.",
+          product: "Automation exports, team integrations, future Dither API access.",
+        },
+        {
+          name: "Privacy controls",
+          intent: "Manage analytics, storage, media retention, and account data usage with explicit consequences.",
+          states: ["default", "custom", "saving", "saved", "restricted", "error"],
+          tokens: "Switch rows, info text, warning role, save state, audit timestamp.",
+          access: "Every choice includes persistent consequence text and avoids hidden opt-outs.",
+          product: "Local media guarantees, telemetry preference, receipt data, team activity retention.",
+        },
+        {
+          name: "Data export request",
+          intent: "Download personal, billing, and workspace data with request, processing, ready, and expired states.",
+          states: ["available", "requested", "processing", "ready", "expired", "failed"],
+          tokens: "Settings row, progress indicator, status chip, download action.",
+          access: "State changes are announced and ready/expired dates are explicit text.",
+          product: "Account portability, billing records, preset archive, team audit export.",
+        },
       ],
     },
     {
@@ -780,6 +1100,46 @@
           tokens: "Segment or card selection, status chip, price row, feature list.",
           access: "Current plan and selected plan are distinguishable without relying on color.",
           product: "Signup plan context, upgrade, downgrade, team seat purchase.",
+        },
+        {
+          name: "Asset preview gallery",
+          intent: "Media-rich product preview with thumbnail strip, compatibility notes, and reduced-motion controls.",
+          states: ["default", "selected preview", "loading media", "video paused", "unavailable"],
+          tokens: "Preview frame, carousel controls, status chips, media text alternative.",
+          access: "Preview media has text alternatives and motion can be paused.",
+          product: "Effect packs, palette packs, preset bundles, motion export examples.",
+        },
+        {
+          name: "License comparison",
+          intent: "Compare plan or asset rights side by side without hiding restrictions in footnotes.",
+          states: ["default", "selected", "current", "unavailable", "loading"],
+          tokens: "Data table, plan selector, status chips, info/warning roles.",
+          access: "Restrictions and commercial rights are exposed as text in each option.",
+          product: "Personal, commercial, team, and enterprise Dither asset licenses.",
+        },
+        {
+          name: "Saved for later",
+          intent: "Persistent wishlist or deferred cart state that survives checkout and account sessions.",
+          states: ["empty", "saved", "moving to cart", "removed", "unavailable"],
+          tokens: "List row, product card, status chip, action buttons.",
+          access: "Move and remove actions identify the product by name.",
+          product: "Packs, presets, plan add-ons, team seats deferred for later.",
+        },
+        {
+          name: "Compatibility matrix",
+          intent: "Explicit support table for product, plan, export format, platform, or workflow requirements.",
+          states: ["supported", "partial", "unsupported", "requires plan", "unknown"],
+          tokens: "Data table, semantic chips, tooltip explanations, warning role.",
+          access: "Support state is text and not only checkmark color.",
+          product: "Pack compatibility, plan features, browser support, export format limits.",
+        },
+        {
+          name: "Download manager",
+          intent: "Post-purchase install and update queue with progress, retry, open, and revoke states.",
+          states: ["queued", "downloading", "installed", "update available", "failed", "revoked"],
+          tokens: "Progress indicator, list row, status chip, retry action, entitlement token.",
+          access: "Progress exposes numeric state and failed items expose a direct retry action.",
+          product: "Purchased packs, preset bundles, export plugins, commercial license files.",
         },
       ],
     },
@@ -876,12 +1236,60 @@
           access: "Rows expose date, amount, status, and action in a stable reading order.",
           product: "Billing history, receipts, open invoices, refund tracking.",
         },
+        {
+          name: "Payment method selector",
+          intent: "Choose between saved card, wallet, new method, or provider fallback with expired states.",
+          states: ["default", "selected", "expired", "adding new", "provider unavailable", "error"],
+          tokens: "Radio/list rows, provider badge, status chip, warning/error roles.",
+          access: "Selected method, expiry, and default status are text and screen-reader visible.",
+          product: "Checkout, subscription renewal, failed payment recovery.",
+        },
+        {
+          name: "Proration preview",
+          intent: "Explain credits, immediate charges, renewal changes, and seat math before plan changes commit.",
+          states: ["estimating", "credit", "charge today", "tax pending", "final", "error"],
+          tokens: "Price rows, ledger table, info/warning text, primary action.",
+          access: "All amounts and dates are labelled. Changes are announced when recalculated.",
+          product: "Upgrade, downgrade, annual switch, team seat increase or removal.",
+        },
+        {
+          name: "Dunning timeline",
+          intent: "Payment recovery sequence that shows attempts, grace period, access impact, and next retry.",
+          states: ["soft fail", "retry scheduled", "past due", "grace period", "suspended", "recovered"],
+          tokens: "Timeline rows, warning/error chips, retry action, access gate.",
+          access: "Dates and impact are explicit text and not conveyed only by severity color.",
+          product: "Subscription recovery, card expiry, invoice retries.",
+        },
+        {
+          name: "Refund status tracker",
+          intent: "Track refund or cancellation request from submitted through approved, denied, or paid out.",
+          states: ["submitted", "reviewing", "approved", "denied", "paid out", "needs info"],
+          tokens: "Stepper/timeline, status chips, message row, document action.",
+          access: "Current status and required user action are announced in order.",
+          product: "Refund queue, duplicate purchase recovery, team seat credit.",
+        },
+        {
+          name: "Dispute evidence panel",
+          intent: "Operational panel for payment dispute, chargeback, or support evidence assembly.",
+          states: ["collecting", "missing evidence", "ready", "submitted", "won", "lost"],
+          tokens: "Checklist rows, upload field, status chip, warning role, data table.",
+          access: "Checklist completion and missing requirements are exposed as text.",
+          product: "Future admin and support billing tools for commercial Dither products.",
+        },
+        {
+          name: "Usage limit alert",
+          intent: "Billing-adjacent warning when exports, seats, storage, or commercial rights approach a limit.",
+          states: ["near limit", "at limit", "over limit", "upgrading", "resolved"],
+          tokens: "Inline alert, usage meter, primary upgrade action, warning/error roles.",
+          access: "Include numeric usage and consequences in text.",
+          product: "Export quota, team seats, storage archive, commercial license caps.",
+        },
       ],
     },
     {
       id: "workflows",
       label: "Dither Workflows",
-      lead: "Product-specific components that make this more than a generic Material clone.",
+      lead: "Product-specific components that make this more than a generic platform clone.",
       components: [
         {
           name: "Preview canvas",
@@ -921,7 +1329,7 @@
           states: ["extracting", "ready", "locked", "contrast warning"],
           tokens: "Swatches, color roles, warning chip, dynamic seed indicator.",
           access: "Swatches expose names or color values.",
-          product: "Material seed color, limited palette, print ramp.",
+          product: "Runtime seed color, limited palette, print ramp.",
         },
         {
           name: "Batch queue row",
@@ -939,31 +1347,97 @@
           access: "Numeric values must render as text, not only in the radial meter.",
           product: "PNG, SVG, palette JSON, WebM, file-size savings.",
         },
+        {
+          name: "Source drop target",
+          intent: "First ingestion affordance for images, video, folders, and replacement source files.",
+          states: ["empty", "drag over", "validating", "accepted", "rejected", "replacing"],
+          tokens: "Drop surface, inward pixel rain, progress, success/error roles, file metadata.",
+          access: "Keyboard file chooser remains visible and accepted/rejected feedback is textual.",
+          product: "Load images, video frames, batch folders, and replacement sources.",
+        },
+        {
+          name: "Preset browser",
+          intent: "Reusable picker for local, account, team, and purchased presets with preview and filters.",
+          states: ["empty", "filtered", "selected", "owned", "locked", "syncing"],
+          tokens: "Collection grid, filter chips, product card, status chip, search field.",
+          access: "Preset names and ownership states are text and selection is announced.",
+          product: "Saved looks, team presets, purchased workflow packs.",
+        },
+        {
+          name: "Parameter rack",
+          intent: "Dense two-column control group for algorithm and effect settings with live values.",
+          states: ["default", "dirty", "linked", "disabled", "error", "reset available"],
+          tokens: "Slider, number field, setting row, reset action, status chip.",
+          access: "Every control exposes value, min/max, unit, and reset label.",
+          product: "Threshold, diffusion, scanline speed, palette count, distortion strength.",
+        },
+        {
+          name: "Before after comparator",
+          intent: "Preview primitive for source/output comparison without relying on a hidden canvas state.",
+          states: ["source", "output", "split", "dragging handle", "zoomed", "error"],
+          tokens: "Canvas frame, split handle, mode chip, focus ring, metadata readouts.",
+          access: "Expose current comparison mode and source/output metadata outside the visual frame.",
+          product: "Dither preview, pack detail media, export review.",
+        },
+        {
+          name: "Keyboard shortcut overlay",
+          intent: "Searchable shortcut reference for power users without bloating every tooltip.",
+          states: ["closed", "open", "filtered", "no result", "section expanded"],
+          tokens: "Dialog/sheet surface, command rows, keycaps, search field, section rules.",
+          access: "Open and close from keyboard, trap focus while modal, restore focus to launcher.",
+          product: "Editor shortcuts, command palette help, batch workflow reference.",
+        },
+        {
+          name: "Render job inspector",
+          intent: "Operational view of queue, worker status, progress, errors, and retry diagnostics.",
+          states: ["idle", "queued", "running", "paused", "failed", "complete"],
+          tokens: "Timeline rows, progress indicator, status chips, error boundary, retry action.",
+          access: "Long-running updates use polite announcements and failures include next actions.",
+          product: "Video frame extraction, batch exports, cloud sync, pack installation.",
+        },
+        {
+          name: "Export manifest",
+          intent: "Final artifact list with file names, formats, sizes, checksums, and copy/download actions.",
+          states: ["empty", "building", "ready", "partial failure", "downloaded", "copied"],
+          tokens: "Data table, file-size meter, status chips, action group, key-value rows.",
+          access: "Each artifact row exposes name, format, size, status, and action.",
+          product: "PNG, SVG, palette JSON, WebM, zip bundles, receipt attachments.",
+        },
       ],
     },
   ];
 
   const componentVariants = {
     Button: ["primary", "secondary", "destructive", "loading", "compact"],
+    "Button state matrix": ["hover", "focus", "pressed", "loading", "soft-disabled"],
     "Floating action button": ["extended", "icon-only", "pinned", "loading"],
     "Icon button": ["plain", "selected", "destructive", "disabled"],
     Icon: ["decorative", "labelled", "filled", "outlined"],
     "Segmented control": ["two-up", "three-up", "scrolling", "disabled item"],
     "Split button": ["default action", "menu trigger", "open menu", "loading"],
+    "Menu button": ["closed", "open", "submenu", "disabled item"],
     "Action group": ["toolbar", "overflow", "mixed selection", "disabled group"],
     "State layer and ripple": ["hover", "focus", "pressed", "selected"],
     "Focus ring": ["outer", "inset", "invalid", "disabled"],
     "Quick trigger": ["pinned", "inline", "busy", "reduced-motion"],
+    Toolbar: ["grouped", "overflow", "sticky", "disabled item"],
+    "Command palette trigger": ["idle", "focused", "open", "no results"],
     Banner: ["info", "success", "warning", "error", "dismissible"],
     Dialog: ["confirmation", "destructive", "busy", "recoverable error"],
     Snackbar: ["confirmation", "undo", "export complete", "dismissed"],
     Tooltip: ["hover", "focus", "delayed", "disabled target"],
+    "Tooltip state matrix": ["plain", "rich", "shortcut", "disabled reason"],
     "Progress indicator": ["determinate", "indeterminate", "paused", "failed"],
     Badge: ["count", "category", "semantic", "hidden"],
     "Status chip": ["neutral", "loading", "success", "warning", "error"],
     "Inline alert": ["info", "success", "warning", "error", "recoverable"],
     "Empty state": ["first use", "filtered", "locked", "empty cart"],
     Skeleton: ["row", "card", "field", "table"],
+    "Toast stack": ["queued", "visible", "actionable", "dismissed"],
+    "Notification center": ["empty", "unread", "read", "filtered"],
+    "Permission prompt": ["request", "granted", "denied", "blocked"],
+    "Coach mark": ["anchored", "next", "dismissed", "reduced motion"],
+    "Error boundary": ["recoverable", "retrying", "diagnostic", "fatal"],
     Card: ["preset", "asset", "selected", "loading"],
     Carousel: ["thumbnail strip", "snap list", "overflow", "empty"],
     Pane: ["ingest", "stage", "control", "collapsed", "loading"],
@@ -971,11 +1445,17 @@
     "List row": ["batch item", "preset row", "effect row", "dragging"],
     "Divider and rule": ["dim", "standard", "active", "semantic"],
     "Elevation surface": ["level 0", "level 1", "level 2", "scrim"],
+    Popover: ["anchored", "flipped", "dismissed", "modal fallback"],
     "Details and accordion": ["closed", "open", "nested section", "disabled"],
     "Bottom sheet": ["modal", "persistent", "half-height", "full-height"],
     "Side sheet": ["modal", "modeless", "resizable", "dismissed"],
     "Frame strip": ["timeline", "thumbnail", "palette", "selected"],
     "Data table": ["invoice ledger", "session list", "plan comparison", "entitlements", "team seats", "payment methods", "activity log", "order history", "usage meters", "refund queue"],
+    "Collection grid": ["cards", "thumbnails", "selected", "virtualized"],
+    "Split view": ["master-detail", "resized", "collapsed", "mobile stacked"],
+    "Inspector panel": ["selected", "dirty", "saving", "read-only"],
+    "Scroll area": ["at start", "scrolling", "at end", "overflow"],
+    "Key-value list": ["default", "highlighted", "editable", "warning"],
     "Settings row": ["default", "dirty", "saving", "disabled"],
     "Top app bar": ["small", "center-aligned", "search", "scrolled"],
     "Bottom app bar": ["plain", "with FAB", "overflow", "hidden"],
@@ -987,25 +1467,40 @@
     Tabs: ["manual activation", "auto activation", "overflow", "disabled"],
     "Breadcrumb and path": ["short path", "overflow", "current page"],
     "Search and command entry": ["empty", "typing", "results", "no results"],
+    "Command palette": ["open", "typing", "highlighted", "executing"],
+    "Context menu": ["open", "submenu", "disabled item", "danger zone"],
+    "Menu bar": ["menu open", "submenu", "shortcut hints", "disabled"],
+    Pagination: ["first", "middle", "last", "loading"],
     Footer: ["document", "product", "link focus", "mobile stack"],
     Checkbox: ["unchecked", "checked", "indeterminate", "error"],
     Radio: ["unchecked", "checked", "group error", "disabled"],
     Switch: ["off", "on", "labelled state", "disabled"],
+    "Toggle button group": ["single toggle", "multi toggle", "mixed", "overflow"],
     Slider: ["single value", "bounded", "live output", "disabled"],
     Chips: ["filter", "input", "selected", "removable"],
     "Menu and listbox": ["native select", "custom listbox", "grouped", "typeahead"],
     "Date picker": ["native", "popover", "range", "invalid"],
     "Time picker": ["native", "duration", "invalid", "disabled"],
     "Palette swatch group": ["extracted", "locked", "selected", "contrast warning"],
+    "Color picker": ["swatch", "channels", "alpha", "contrast warning"],
+    "Tree and outline view": ["collapsed", "expanded", "selected", "loading"],
+    "Transfer list": ["available", "assigned", "moving", "error"],
+    "Bulk selection bar": ["partial", "all selected", "processing", "hidden"],
     "Text field": ["empty", "filled", "helper text", "invalid"],
     "Search field": ["empty", "typing", "clearable", "no results"],
     Textarea: ["notes", "resizable", "counter", "invalid"],
     "Select field": ["native", "grouped", "invalid", "disabled"],
     "Autocomplete field": ["combobox", "suggestions", "no results", "invalid"],
+    "Search suggestion list": ["recent", "category headers", "highlighted", "empty"],
     "Number field and stepper": ["unit suffix", "bounded", "stepping", "invalid"],
     "File input and dropzone": ["empty", "drag over", "accepted", "rejected"],
     "Range and frame fields": ["start/end", "linked", "invalid range", "disabled"],
     "Password field": ["hidden", "revealed", "weak", "invalid"],
+    "Tokenized input": ["tokens", "duplicate", "invalid", "max reached"],
+    "Inline edit field": ["read", "editing", "dirty", "saving"],
+    "Address form": ["domestic", "international", "invalid", "saved"],
+    "Form field group": ["dirty", "saving", "group error", "read-only"],
+    "Masked input": ["partial", "complete", "invalid", "pasted"],
     "One-time code field": ["empty", "typing", "complete", "expired"],
     "Validation summary": ["warning", "error", "field links", "resolved"],
     "Sign-in form": ["password", "passkey", "remembered", "locked"],
@@ -1014,6 +1509,10 @@
     "Password reset": ["request", "sent", "reset", "rate limited"],
     "Session state": ["signed in", "expiring", "expired", "offline"],
     "Access gate": ["login", "plan", "locked", "unlocked"],
+    "Passkey prompt": ["available", "prompting", "fallback", "failed"],
+    "SSO option group": ["provider", "domain locked", "loading", "error"],
+    "Consent and legal gate": ["unchecked", "checked", "required", "version changed"],
+    "Invite accept flow": ["valid", "expired", "switch account", "accepted"],
     "Account menu": ["closed", "open", "switching", "signed out"],
     "Profile settings": ["view", "editing", "dirty", "saved"],
     "Security settings": ["MFA", "passkeys", "sessions", "recovery"],
@@ -1024,6 +1523,11 @@
     "Settings section": ["profile", "security", "billing", "dirty"],
     "Danger zone": ["available", "confirming", "blocked", "submitted"],
     "Activity log": ["security", "billing", "team", "filtered"],
+    "Appearance settings": ["system", "custom", "saved", "reduced motion"],
+    "Connected accounts": ["connected", "expired", "reconnecting", "revoked"],
+    "API key manager": ["created", "copied", "rotating", "revoked"],
+    "Privacy controls": ["default", "custom", "restricted", "saved"],
+    "Data export request": ["requested", "processing", "ready", "expired"],
     "Product listing": ["grid", "filtered", "owned", "sale"],
     "Product detail": ["preview", "compatible", "owned", "unavailable"],
     "Cart drawer": ["empty", "filled", "discounted", "checking out"],
@@ -1034,6 +1538,11 @@
     "Product card": ["default", "owned", "sale", "unavailable"],
     "Price row": ["subtotal", "discount", "tax", "total"],
     "Plan selector": ["monthly", "annual", "team", "current"],
+    "Asset preview gallery": ["selected preview", "video paused", "loading", "unavailable"],
+    "License comparison": ["personal", "commercial", "team", "enterprise"],
+    "Saved for later": ["saved", "moving to cart", "removed", "unavailable"],
+    "Compatibility matrix": ["supported", "partial", "unsupported", "requires plan"],
+    "Download manager": ["queued", "downloading", "installed", "failed"],
     "Payment method form": ["card", "wallet", "invalid", "saved"],
     "Saved payment method": ["default", "selected", "expired", "removing"],
     "Billing address": ["domestic", "international", "tax id", "invalid"],
@@ -1045,6 +1554,12 @@
     "Payment provider frame": ["empty", "focused", "invalid", "saved"],
     "Tax and VAT fields": ["optional", "required", "invalid", "saved"],
     "Billing ledger table": ["invoice", "receipt", "credit", "past due"],
+    "Payment method selector": ["saved card", "wallet", "new method", "expired"],
+    "Proration preview": ["credit", "charge today", "tax pending", "final"],
+    "Dunning timeline": ["soft fail", "retry scheduled", "grace period", "recovered"],
+    "Refund status tracker": ["submitted", "reviewing", "approved", "denied"],
+    "Dispute evidence panel": ["checklist", "upload", "submitted", "missing"],
+    "Usage limit alert": ["near limit", "at limit", "over limit", "resolved"],
     "Preview canvas": ["processed", "split", "source", "zoomed"],
     "Timeline transport": ["stopped", "playing", "recording", "reduced-motion"],
     "Algorithm picker": ["unfiltered", "filtered", "selected", "favorite"],
@@ -1052,6 +1567,13 @@
     "Palette inspector": ["extracting", "ready", "locked", "warning"],
     "Batch queue row": ["queued", "processing", "complete", "failed"],
     "Export meter": ["estimating", "ready", "over budget", "complete"],
+    "Source drop target": ["empty", "drag over", "accepted", "rejected"],
+    "Preset browser": ["local", "team", "owned", "locked"],
+    "Parameter rack": ["dirty", "linked", "disabled", "reset"],
+    "Before after comparator": ["source", "output", "split", "handle"],
+    "Keyboard shortcut overlay": ["open", "filtered", "sectioned", "empty"],
+    "Render job inspector": ["queued", "running", "failed", "complete"],
+    "Export manifest": ["building", "ready", "partial failure", "copied"],
   };
 
   function createElement(tag, className, text) {
@@ -1087,24 +1609,25 @@
 
   function createCoverageDisclosure(totalComponents) {
     const coverage = createElement("details", "component-benchmark-disclosure");
-    coverage.id = "component-material-coverage";
+    coverage.id = "component-platform-coverage";
     const summary = document.createElement("summary");
     const copy = createElement("span", "component-summary-copy");
-    copy.appendChild(createElement("strong", "", "Material 3 benchmark coverage"));
-    copy.appendChild(createElement("span", "", `${totalComponents} visualized records. Material primitives stay separated from account and commerce composites.`));
+    copy.appendChild(createElement("strong", "", "Platform benchmark coverage"));
+    copy.appendChild(createElement("span", "", `${totalComponents} visualized records. Platform primitives stay separated from account, commerce, and Dither workflow composites.`));
     summary.appendChild(copy);
     summary.appendChild(createElement("span", "component-expander"));
     coverage.appendChild(summary);
 
     const grid = createElement("div", "component-coverage-grid");
     [
-      ["Actions", "Buttons, FABs, icon buttons, segmented controls, split buttons, button groups, icons, ripple/state layers, focus rings."],
-      ["Communication", "Badges, banners, dialogs, progress, snackbars, tooltips, inline alerts, empty and loading states."],
-      ["Containment", "Cards, carousel, lists, dividers, elevation, details, bottom/side sheets, tables, settings rows."],
-      ["Navigation", "Top and bottom app bars, navigation bar, drawer, rail, tabs, breadcrumbs, search, footer."],
-      ["Selection", "Checkboxes, chips, menus/listboxes, radios, sliders, switches, date and time pickers, swatches."],
-      ["Text input", "Text, search, textarea, select, autocomplete, number, file/dropzone, range, password, OTP, validation summary."],
-      ["Commerce", "Auth, account, store, cart, checkout, payment, invoice, receipt, refund, tax, recovery, entitlement, activity log."],
+      ["Actions", "Buttons, button states, FABs, icon buttons, segmented controls, split/menu buttons, toolbars, command launchers, state layers, focus rings."],
+      ["Communication", "Badges, banners, dialogs, progress, snackbars, toast stacks, notifications, permissions, tooltips, empty/loading/error states."],
+      ["Containment", "Cards, carousel, lists, dividers, elevation, popovers, details, bottom/side sheets, split views, collection grids, tables, inspectors."],
+      ["Navigation", "Top and bottom app bars, navigation bar, drawer, rail, tabs, breadcrumbs, search, command palette, context menus, menu bar, pagination, footer."],
+      ["Selection", "Checkboxes, chips, menus/listboxes, radios, sliders, switches, toggle groups, pickers, swatches, tree/outline, transfer and bulk selection."],
+      ["Text input", "Text, search, textarea, select, autocomplete, suggestions, number, file/dropzone, range, password, OTP, address, tokens, inline edit, validation."],
+      ["Commerce", "Auth, passkeys, SSO, account, privacy, API keys, store, cart, checkout, payment, invoice, receipt, refund, tax, dunning, entitlement, activity log."],
+      ["Dither workflows", "Source drop, preset browser, parameter rack, comparator, shortcuts, render inspector, export manifest, preview, timeline, batch, meter."],
       ["Disclosure", "Every record opens specimen-first; states, variants, tokens, accessibility, and product usage are nested one level deeper."],
     ].forEach(([title, text]) => {
       const item = createElement("article", "");
@@ -1212,6 +1735,38 @@
     if (actionText) appendButton(row, actionText);
     parent.appendChild(row);
     return row;
+  }
+
+  function appendKeyValue(parent, label, value, modifier = "") {
+    const row = createElement("span", modifier ? `key-value-row ${modifier}` : "key-value-row");
+    row.appendChild(createElement("small", "", label));
+    row.appendChild(createElement("strong", "", value));
+    parent.appendChild(row);
+    return row;
+  }
+
+  function buildStateMatrix(stage, title, states) {
+    const matrix = createElement("div", "specimen-state-matrix");
+    appendText(matrix, "span", "token-name", title);
+    states.forEach(([label, meta, modifier]) => {
+      const row = createElement("span", modifier ? `state-matrix-item ${modifier}` : "state-matrix-item");
+      row.appendChild(createElement("strong", "", label));
+      row.appendChild(createElement("small", "", meta));
+      matrix.appendChild(row);
+    });
+    stage.appendChild(matrix);
+  }
+
+  function buildPopoverShell(stage, title, body, action = "Apply") {
+    const popover = createElement("div", "popover-demo");
+    appendText(popover, "span", "token-name", "anchored surface");
+    appendText(popover, "strong", "", title);
+    appendText(popover, "p", "", body);
+    const actions = createElement("div", "component-button-row");
+    appendButton(actions, "Cancel");
+    appendButton(actions, action, "is-active");
+    popover.appendChild(actions);
+    stage.appendChild(popover);
   }
 
   function tableStatusModifier(status) {
@@ -1344,7 +1899,7 @@
       button.dataset.tableVariantTarget = variantId;
       button.setAttribute("aria-pressed", index === 0 ? "true" : "false");
       button.setAttribute("aria-controls", variantId);
-      button.title = variant.label;
+      button.setAttribute("aria-label", `Show ${variant.label} variation`);
 
       const panel = createElement("section", `table-variant-panel is-${variant.mode}`);
       panel.id = variantId;
@@ -1377,6 +1932,20 @@
 
   function buildActionSpecimen(stage, component) {
     const row = createElement("div", "specimen-button-row");
+    if (component.name === "Button state matrix") {
+      buildStateMatrix(stage, "button contract", [
+        ["default", "resting"],
+        ["hover", "state layer"],
+        ["focus", "2px ring", "is-focus"],
+        ["pressed", "active layer", "is-active"],
+        ["loading", "aria-busy", "is-loading"],
+        ["disabled", "readable", "is-disabled"],
+        ["soft", "focusable reason"],
+        ["danger", "error role", "is-error"],
+      ]);
+      return;
+    }
+
     if (component.name === "Icon") {
       const icons = createElement("div", "specimen-icon-strip");
       ["search", "cart", "shield", "receipt", "user", "lock"].forEach((label, index) => {
@@ -1396,6 +1965,17 @@
       appendButton(row, "Export PNG");
       appendButton(row, "▾", "specimen-square-button");
       appendStateChip(row, "open", "is-selected");
+    } else if (component.name === "Menu button") {
+      const menu = createElement("div", "menu-demo action-menu-demo");
+      const trigger = createElement("div", "component-button-row");
+      appendButton(trigger, "Export");
+      appendStateChip(trigger, "aria-expanded true", "is-selected");
+      menu.appendChild(trigger);
+      appendSpecimenRow(menu, "PNG image", "Enter", "");
+      appendSpecimenRow(menu, "SVG vector", "Shift Enter", "");
+      appendSpecimenRow(menu, "WebM loop", "disabled", "");
+      stage.appendChild(menu);
+      return;
     } else if (component.name === "State layer and ripple") {
       ["Hover", "Focus", "Pressed", "Selected"].forEach((label, index) => {
         const state = appendButton(row, label, `state-layer-demo is-layer-${index + 1}`);
@@ -1411,6 +1991,22 @@
       return;
     } else if (component.name === "Action group") {
       ["Undo", "Redo", "Compare", "Zoom", "Snap"].forEach((label, index) => appendButton(row, label, index === 2 ? "is-active" : ""));
+    } else if (component.name === "Toolbar") {
+      const toolbar = createElement("div", "toolbar-demo");
+      ["Undo", "Redo", "Crop", "Fit", "Zoom", "More"].forEach((label, index) => {
+        appendButton(toolbar, label, index === 2 ? "is-active" : index === 5 ? "specimen-square-button" : "");
+      });
+      appendStateChip(toolbar, "selection: frame 08", "is-selected");
+      stage.appendChild(toolbar);
+      return;
+    } else if (component.name === "Command palette trigger") {
+      const launcher = createElement("div", "command-trigger-demo");
+      appendText(launcher, "span", "token-name", "global command");
+      appendText(launcher, "strong", "", "Search commands, routes, packs");
+      appendText(launcher, "small", "", "Cmd K");
+      appendButton(launcher, "Open");
+      stage.appendChild(launcher);
+      return;
     } else if (component.name === "Floating action button" || component.name === "Quick trigger") {
       appendButton(row, component.name === "Floating action button" ? "Capture" : "Run batch", "specimen-fab-demo");
       appendButton(row, "Export");
@@ -1427,6 +2023,71 @@
   }
 
   function buildCommunicationSpecimen(stage, component) {
+    if (component.name === "Tooltip state matrix") {
+      buildStateMatrix(stage, "tooltip contract", [
+        ["plain", "label only"],
+        ["rich", "short help"],
+        ["shortcut", "Cmd K"],
+        ["disabled", "reason shown", "is-disabled"],
+        ["focus", "keyboard parity", "is-focus"],
+        ["flip", "edge-safe"],
+      ]);
+      return;
+    }
+
+    if (component.name === "Toast stack") {
+      const stack = createElement("div", "toast-stack-demo");
+      ["Preset saved", "Export copied", "Batch complete"].forEach((label, index) => {
+        const toast = createElement("div", "snackbar-demo");
+        appendText(toast, "span", "", label);
+        appendButton(toast, index === 0 ? "Undo" : "View");
+        stack.appendChild(toast);
+      });
+      stage.appendChild(stack);
+      return;
+    }
+
+    if (component.name === "Notification center") {
+      const center = createElement("div", "notification-demo");
+      appendText(center, "span", "token-name", "unread events");
+      appendSpecimenRow(center, "Payment retry", "Billing / 2 min", "Open");
+      appendSpecimenRow(center, "Pack update", "Store / today", "Install");
+      appendSpecimenRow(center, "Batch complete", "Render / 14 files", "View");
+      stage.appendChild(center);
+      return;
+    }
+
+    if (component.name === "Permission prompt") {
+      const prompt = createElement("div", "specimen-dialog permission-demo");
+      appendStateChip(prompt, "permission", "is-warning");
+      appendText(prompt, "strong", "", "Allow folder access?");
+      appendText(prompt, "p", "", "Dither Wizard can process this batch locally and remember the source folder.");
+      const actions = createElement("div", "component-button-row");
+      appendButton(actions, "Not now");
+      appendButton(actions, "Allow", "is-active");
+      prompt.appendChild(actions);
+      stage.appendChild(prompt);
+      return;
+    }
+
+    if (component.name === "Coach mark") {
+      buildPopoverShell(stage, "Timeline transport", "Use step controls for exact frame review. This tip will not block export.", "Next");
+      return;
+    }
+
+    if (component.name === "Error boundary") {
+      const error = createElement("div", "specimen-alert is-error");
+      appendStateChip(error, "render failed", "is-error");
+      appendText(error, "strong", "", "Worker stopped");
+      appendText(error, "p", "", "Retry the render or open diagnostics for the failed frame.");
+      const actions = createElement("div", "component-button-row");
+      appendButton(actions, "Retry");
+      appendButton(actions, "Diagnostics");
+      error.appendChild(actions);
+      stage.appendChild(error);
+      return;
+    }
+
     if (component.name === "Progress indicator" || component.name === "Skeleton") {
       const stack = createElement("div", "specimen-stack");
       const meter = createElement("div", component.name === "Skeleton" ? "specimen-skeleton" : "specimen-progress");
@@ -1511,6 +2172,11 @@
   }
 
   function buildContainmentSpecimen(stage, component) {
+    if (component.name === "Popover") {
+      buildPopoverShell(stage, "Export options", "Anchored to the export control, flips above when the lower edge is crowded.", "Save");
+      return;
+    }
+
     if (component.name === "Carousel") {
       const carousel = createElement("div", "specimen-carousel");
       const strip = createElement("div", "specimen-carousel-strip");
@@ -1533,6 +2199,65 @@
 
     if (component.name === "Data table") {
       buildTableVariantGallery(stage);
+      return;
+    }
+
+    if (component.name === "Collection grid") {
+      const grid = createElement("div", "collection-grid-demo");
+      ["CRT Fog", "Signal Rot", "Cathode", "Vector Pro"].forEach((label, index) => {
+        const item = createElement("article", index === 1 ? "is-active" : "");
+        appendText(item, "span", "token-name", index === 3 ? "locked" : "preset");
+        appendText(item, "strong", "", label);
+        appendStateChip(item, index === 3 ? "plan" : index === 1 ? "selected" : "ready", index === 1 ? "is-selected" : "");
+        grid.appendChild(item);
+      });
+      stage.appendChild(grid);
+      return;
+    }
+
+    if (component.name === "Split view") {
+      const split = createElement("div", "split-view-demo");
+      const master = createElement("div", "split-master");
+      appendSpecimenRow(master, "Store packs", "12 results", "");
+      appendSpecimenRow(master, "Owned", "4 packs", "");
+      const detail = createElement("div", "split-detail");
+      appendText(detail, "span", "token-name", "detail");
+      appendText(detail, "strong", "", "Signal Rot Kit");
+      appendText(detail, "p", "", "Master-detail layout collapses into stacked mobile sections.");
+      split.appendChild(master);
+      split.appendChild(detail);
+      stage.appendChild(split);
+      return;
+    }
+
+    if (component.name === "Inspector panel") {
+      const inspector = createElement("div", "inspector-demo");
+      appendText(inspector, "span", "token-name", "selected effect");
+      appendText(inspector, "strong", "", "Atkinson pass");
+      appendKeyValue(inspector, "threshold", "64");
+      appendKeyValue(inspector, "diffusion", "0.72");
+      appendStateChip(inspector, "dirty", "is-warning");
+      appendButton(inspector, "Save");
+      stage.appendChild(inspector);
+      return;
+    }
+
+    if (component.name === "Scroll area") {
+      const scroll = createElement("div", "scroll-area-demo");
+      ["Bayer 8x8", "Atkinson", "Floyd-Steinberg", "Jarvis", "Stucki"].forEach((label, index) => {
+        appendSpecimenRow(scroll, label, index === 2 ? "selected" : "available", "");
+      });
+      stage.appendChild(scroll);
+      return;
+    }
+
+    if (component.name === "Key-value list") {
+      const facts = createElement("div", "key-value-list-demo");
+      appendKeyValue(facts, "format", "PNG");
+      appendKeyValue(facts, "size", "1.8 MB", "is-highlighted");
+      appendKeyValue(facts, "dimensions", "2048 x 2048");
+      appendKeyValue(facts, "license", "Commercial");
+      stage.appendChild(facts);
       return;
     }
 
@@ -1638,6 +2363,45 @@
       return;
     }
 
+    if (component.name === "Command palette") {
+      const palette = createElement("div", "command-palette-demo");
+      appendField(palette, "Command", "open bill");
+      appendSpecimenRow(palette, "Open billing settings", "Account", "Enter");
+      appendSpecimenRow(palette, "Retry June invoice", "Billing", "");
+      appendSpecimenRow(palette, "Search store packs", "Store", "");
+      stage.appendChild(palette);
+      return;
+    }
+
+    if (component.name === "Context menu") {
+      const menu = createElement("div", "context-menu-demo");
+      appendSpecimenRow(menu, "Duplicate effect", "Cmd D", "");
+      appendSpecimenRow(menu, "Bypass layer", "B", "");
+      appendSpecimenRow(menu, "Delete layer", "danger", "");
+      stage.appendChild(menu);
+      return;
+    }
+
+    if (component.name === "Menu bar") {
+      const bar = createElement("div", "menu-bar-demo");
+      ["File", "Edit", "View", "Export", "Account"].forEach((label, index) => {
+        const item = createElement("span", index === 3 ? "is-active" : "", label);
+        bar.appendChild(item);
+      });
+      stage.appendChild(bar);
+      return;
+    }
+
+    if (component.name === "Pagination") {
+      const pagination = createElement("div", "pagination-demo");
+      appendButton(pagination, "Prev");
+      ["1", "2", "3", "4"].forEach((label, index) => appendButton(pagination, label, index === 1 ? "is-active" : "specimen-square-button"));
+      appendButton(pagination, "Next");
+      appendStateChip(pagination, "96 icons", "is-selected");
+      stage.appendChild(pagination);
+      return;
+    }
+
     if (component.name === "Top app bar" || component.name === "Shared header") {
       const bar = createElement("div", "app-bar-demo is-top");
       appendButton(bar, "Menu", "specimen-square-button");
@@ -1668,7 +2432,7 @@
       const rail = createElement("div", "rail-demo");
       ["Color", "Type", "Icons", "Components", "QA"].forEach((label, index) => {
         const item = createElement("span", index === 3 ? "is-active" : "", label.slice(0, 2));
-        item.title = label;
+        item.setAttribute("aria-label", label);
         rail.appendChild(item);
       });
       stage.appendChild(rail);
@@ -1707,6 +2471,16 @@
   }
 
   function buildSelectionSpecimen(stage, component) {
+    if (component.name === "Toggle button group") {
+      const toggles = createElement("div", "toggle-group-demo");
+      ["Grid", "Guides", "Mask", "Alpha", "Proof"].forEach((label, index) => {
+        const button = appendButton(toggles, label, index === 1 || index === 3 ? "is-active" : "");
+        button.setAttribute("aria-pressed", index === 1 || index === 3 ? "true" : "false");
+      });
+      stage.appendChild(toggles);
+      return;
+    }
+
     if (component.name === "Checkbox" || component.name === "Radio" || component.name === "Switch") {
       const controls = createElement("div", "specimen-choice-list");
       const labels = component.name === "Checkbox"
@@ -1769,6 +2543,56 @@
       return;
     }
 
+    if (component.name === "Color picker") {
+      const picker = createElement("div", "color-picker-demo");
+      const swatches = createElement("div", "specimen-swatches");
+      ["#61ff9b", "#38d9ff", "#f6c453", "#ff5d73"].forEach((color, index) => {
+        const swatch = createElement("span", index === 0 ? "is-active" : "");
+        swatch.style.setProperty("--specimen-swatch", color);
+        swatches.appendChild(swatch);
+      });
+      picker.appendChild(swatches);
+      appendField(picker, "OKLCH", "72% 0.16 148");
+      appendStateChip(picker, "AA pass", "is-success");
+      stage.appendChild(picker);
+      return;
+    }
+
+    if (component.name === "Tree and outline view") {
+      const tree = createElement("div", "tree-demo");
+      appendSpecimenRow(tree, "Components", "expanded", "");
+      appendSpecimenRow(tree, "  Actions", "selected", "");
+      appendSpecimenRow(tree, "  Billing", "collapsed", "");
+      stage.appendChild(tree);
+      return;
+    }
+
+    if (component.name === "Transfer list") {
+      const transfer = createElement("div", "transfer-demo");
+      const left = createElement("div", "transfer-column");
+      appendText(left, "span", "token-name", "available");
+      appendSpecimenRow(left, "Signal Rot Kit", "pack", "");
+      appendSpecimenRow(left, "Vector Pro", "license", "");
+      const right = createElement("div", "transfer-column");
+      appendText(right, "span", "token-name", "assigned");
+      appendSpecimenRow(right, "Cathode Ramps", "Corey", "");
+      appendSpecimenRow(right, "CRT Fog", "Team", "");
+      transfer.appendChild(left);
+      transfer.appendChild(right);
+      stage.appendChild(transfer);
+      return;
+    }
+
+    if (component.name === "Bulk selection bar") {
+      const bar = createElement("div", "bulk-bar-demo");
+      appendStateChip(bar, "4 selected", "is-selected");
+      appendButton(bar, "Export");
+      appendButton(bar, "Assign");
+      appendButton(bar, "Delete");
+      stage.appendChild(bar);
+      return;
+    }
+
     const controls = createElement("div", "specimen-choice-list");
     [["Checkbox", "checked"], ["Radio", "checked"], ["Switch", "on"], ["Chips", "selected"]].forEach(([label, state]) => {
       appendStateChip(controls, `${label} ${state}`, label === component.name ? "is-selected" : "");
@@ -1777,6 +2601,16 @@
   }
 
   function buildInputSpecimen(stage, component) {
+    if (component.name === "Search suggestion list") {
+      const combo = createElement("div", "autocomplete-demo");
+      appendField(combo, "Search", "diff");
+      appendSpecimenRow(combo, "Floyd-Steinberg", "Algorithm", "Enter");
+      appendSpecimenRow(combo, "Diffusion settings", "Command", "");
+      appendSpecimenRow(combo, "Signal Diff Pack", "Store", "");
+      stage.appendChild(combo);
+      return;
+    }
+
     if (component.name === "One-time code field") {
       const code = createElement("div", "code-entry");
       ["4", "8", "1", "9", "", ""].forEach((value) => code.appendChild(createElement("span", "", value)));
@@ -1820,6 +2654,61 @@
       return;
     }
 
+    if (component.name === "Tokenized input") {
+      const tokenized = createElement("div", "token-input-demo");
+      appendField(tokenized, "Invite teammates", "alex@");
+      const chips = createElement("div", "component-chip-list");
+      ["corey@studio.test", "ops@studio.test", "alex@"].forEach((label, index) => {
+        chips.appendChild(createElement("span", index === 2 ? "component-chip is-error" : "component-chip is-selected", label));
+      });
+      tokenized.appendChild(chips);
+      appendText(tokenized, "p", "", "Invalid token is preserved with an explicit remove control in production.");
+      stage.appendChild(tokenized);
+      return;
+    }
+
+    if (component.name === "Inline edit field") {
+      const edit = createElement("div", "inline-edit-demo");
+      appendText(edit, "span", "token-name", "preset name");
+      appendField(edit, "Name", "CRT Fog 02");
+      appendStateChip(edit, "dirty", "is-warning");
+      const actions = createElement("div", "component-button-row");
+      appendButton(actions, "Cancel");
+      appendButton(actions, "Save", "is-active");
+      edit.appendChild(actions);
+      stage.appendChild(edit);
+      return;
+    }
+
+    if (component.name === "Address form") {
+      const address = createElement("div", "specimen-form address-form-demo");
+      appendField(address, "Country", "United States");
+      appendField(address, "Region", "California");
+      appendField(address, "Postal code", "94107");
+      appendStateChip(address, "tax ready", "is-success");
+      stage.appendChild(address);
+      return;
+    }
+
+    if (component.name === "Form field group") {
+      const group = createElement("div", "field-group-demo");
+      appendText(group, "span", "token-name", "billing identity");
+      appendField(group, "Business name", "Dither Studio");
+      appendField(group, "Tax ID", "US-1234");
+      appendText(group, "p", "", "Group-level validation links errors back to each field.");
+      stage.appendChild(group);
+      return;
+    }
+
+    if (component.name === "Masked input") {
+      const mask = createElement("div", "specimen-form");
+      appendField(mask, "License key", "DW-2026-____");
+      appendStateChip(mask, "partial", "is-warning");
+      appendText(mask, "p", "", "Supports paste and reads as plain grouped text.");
+      stage.appendChild(mask);
+      return;
+    }
+
     const form = createElement("div", "specimen-form");
     appendField(form, component.name === "Search field" ? "Search" : component.name === "Password field" ? "Password" : "Field label", component.name === "Password field" ? "••••••••" : component.name === "Number field and stepper" ? "64" : "Dither preset", component.name === "Password field" ? "text" : "text");
     if (component.name === "Search field") appendSpecimenRow(form, "4 results", "icons, presets, store", "Clear");
@@ -1837,6 +2726,47 @@
 
   function buildAuthSpecimen(stage, component) {
     const form = createElement("div", "specimen-form");
+    if (component.name === "Passkey prompt") {
+      const prompt = createElement("div", "specimen-dialog");
+      appendStateChip(prompt, "passkey", "is-selected");
+      appendText(prompt, "strong", "", "Use a passkey");
+      appendText(prompt, "p", "", "Verify this device or continue with password.");
+      const actions = createElement("div", "component-button-row");
+      appendButton(actions, "Password");
+      appendButton(actions, "Continue", "is-active");
+      prompt.appendChild(actions);
+      stage.appendChild(prompt);
+      return;
+    }
+
+    if (component.name === "SSO option group") {
+      const sso = createElement("div", "specimen-form");
+      appendButton(sso, "Continue with Studio SSO");
+      appendButton(sso, "Continue with email");
+      appendStateChip(sso, "domain locked", "is-warning");
+      stage.appendChild(sso);
+      return;
+    }
+
+    if (component.name === "Consent and legal gate") {
+      const consent = createElement("div", "specimen-form");
+      appendSpecimenRow(consent, "Commercial license terms", "required", "Review");
+      appendStateChip(consent, "unchecked", "is-warning");
+      appendButton(consent, "Accept and continue");
+      stage.appendChild(consent);
+      return;
+    }
+
+    if (component.name === "Invite accept flow") {
+      const invite = createElement("div", "specimen-alert is-info");
+      appendStateChip(invite, "team invite", "is-selected");
+      appendText(invite, "strong", "", "Join Dither Studio");
+      appendText(invite, "p", "", "Role: editor. Invitation expires in 2 days.");
+      appendButton(invite, "Accept invite");
+      stage.appendChild(invite);
+      return;
+    }
+
     if (component.name === "Verification challenge") {
       buildInputSpecimen(stage, { name: "One-time code field" });
       return;
@@ -1915,6 +2845,26 @@
       appendSpecimenRow(rows, "MFA enabled", "May 09 / security", "");
       appendSpecimenRow(rows, "Pack installed", "May 09 / store", "");
       appendSpecimenRow(rows, "Payment retry", "May 09 / billing", "");
+    } else if (component.name === "Appearance settings") {
+      appendSpecimenRow(rows, "Theme", "system", "Change");
+      appendSpecimenRow(rows, "Density", "compact", "Edit");
+      appendSpecimenRow(rows, "Reduced motion", "on", "Toggle");
+    } else if (component.name === "Connected accounts") {
+      appendSpecimenRow(rows, "Payment provider", "connected", "Manage");
+      appendSpecimenRow(rows, "Studio SSO", "expired", "Reconnect");
+      appendSpecimenRow(rows, "Cloud storage", "disconnected", "Connect");
+    } else if (component.name === "API key manager") {
+      appendSpecimenRow(rows, "Render automation", "created May 09", "Rotate");
+      appendSpecimenRow(rows, "Store sync", "last used today", "Revoke");
+      appendStateChip(rows, "reveal once", "is-warning");
+    } else if (component.name === "Privacy controls") {
+      appendSpecimenRow(rows, "Telemetry", "off", "Toggle");
+      appendSpecimenRow(rows, "Local media retention", "session only", "Edit");
+      appendSpecimenRow(rows, "Team activity log", "90 days", "Change");
+    } else if (component.name === "Data export request") {
+      appendSpecimenRow(rows, "Account archive", "processing", "View");
+      appendSpecimenRow(rows, "Billing records", "ready until Jun 09", "Download");
+      appendStateChip(rows, "ready", "is-success");
     } else {
       appendSpecimenRow(rows, "Profile", "saved", "Edit");
       appendSpecimenRow(rows, "Security", "MFA required", "Manage");
@@ -1976,6 +2926,47 @@
       return;
     }
 
+    if (component.name === "Asset preview gallery") {
+      const gallery = createElement("div", "asset-gallery-demo");
+      const preview = createElement("div", "specimen-preview-frame");
+      preview.appendChild(createElement("span", "", ""));
+      gallery.appendChild(preview);
+      const strip = createElement("div", "specimen-carousel-controls");
+      ["01", "02", "03"].forEach((label, index) => appendButton(strip, label, index === 1 ? "is-active" : "specimen-square-button"));
+      gallery.appendChild(strip);
+      appendStateChip(gallery, "motion paused", "is-selected");
+      stage.appendChild(gallery);
+      return;
+    }
+
+    if (component.name === "License comparison" || component.name === "Compatibility matrix") {
+      const matrix = createElement("div", "invoice-table-demo");
+      appendSpecimenRow(matrix, component.name === "License comparison" ? "Personal" : "PNG export", "included", "");
+      appendSpecimenRow(matrix, component.name === "License comparison" ? "Commercial" : "SVG export", "Pro", "");
+      appendSpecimenRow(matrix, component.name === "License comparison" ? "Team" : "Team library", "Team plan", "");
+      stage.appendChild(matrix);
+      return;
+    }
+
+    if (component.name === "Saved for later") {
+      const saved = createElement("div", "settings-stack");
+      appendSpecimenRow(saved, "Cathode Ramps", "saved", "Move to cart");
+      appendSpecimenRow(saved, "Signal Rot Kit", "unavailable", "Remove");
+      stage.appendChild(saved);
+      return;
+    }
+
+    if (component.name === "Download manager") {
+      const download = createElement("div", "specimen-stack");
+      appendSpecimenRow(download, "Signal Rot Kit", "72% downloaded", "Pause");
+      const meter = createElement("div", "specimen-progress");
+      meter.appendChild(createElement("span", "", ""));
+      download.appendChild(meter);
+      appendSpecimenRow(download, "Cathode Ramps", "installed", "Open");
+      stage.appendChild(download);
+      return;
+    }
+
     if (component.name === "Checkout shell") {
       const checkout = createElement("div", "checkout-panel");
       const steps = createElement("div", "checkout-stepper");
@@ -2003,6 +2994,58 @@
   }
 
   function buildBillingSpecimen(stage, component) {
+    if (component.name === "Payment method selector") {
+      const methods = createElement("div", "settings-stack");
+      appendSpecimenRow(methods, "Visa 4242", "selected / default", "");
+      appendSpecimenRow(methods, "Wallet", "backup", "");
+      appendSpecimenRow(methods, "Add new method", "provider frame", "Add");
+      stage.appendChild(methods);
+      return;
+    }
+
+    if (component.name === "Proration preview") {
+      const ledger = createElement("div", "cart-ledger");
+      appendText(ledger, "span", "token-name", "plan change");
+      appendSpecimenRow(ledger, "Unused Pro credit", "-$8.40");
+      appendSpecimenRow(ledger, "Team prorated charge", "$18.60");
+      appendSpecimenRow(ledger, "Due today", "$10.20", "Confirm");
+      stage.appendChild(ledger);
+      return;
+    }
+
+    if (component.name === "Dunning timeline" || component.name === "Refund status tracker") {
+      const timeline = createElement("div", "timeline-list-demo");
+      const rows = component.name === "Dunning timeline"
+        ? [["Card failed", "May 09", "is-error"], ["Retry scheduled", "May 12", "is-warning"], ["Grace ends", "May 16", ""]]
+        : [["Submitted", "May 09", "is-success"], ["Reviewing", "2 business days", "is-warning"], ["Paid out", "pending", ""]];
+      rows.forEach(([label, meta, modifier]) => {
+        const row = appendSpecimenRow(timeline, label, meta, "");
+        if (modifier) row.classList.add(modifier);
+      });
+      stage.appendChild(timeline);
+      return;
+    }
+
+    if (component.name === "Dispute evidence panel") {
+      const dispute = createElement("div", "settings-stack");
+      appendSpecimenRow(dispute, "Receipt PDF", "attached", "");
+      appendSpecimenRow(dispute, "Usage proof", "missing", "Upload");
+      appendSpecimenRow(dispute, "Customer messages", "ready", "");
+      appendStateChip(dispute, "missing evidence", "is-warning");
+      stage.appendChild(dispute);
+      return;
+    }
+
+    if (component.name === "Usage limit alert") {
+      const alert = createElement("div", "specimen-alert is-warning");
+      appendStateChip(alert, "92% used", "is-warning");
+      appendText(alert, "strong", "", "Export limit approaching");
+      appendText(alert, "p", "", "92 of 100 monthly Pro exports used. Upgrade or wait until Jun 09.");
+      appendButton(alert, "View options");
+      stage.appendChild(alert);
+      return;
+    }
+
     if (component.name === "Invoice list" || component.name === "Billing ledger table") {
       const table = createElement("div", "invoice-table-demo");
       appendSpecimenRow(table, "May 2026", "$18.00 paid", "PDF");
@@ -2090,6 +3133,76 @@
   }
 
   function buildWorkflowSpecimen(stage, component) {
+    if (component.name === "Source drop target") {
+      const drop = createElement("div", "dropzone-demo workflow-drop-demo");
+      appendText(drop, "strong", "", "Drop source media");
+      appendText(drop, "p", "", "Image, video, or folder. Keyboard chooser remains available.");
+      appendButton(drop, "Choose source");
+      appendStateChip(drop, "drag ready", "is-selected");
+      stage.appendChild(drop);
+      return;
+    }
+
+    if (component.name === "Preset browser") {
+      const browser = createElement("div", "collection-grid-demo");
+      ["Local CRT", "Team Print", "Signal Pack", "Locked Pro"].forEach((label, index) => {
+        const item = createElement("article", index === 1 ? "is-active" : "");
+        appendText(item, "span", "token-name", index === 3 ? "locked" : "preset");
+        appendText(item, "strong", "", label);
+        appendStateChip(item, index === 3 ? "upgrade" : "apply", index === 1 ? "is-selected" : "");
+        browser.appendChild(item);
+      });
+      stage.appendChild(browser);
+      return;
+    }
+
+    if (component.name === "Parameter rack") {
+      const rack = createElement("div", "parameter-rack-demo");
+      [["Threshold", "64"], ["Diffusion", "0.72"], ["Scale", "2x"], ["Noise", "14%"]].forEach(([label, value]) => appendKeyValue(rack, label, value));
+      appendStateChip(rack, "dirty", "is-warning");
+      stage.appendChild(rack);
+      return;
+    }
+
+    if (component.name === "Before after comparator") {
+      const compare = createElement("div", "compare-demo");
+      const preview = createElement("div", "specimen-preview-frame");
+      preview.appendChild(createElement("span", "", ""));
+      compare.appendChild(preview);
+      appendStateChip(compare, "split 52%", "is-selected");
+      appendButton(compare, "Swap");
+      stage.appendChild(compare);
+      return;
+    }
+
+    if (component.name === "Keyboard shortcut overlay") {
+      const overlay = createElement("div", "command-palette-demo");
+      appendField(overlay, "Filter shortcuts", "export");
+      appendSpecimenRow(overlay, "Export current frame", "Cmd Enter", "");
+      appendSpecimenRow(overlay, "Toggle compare", "C", "");
+      appendSpecimenRow(overlay, "Open command palette", "Cmd K", "");
+      stage.appendChild(overlay);
+      return;
+    }
+
+    if (component.name === "Render job inspector") {
+      const jobs = createElement("div", "timeline-list-demo");
+      appendSpecimenRow(jobs, "Frame extraction", "running / 62%", "Pause");
+      appendSpecimenRow(jobs, "Vector pass", "queued", "");
+      appendSpecimenRow(jobs, "Palette JSON", "complete", "Open");
+      stage.appendChild(jobs);
+      return;
+    }
+
+    if (component.name === "Export manifest") {
+      const manifest = createElement("div", "invoice-table-demo");
+      appendSpecimenRow(manifest, "output.png", "1.8 MB", "Download");
+      appendSpecimenRow(manifest, "palette.json", "4 KB", "Copy");
+      appendSpecimenRow(manifest, "vector.svg", "220 KB", "Open");
+      stage.appendChild(manifest);
+      return;
+    }
+
     const frame = createElement("div", "specimen-workflow");
     appendText(frame, "span", "token-name", component.name);
     const preview = createElement("div", "specimen-preview-frame");
@@ -2116,9 +3229,9 @@
     else buildWorkflowSpecimen(stage, component);
   }
 
-  function createComponentSpecimen(component, familyId) {
-    const cell = createElement("div", "component-detail-cell component-specimen-cell");
-    cell.appendChild(createElement("span", "token-name", "Specimen"));
+  function createComponentSpecimen(component, familyId, options = {}) {
+    const cell = createElement("div", options.compact ? "component-specimen-cell is-compact" : "component-detail-cell component-specimen-cell");
+    if (!options.compact) cell.appendChild(createElement("span", "token-name", "Specimen"));
     const stage = createElement("div", `component-record-specimen specimen-${familyId}`);
     stage.dataset.specimen = slugify(component.name);
     buildComponentSpecimen(stage, component, familyId);
@@ -2126,33 +3239,69 @@
     return cell;
   }
 
-  function createDetail(component, familyId, isOpen) {
-    const detail = createElement("details", "component-detail");
-    detail.open = isOpen;
-    detail.id = componentRecordId(familyId, component.name);
-    detail.dataset.componentRecord = detail.id;
-    detail.dataset.componentFamily = familyId;
-    detail.addEventListener("toggle", () => {
-      if (!detail.open) return;
-      const panel = detail.closest("[data-component-panel]");
-      panel?.querySelectorAll(".component-detail[open]").forEach((record) => {
-        if (record !== detail) record.open = false;
-      });
-    });
+  function getComponentBoardScale(component, familyId) {
+    const fullWidthComponents = new Set([
+      "Data table",
+      "Command palette",
+      "Navigation drawer",
+      "Tree and outline view",
+      "Transfer list",
+      "Address form",
+      "Form field group",
+      "Profile settings",
+      "Security settings",
+      "Team and seats",
+      "Subscription settings",
+      "Entitlement library",
+      "Activity log",
+      "API key manager",
+      "Privacy controls",
+      "Product listing",
+      "Product detail",
+      "Checkout shell",
+      "Asset preview gallery",
+      "License comparison",
+      "Compatibility matrix",
+      "Download manager",
+      "Payment method form",
+      "Payment failure recovery",
+      "Checkout stepper",
+      "Billing ledger table",
+      "Dunning timeline",
+      "Dispute evidence panel",
+      "Preview canvas",
+      "Algorithm picker",
+      "Effect stack",
+      "Preset browser",
+      "Parameter rack",
+      "Before after comparator",
+      "Render job inspector",
+      "Export manifest",
+    ]);
 
-    const summary = document.createElement("summary");
-    const copy = createElement("span", "component-summary-copy");
-    copy.appendChild(createElement("strong", "", component.name));
-    copy.appendChild(createElement("span", "", getComponentVariants(component).slice(0, 4).join(" / ")));
-    summary.appendChild(copy);
-    summary.appendChild(createElement("span", "component-expander"));
-    detail.appendChild(summary);
+    if (fullWidthComponents.has(component.name)) return "full";
+    if (["account", "store", "billing", "workflows"].includes(familyId)) return "wide";
+    return "standard";
+  }
 
-    const body = createElement("div", "component-detail-body");
-    body.appendChild(createComponentSpecimen(component, familyId));
-    body.appendChild(createContractDisclosure(component));
-    detail.appendChild(body);
-    return detail;
+  function createSpecimenBoardItem(component, familyId) {
+    const tile = createElement("article", "component-specimen-board-item");
+    tile.id = componentRecordId(familyId, component.name);
+    tile.dataset.componentRecord = tile.id;
+    tile.dataset.componentFamily = familyId;
+    tile.dataset.componentScale = getComponentBoardScale(component, familyId);
+    tile.setAttribute(
+      "aria-label",
+      `${component.name}. Variants: ${getComponentVariants(component).join(", ")}. States: ${component.states.join(", ")}.`
+    );
+    const caption = createElement("div", "component-board-caption");
+    const label = createElement("a", "component-board-label", component.name);
+    label.href = `#${tile.id}`;
+    caption.appendChild(label);
+    tile.appendChild(caption);
+
+    tile.appendChild(createComponentSpecimen(component, familyId, { compact: true }));
+    return tile;
   }
 
   function setActiveTab(root, activeId, focusTab = false) {
@@ -2175,28 +3324,7 @@
 
   function renderCatalog(root) {
     const totalComponents = componentFamilies.reduce((count, family) => count + family.components.length, 0);
-    const header = createElement("div", "component-catalog-head");
-    const intro = createElement("div", "component-catalog-intro");
-    intro.appendChild(createElement("span", "token-name", "component model"));
-    intro.appendChild(createElement("strong", "", "Specimen-first records with Material 3 coverage."));
-    intro.appendChild(createElement("p", "", "Open a component to see the visual specimen first. States, variants, tokens, accessibility, and product usage stay one disclosure deeper."));
-    header.appendChild(intro);
-
-    const stats = createElement("div", "component-catalog-stats", "");
-    [
-      [6, "M3 groups"],
-      [totalComponents, "specimens"],
-      [4, "commerce flows"],
-    ].forEach(([value, label]) => {
-      const stat = createElement("span", "");
-      stat.appendChild(createElement("strong", "", String(value)));
-      stat.appendChild(createElement("em", "", label));
-      stats.appendChild(stat);
-    });
-    header.appendChild(stats);
-    root.appendChild(header);
-    root.appendChild(createCoverageDisclosure(totalComponents));
-    root.appendChild(createCommerceKitDisclosure());
+    root.dataset.componentCount = String(totalComponents);
 
     const tablist = createElement("div", "component-tablist");
     tablist.setAttribute("role", "tablist");
@@ -2227,16 +3355,16 @@
 
       const panelIntro = createElement("div", "component-family-intro");
       const panelCopy = createElement("div", "");
-      panelCopy.appendChild(createElement("span", "token-name", `${String(family.components.length).padStart(2, "0")} records`));
       panelCopy.appendChild(createElement("strong", "", family.label));
       panelCopy.appendChild(createElement("p", "", family.lead));
       panelIntro.appendChild(panelCopy);
-      panelIntro.appendChild(createElement("span", "component-family-count", `${family.components.length} components`));
       panel.appendChild(panelIntro);
 
+      const grid = createElement("div", "component-specimen-board");
       family.components.forEach((component, componentIndex) => {
-        panel.appendChild(createDetail(component, family.id, familyIndex === 0 && componentIndex === 0));
+        grid.appendChild(createSpecimenBoardItem(component, family.id, componentIndex));
       });
+      panel.appendChild(grid);
 
       panels.appendChild(panel);
     });
@@ -2308,7 +3436,9 @@
     if (!record) return false;
     const familyId = record.dataset.componentFamily || componentFamilies[0].id;
     setActiveTab(root, familyId, false);
-    record.open = true;
+    root.querySelectorAll("[data-component-record].is-targeted").forEach((item) => item.classList.remove("is-targeted"));
+    record.classList.add("is-targeted");
+    if ("open" in record) record.open = true;
     if (shouldScroll) {
       requestAnimationFrame(() => {
         record.scrollIntoView({
