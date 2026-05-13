@@ -117,11 +117,13 @@
   }
 
   function cursorThemeColors() {
+    const theme = document.documentElement.dataset.theme === "light" ? "light" : "dark";
     const rawPrimary = cssColor("--m3-primary") || cssColor("--green-strong") || LOGOTYPE_FALLBACK_COLORS["--m3-primary"];
     const rawSecondary = cssColor("--m3-secondary") || LOGOTYPE_FALLBACK_COLORS["--m3-secondary"];
     const rawTertiary = cssColor("--m3-tertiary") || LOGOTYPE_FALLBACK_COLORS["--m3-tertiary"];
     const background = cssColor("--bg") || LOGOTYPE_FALLBACK_COLORS["--bg"];
-    const primary = contrastAdjustedThemeColor(rawPrimary, background);
+    const rawWand = cssColor("--m3-surface-container-lowest") || background;
+    const primary = mixRgb(rawWand, rawPrimary, theme === "light" ? 0.08 : 0.12);
     const secondary = contrastAdjustedThemeColor(rawSecondary, background);
     const tertiary = contrastAdjustedThemeColor(rawTertiary, background);
     return {

@@ -45,6 +45,7 @@ const EXPORT_COUNT_KEY = "ditherWizardExportCount";
 const els = {
   fileInput: $("fileInput"),
   loadButton: $("loadButton"),
+  randomSourceButton: $("randomSourceButton"),
   dropZone: $("dropZone"),
   resetSampleButton: $("resetSampleButton"),
   presetGrid: $("presetGrid"),
@@ -60,6 +61,7 @@ const els = {
   palettePickerList: $("palettePickerList"),
   swatchRow: $("swatchRow"),
   randomizePaletteButton: $("randomizePaletteButton"),
+  randomizePresetButton: $("randomizePresetButton"),
   randomizeAlgorithmButton: $("randomizeAlgorithmButton"),
   extractPaletteButton: $("extractPaletteButton"),
   exportPaletteButton: $("exportPaletteButton"),
@@ -68,6 +70,8 @@ const els = {
   effectSelect: $("effectSelect"),
   randomizeEffectsButton: $("randomizeEffectsButton"),
   effectsStack: $("effectsStack"),
+  effectsStackScrollIndicator: document.querySelector(".effects-stack-scroll-indicator"),
+  effectsStackScrollThumb: document.querySelector(".effects-stack-scroll-indicator span"),
   playButton: $("playButton"),
   playIcon: $("playIcon"),
   stepBackButton: $("stepBackButton"),
@@ -120,6 +124,12 @@ const els = {
   themeToggle: $("themeToggle"),
   themeGlyph: $("themeGlyph"),
   themeText: $("themeText"),
+  masterControlsPane: document.querySelector(".master-controls-pane"),
+  masterScrollIndicator: document.querySelector(".master-scroll-indicator"),
+  masterScrollThumb: document.querySelector(".master-scroll-indicator span"),
+  pageScrollIndicator: document.querySelector(".page-scroll-indicator"),
+  pageScrollThumb: document.querySelector(".page-scroll-indicator span"),
+  stagePane: document.querySelector(".stage-pane"),
 };
 
 const ERROR_KERNELS = {
@@ -388,7 +398,7 @@ const PALETTES = {
     ],
   },
   gameboy: {
-    name: "Game Console",
+    name: "GameBoy Original",
     themeScheme: "monochrome",
     colors: [
       [15, 56, 15],
@@ -397,25 +407,89 @@ const PALETTES = {
       [155, 188, 15],
     ],
   },
-  c64: {
-    name: "C64 Deep",
+  gameboyPocket: {
+    name: "GameBoy Pocket",
+    themeScheme: "monochrome",
     colors: [
-      [10, 12, 11],
-      [238, 241, 231],
-      [104, 55, 43],
-      [112, 164, 178],
-      [111, 61, 134],
-      [88, 141, 67],
-      [53, 40, 121],
-      [184, 199, 111],
-      [111, 79, 37],
-      [67, 57, 0],
-      [154, 103, 89],
-      [68, 68, 68],
-      [108, 108, 108],
-      [154, 210, 132],
-      [108, 94, 181],
-      [149, 149, 149],
+      [28, 28, 28],
+      [86, 86, 86],
+      [139, 139, 139],
+      [196, 196, 196],
+    ],
+  },
+  nes: {
+    name: "NES",
+    colors: [
+      [124, 124, 124],
+      [0, 0, 252],
+      [0, 0, 188],
+      [68, 40, 188],
+      [148, 0, 132],
+      [168, 0, 32],
+      [168, 16, 0],
+      [136, 20, 0],
+      [80, 48, 0],
+      [0, 120, 0],
+      [0, 104, 0],
+      [0, 88, 0],
+      [0, 64, 88],
+      [0, 0, 0],
+    ],
+  },
+  virtualBoy: {
+    name: "Virtual Boy",
+    themeScheme: "monochrome",
+    colors: [
+      [0, 0, 0],
+      [56, 0, 0],
+      [112, 0, 0],
+      [168, 0, 0],
+      [224, 0, 0],
+    ],
+  },
+  c64: {
+    name: "Commodore 64",
+    colors: [
+      [0, 0, 0],
+      [255, 255, 255],
+      [136, 0, 0],
+      [170, 255, 238],
+      [204, 68, 204],
+      [0, 204, 85],
+      [0, 0, 170],
+      [238, 238, 119],
+      [221, 136, 85],
+      [102, 68, 0],
+      [255, 119, 119],
+      [51, 51, 51],
+      [119, 119, 119],
+      [170, 255, 102],
+      [0, 136, 255],
+      [187, 187, 187],
+    ],
+  },
+  zxSpectrum: {
+    name: "ZX Spectrum",
+    colors: [
+      [0, 0, 0],
+      [0, 0, 215],
+      [215, 0, 0],
+      [215, 0, 215],
+      [0, 215, 0],
+      [0, 215, 215],
+      [215, 215, 0],
+      [215, 215, 215],
+    ],
+  },
+  appleII: {
+    name: "Apple II",
+    colors: [
+      [0, 0, 0],
+      [255, 20, 147],
+      [0, 0, 255],
+      [255, 215, 0],
+      [0, 100, 0],
+      [255, 255, 255],
     ],
   },
   cga: {
@@ -425,6 +499,36 @@ const PALETTES = {
       [85, 255, 255],
       [255, 85, 255],
       [255, 255, 255],
+    ],
+  },
+  cgaMode4: {
+    name: "CGA Mode 4",
+    colors: [
+      [0, 0, 0],
+      [85, 255, 255],
+      [255, 85, 85],
+      [255, 255, 255],
+    ],
+  },
+  pico8: {
+    name: "Pico-8",
+    colors: [
+      [0, 0, 0],
+      [29, 43, 83],
+      [126, 37, 83],
+      [0, 135, 81],
+      [171, 82, 54],
+      [95, 87, 79],
+      [194, 195, 199],
+      [255, 241, 232],
+      [255, 0, 77],
+      [255, 163, 0],
+      [255, 236, 39],
+      [0, 228, 54],
+      [41, 173, 255],
+      [131, 118, 156],
+      [255, 119, 168],
+      [255, 204, 170],
     ],
   },
   riso: {
@@ -458,11 +562,11 @@ const PALETTES = {
     ],
   },
   macpaint: {
-    name: "MacPaint",
+    name: "Macintosh SE",
     themeScheme: "monochrome",
     colors: [
-      [20, 22, 21],
-      [235, 236, 226],
+      [0, 0, 0],
+      [255, 255, 255],
     ],
   },
   blueprint: {
@@ -528,6 +632,199 @@ const PALETTES = {
       [222, 223, 207],
     ],
   },
+  hotlineMiami: {
+    name: "Hotline Miami",
+    colors: [
+      [26, 26, 46],
+      [22, 33, 62],
+      [15, 52, 96],
+      [233, 69, 96],
+      [0, 255, 245],
+    ],
+  },
+  moltenRock: {
+    name: "Molten Rock",
+    colors: [
+      [26, 5, 0],
+      [74, 13, 0],
+      [130, 30, 0],
+      [181, 57, 0],
+      [232, 93, 4],
+      [255, 186, 8],
+    ],
+  },
+  deepOcean: {
+    name: "Deep Ocean",
+    colors: [
+      [0, 18, 25],
+      [0, 95, 115],
+      [10, 147, 150],
+      [148, 210, 189],
+      [233, 216, 166],
+    ],
+  },
+  nordTheme: {
+    name: "Nord Theme",
+    colors: [
+      [46, 52, 64],
+      [59, 66, 82],
+      [67, 76, 94],
+      [76, 86, 106],
+      [216, 222, 233],
+      [229, 233, 240],
+      [236, 239, 244],
+      [143, 188, 187],
+      [136, 192, 208],
+      [129, 161, 193],
+      [94, 129, 172],
+    ],
+  },
+  dracula: {
+    name: "Dracula",
+    colors: [
+      [40, 42, 54],
+      [68, 71, 90],
+      [248, 248, 242],
+      [98, 114, 164],
+      [139, 233, 253],
+      [80, 250, 123],
+      [255, 184, 108],
+      [255, 121, 198],
+      [189, 147, 249],
+      [255, 85, 85],
+      [241, 250, 140],
+    ],
+  },
+  solarizedDark: {
+    name: "Solarized Dark",
+    colors: [
+      [0, 43, 54],
+      [7, 54, 66],
+      [88, 110, 117],
+      [101, 123, 131],
+      [131, 148, 150],
+      [147, 161, 161],
+      [238, 232, 213],
+      [253, 246, 227],
+      [181, 137, 0],
+      [203, 75, 22],
+      [220, 50, 47],
+      [211, 54, 130],
+      [108, 113, 196],
+      [38, 139, 210],
+      [42, 161, 152],
+      [133, 153, 0],
+    ],
+  },
+  monokai: {
+    name: "Monokai",
+    colors: [
+      [39, 40, 34],
+      [249, 38, 114],
+      [102, 217, 239],
+      [166, 226, 46],
+      [253, 151, 31],
+      [230, 219, 116],
+    ],
+  },
+  gruvbox: {
+    name: "Gruvbox",
+    colors: [
+      [40, 40, 40],
+      [204, 36, 29],
+      [152, 151, 26],
+      [215, 153, 33],
+      [69, 133, 136],
+      [177, 98, 134],
+      [104, 157, 106],
+      [168, 153, 132],
+      [146, 131, 116],
+      [251, 73, 52],
+      [184, 187, 38],
+      [250, 189, 47],
+      [131, 165, 152],
+      [211, 134, 155],
+      [142, 192, 124],
+      [235, 219, 178],
+    ],
+  },
+  cyberpunkNeon: {
+    name: "Cyberpunk Neon",
+    colors: [
+      [11, 12, 21],
+      [24, 42, 58],
+      [38, 64, 86],
+      [20, 184, 166],
+      [244, 63, 94],
+      [139, 92, 246],
+      [254, 243, 199],
+    ],
+  },
+  vaporwave: {
+    name: "Vaporwave",
+    colors: [
+      [44, 33, 55],
+      [70, 54, 90],
+      [118, 101, 156],
+      [139, 186, 199],
+      [231, 151, 150],
+      [215, 75, 118],
+    ],
+  },
+  synthwaveSunset: {
+    name: "Synthwave Sunset",
+    colors: [
+      [43, 33, 58],
+      [76, 47, 105],
+      [176, 48, 92],
+      [235, 86, 75],
+      [255, 155, 94],
+      [243, 216, 125],
+    ],
+  },
+  ammo8: {
+    name: "Ammo-8",
+    themeScheme: "monochrome",
+    colors: [
+      [4, 12, 6],
+      [17, 35, 24],
+      [30, 58, 41],
+      [48, 93, 66],
+      [77, 128, 97],
+      [137, 162, 87],
+      [190, 204, 133],
+      [205, 222, 163],
+    ],
+  },
+  obraDinn: {
+    name: "Obra Dinn",
+    themeScheme: "monochrome",
+    colors: [
+      [29, 31, 33],
+      [197, 193, 163],
+    ],
+  },
+  matrix: {
+    name: "Matrix",
+    themeScheme: "monochrome",
+    colors: [
+      [0, 0, 0],
+      [0, 59, 0],
+      [0, 143, 17],
+      [0, 255, 65],
+      [204, 255, 204],
+    ],
+  },
+  blueprintClassic: {
+    name: "Blueprint",
+    themeScheme: "monochrome",
+    colors: [
+      [0, 34, 102],
+      [0, 51, 153],
+      [0, 68, 204],
+      [255, 255, 255],
+    ],
+  },
 };
 
 const ADAPTIVE_PALETTE_PREVIEW = [
@@ -569,31 +866,34 @@ const PRESETS = [
     effects: [{ id: "epsilon-glow", strength: 12, enabled: true }],
   },
   {
-    name: "Live Wire",
-    detail: "drift / phosphor",
-    algorithm: "temporal-drift",
-    palette: "phosphor",
-    settings: { cell: 3, levels: 4, contrast: 28, brightness: -10, gamma: 1.22, noise: 18, threshold: 118, temporal: 70 },
+    name: "Tokyo Nightlife",
+    detail: "neon / clear",
+    algorithm: "sierra-lite",
+    palette: "cyberpunkNeon",
+    settings: { cell: 2, levels: 8, contrast: 8, brightness: 6, gamma: 0.96, noise: 5, threshold: 128, temporal: 18 },
     effects: [
-      { id: "chromatic-aberration", strength: 22, enabled: true },
-      { id: "scanlines", strength: 34, enabled: true },
+      { id: "epsilon-glow", strength: 12, enabled: true },
+      { id: "chromatic-aberration", strength: 6, enabled: true },
     ],
   },
   {
-    name: "CMYK Rot",
-    detail: "halftone",
-    algorithm: "cmyk-halftone",
-    palette: "cmyk",
-    settings: { cell: 4, levels: 5, contrast: 22, brightness: 4, gamma: 0.88, noise: 6, threshold: 130, temporal: 20 },
-    effects: [{ id: "cmyk-shift", strength: 18, enabled: true }],
+    name: "Tron Grid",
+    detail: "blue / crisp",
+    algorithm: "blue-noise",
+    palette: "blueprint",
+    settings: { cell: 2, levels: 7, contrast: 12, brightness: 8, gamma: 0.98, noise: 1, threshold: 128, temporal: 12 },
+    effects: [
+      { id: "epsilon-glow", strength: 14, enabled: true },
+      { id: "scanlines", strength: 8, enabled: true },
+    ],
   },
   {
-    name: "Embroidery",
-    detail: "vector hatch",
-    algorithm: "embroidery-satin",
-    palette: "vectorBlack",
-    settings: { cell: 5, levels: 2, contrast: 42, brightness: 0, gamma: 1, noise: 1, threshold: 124, temporal: 4 },
-    effects: [],
+    name: "Clear Proof",
+    detail: "adaptive / clean",
+    algorithm: "atkinson",
+    palette: "adaptive",
+    settings: { cell: 1, levels: 11, contrast: 4, brightness: 5, gamma: 1, noise: 0, threshold: 128, temporal: 6 },
+    effects: [{ id: "epsilon-glow", strength: 6, enabled: true }],
   },
   {
     name: "Datamosh",
@@ -606,10 +906,36 @@ const PRESETS = [
       { id: "chromatic-aberration", strength: 24, enabled: true },
     ],
   },
+  {
+    name: "Old VHS",
+    detail: "tape / drift",
+    algorithm: "scanline-split",
+    palette: "adaptive",
+    settings: { cell: 2, levels: 7, contrast: -10, brightness: -6, gamma: 0.92, noise: 34, threshold: 126, temporal: 76 },
+    effects: [
+      { id: "noise", strength: 26, enabled: true },
+      { id: "chromatic-aberration", strength: 28, enabled: true },
+      { id: "jpeg-glitch", strength: 14, enabled: true },
+      { id: "vignette", strength: 16, enabled: true },
+    ],
+  },
+  {
+    name: "CRT Monitor",
+    detail: "warp / phos",
+    algorithm: "crt-warp",
+    palette: "phosphor",
+    settings: { cell: 2, levels: 4, contrast: 28, brightness: -9, gamma: 1.18, noise: 9, threshold: 122, temporal: 36 },
+    effects: [
+      { id: "scanlines", strength: 48, enabled: true },
+      { id: "epsilon-glow", strength: 22, enabled: true },
+      { id: "chromatic-aberration", strength: 10, enabled: true },
+      { id: "vignette", strength: 22, enabled: true },
+    ],
+  },
 ];
 
 const ADJUSTMENTS = [
-  { id: "cell", label: "Cell", min: 2, max: 12, step: 1 },
+  { id: "cell", label: "Cell", min: 1, max: 12, step: 1 },
   { id: "levels", label: "Levels", min: 2, max: 16, step: 1 },
   { id: "threshold", label: "Gate", min: 0, max: 255, step: 1 },
   { id: "contrast", label: "Contrast", min: -100, max: 100, step: 1 },
@@ -639,6 +965,7 @@ const state = {
   ],
   sourceType: "image",
   sourceName: "procedural",
+  randomSourceVisibilityGuard: false,
   duration: 4,
   time: 0,
   playing: false,
@@ -747,6 +1074,15 @@ const RANDOM_SOURCE_CLARITY_EFFECTS = [
   { id: "scanlines", weight: 4, min: 6, max: 12 },
   { id: "posterize", weight: 2, min: 5, max: 10 },
 ];
+const RANDOM_SOURCE_VISIBILITY_GUARD = {
+  lowMean: 46,
+  highMean: 212,
+  minRange: 58,
+  minDeviation: 21,
+  targetMean: 132,
+  targetRange: 148,
+  maxSamples: 12000,
+};
 
 const WIZARD_SIGNAL_PALETTES = [
   ["rgb(7,18,17)", "rgb(33,74,50)", "rgb(190,218,120)", "rgb(240,174,76)", "rgb(236,92,134)"],
@@ -764,6 +1100,7 @@ let objectUrl = "";
 let lastExportUrl = "";
 let exportMetricsTimer = 0;
 let exportStatusTimer = 0;
+let pageScrollHideTimer = 0;
 let errorDiffusionBuffer = new Float32Array(0);
 let logotypeRaf = 0;
 let lastLogotypeRenderAt = 0;
@@ -1350,6 +1687,34 @@ function luminance(r, g, b) {
   return 0.2126 * r + 0.7152 * g + 0.0722 * b;
 }
 
+function luminanceStats(data, pixelCount, maxSamples = RANDOM_SOURCE_VISIBILITY_GUARD.maxSamples) {
+  if (!data || !pixelCount) return { mean: 0, deviation: 0, range: 0, min: 0, max: 0 };
+  const sampleStep = Math.max(1, Math.floor(pixelCount / maxSamples));
+  let min = 255;
+  let max = 0;
+  let sum = 0;
+  let sumSq = 0;
+  let count = 0;
+  for (let pixel = 0; pixel < pixelCount; pixel += sampleStep) {
+    const index = pixel * 4;
+    const value = luminance(data[index], data[index + 1], data[index + 2]);
+    min = Math.min(min, value);
+    max = Math.max(max, value);
+    sum += value;
+    sumSq += value * value;
+    count += 1;
+  }
+  const mean = count ? sum / count : 0;
+  const variance = count ? Math.max(0, sumSq / count - mean * mean) : 0;
+  return {
+    mean,
+    deviation: Math.sqrt(variance),
+    range: max - min,
+    min,
+    max,
+  };
+}
+
 function hashNoise(x, y, t = 0) {
   const n = Math.sin(x * 12.9898 + y * 78.233 + t * 37.719) * 43758.5453;
   return n - Math.floor(n);
@@ -1922,6 +2287,7 @@ function setExportButtonsDisabled(disabled) {
     els.downloadJpgButton,
     els.downloadSvgButton,
     els.wizardSignalButton,
+    els.randomSourceButton,
     els.recordWebmButton,
     els.recordMp4Button,
     els.recordButton,
@@ -2247,6 +2613,57 @@ function applyBaseAdjustments(data, width, height, time) {
         data[i + c] = clamp(value);
       }
     }
+  }
+}
+
+function outputNeedsRandomSourceGuard(stats) {
+  return (
+    stats.mean < RANDOM_SOURCE_VISIBILITY_GUARD.lowMean ||
+    stats.mean > RANDOM_SOURCE_VISIBILITY_GUARD.highMean ||
+    stats.range < RANDOM_SOURCE_VISIBILITY_GUARD.minRange ||
+    stats.deviation < RANDOM_SOURCE_VISIBILITY_GUARD.minDeviation
+  );
+}
+
+function applyRandomSourceVisibilityGuard(imageData) {
+  if (!state.randomSourceVisibilityGuard || !imageData?.data?.length) return;
+  const pixelCount = imageData.width * imageData.height;
+  const outputStats = luminanceStats(imageData.data, pixelCount);
+  if (!outputNeedsRandomSourceGuard(outputStats)) return;
+
+  const sourceData = workCtx.getImageData(0, 0, imageData.width, imageData.height).data;
+  const sourceStats = luminanceStats(sourceData, pixelCount);
+  const missingRange = Math.max(0, RANDOM_SOURCE_VISIBILITY_GUARD.minRange - outputStats.range);
+  const missingDeviation = Math.max(0, RANDOM_SOURCE_VISIBILITY_GUARD.minDeviation - outputStats.deviation);
+  const extremeMean = outputStats.mean < RANDOM_SOURCE_VISIBILITY_GUARD.lowMean || outputStats.mean > RANDOM_SOURCE_VISIBILITY_GUARD.highMean;
+  const sourceMix = clamp(
+    0.18 + missingRange / 150 + missingDeviation / 90 + (extremeMean ? 0.16 : 0),
+    0.18,
+    0.52,
+  );
+  const outputScale = clamp(
+    RANDOM_SOURCE_VISIBILITY_GUARD.targetRange / Math.max(outputStats.range, 1),
+    1.05,
+    2.35,
+  );
+  const sourceScale = clamp(
+    RANDOM_SOURCE_VISIBILITY_GUARD.targetRange / Math.max(sourceStats.range, 1),
+    0.82,
+    2.1,
+  );
+  const targetMean = RANDOM_SOURCE_VISIBILITY_GUARD.targetMean;
+  const data = imageData.data;
+
+  for (let index = 0; index < data.length; index += 4) {
+    const outputLuma = luminance(data[index], data[index + 1], data[index + 2]);
+    const sourceLuma = luminance(sourceData[index], sourceData[index + 1], sourceData[index + 2]);
+    const outputTone = (outputLuma - outputStats.mean) * outputScale + targetMean;
+    const sourceTone = (sourceLuma - sourceStats.mean) * sourceScale + targetMean;
+    const targetTone = clamp(lerp(outputTone, sourceTone, sourceMix));
+    const delta = targetTone - outputLuma;
+    data[index] = clamp(data[index] + delta);
+    data[index + 1] = clamp(data[index + 1] + delta);
+    data[index + 2] = clamp(data[index + 2] + delta);
   }
 }
 
@@ -2849,6 +3266,7 @@ function renderNow(options = {}) {
   applyBaseAdjustments(imageData.data, imageData.width, imageData.height, state.time);
   applyAlgorithm(imageData, state.time);
   for (const effect of state.effects) applyDataEffect(imageData, effect, state.time);
+  applyRandomSourceVisibilityGuard(imageData);
 
   outputCtx.clearRect(0, 0, outputCanvas.width, outputCanvas.height);
   if (renderDimensions.preview) {
@@ -3147,7 +3565,7 @@ function getPalettePreviewColors(id = state.palette) {
   return PALETTES[id]?.colors || ADAPTIVE_PALETTE_PREVIEW;
 }
 
-function renderPalettePreview(target, colors, limit = 8) {
+function renderPalettePreview(target, colors, limit = 16) {
   if (!target) return;
   target.innerHTML = "";
   colors.slice(0, limit).forEach((color) => {
@@ -3217,6 +3635,210 @@ function syncPaletteScrollIndicator() {
   const thumbTop = trackPadding + (maxScroll ? (list.scrollTop / maxScroll) * (trackHeight - thumbHeight) : 0);
   els.palettePicker.style.setProperty("--palette-scroll-thumb-height", `${thumbHeight}px`);
   els.palettePicker.style.setProperty("--palette-scroll-thumb-top", `${thumbTop}px`);
+}
+
+function syncMasterScrollIndicator() {
+  const pane = els.masterControlsPane;
+  if (!pane) return;
+  const indicator = els.masterScrollIndicator;
+  const trackPadding = 14;
+  const paneRect = pane.getBoundingClientRect();
+  const workbenchRect = pane.closest(".workbench")?.getBoundingClientRect();
+  const stageRect = els.stagePane?.getBoundingClientRect();
+  const imageRect = els.canvasFrame?.getBoundingClientRect();
+  const rightBoundaryRect = imageRect?.width > 0 ? imageRect : stageRect;
+  const rightBoundary = rightBoundaryRect?.left ?? paneRect.right + 28;
+  const trackHeight = Math.max(1, pane.clientHeight - trackPadding * 2);
+  const maxScroll = Math.max(0, pane.scrollHeight - pane.clientHeight);
+  const visibleRatio = pane.scrollHeight ? pane.clientHeight / pane.scrollHeight : 1;
+  const thumbHeight = clamp(trackHeight * visibleRatio, 48, Math.min(trackHeight, 172));
+  const thumbTop = maxScroll ? (pane.scrollTop / maxScroll) * (trackHeight - thumbHeight) : 0;
+  const gutterInset = 4;
+  const gutterLeft = paneRect.right - 4;
+  const gutterRight = rightBoundary - gutterInset;
+  const gutterWidth = Math.max(0, gutterRight - gutterLeft);
+  const indicatorWidth = Math.min(22, gutterWidth);
+  const thumbWidth = Math.min(16, Math.max(10, indicatorWidth - 6));
+  const indicatorLeft = gutterLeft;
+  pane.style.setProperty("--master-scroll-thumb-height", `${thumbHeight}px`);
+  pane.style.setProperty("--master-scroll-thumb-top", `${thumbTop}px`);
+  if (indicator) {
+    indicator.hidden = indicatorWidth < 6;
+    indicator.style.setProperty("--master-scroll-track-left", `${indicatorLeft - (workbenchRect?.left ?? 0)}px`);
+    indicator.style.setProperty("--master-scroll-track-top", `${paneRect.top - (workbenchRect?.top ?? 0) + trackPadding}px`);
+    indicator.style.setProperty("--master-scroll-track-height", `${trackHeight}px`);
+    indicator.style.setProperty("--master-scroll-track-width", `${indicatorWidth}px`);
+    indicator.style.setProperty("--master-scroll-thumb-width", `${thumbWidth}px`);
+    indicator.style.setProperty("--master-scroll-thumb-height", `${thumbHeight}px`);
+    indicator.style.setProperty("--master-scroll-thumb-top", `${thumbTop}px`);
+  }
+  pane.classList.toggle("is-scrollable", maxScroll > 1);
+}
+
+function syncEffectsStackScrollIndicator() {
+  const stack = els.effectsStack;
+  const indicator = els.effectsStackScrollIndicator;
+  if (!stack || !indicator) return;
+  const trackPadding = 5;
+  const stackRect = stack.getBoundingClientRect();
+  const trackHeight = Math.max(1, stack.clientHeight - trackPadding * 2);
+  const maxScroll = Math.max(0, stack.scrollHeight - stack.clientHeight);
+  const visibleRatio = stack.scrollHeight ? stack.clientHeight / stack.scrollHeight : 1;
+  const thumbHeight = clamp(trackHeight * visibleRatio, 28, trackHeight);
+  const thumbTop = trackPadding + (maxScroll ? (stack.scrollTop / maxScroll) * (trackHeight - thumbHeight) : 0);
+  const isVisible = stackRect.bottom > 0 && stackRect.top < window.innerHeight && stack.clientHeight > 0;
+  indicator.hidden = !isVisible;
+  indicator.style.setProperty("--effects-stack-scroll-track-left", `${stackRect.right - 11}px`);
+  indicator.style.setProperty("--effects-stack-scroll-track-top", `${stackRect.top + trackPadding}px`);
+  indicator.style.setProperty("--effects-stack-scroll-track-height", `${trackHeight}px`);
+  indicator.style.setProperty("--effects-stack-scroll-thumb-height", `${thumbHeight}px`);
+  indicator.style.setProperty("--effects-stack-scroll-thumb-top", `${thumbTop - trackPadding}px`);
+  stack.classList.toggle("is-scrollable", maxScroll > 1);
+}
+
+function dragMasterScrollIndicator(event) {
+  const pane = els.masterControlsPane;
+  const thumb = els.masterScrollThumb;
+  if (!pane || !thumb) return;
+  const maxScroll = Math.max(0, pane.scrollHeight - pane.clientHeight);
+  if (!maxScroll) return;
+  event.preventDefault();
+  thumb.setPointerCapture?.(event.pointerId);
+  pane.classList.add("is-master-scroll-dragging");
+  els.masterScrollIndicator?.classList.add("is-master-scroll-dragging");
+
+  const startY = event.clientY;
+  const startScroll = pane.scrollTop;
+  const trackPadding = 14;
+  const trackHeight = Math.max(1, pane.clientHeight - trackPadding * 2);
+  const thumbHeight = Number.parseFloat(pane.style.getPropertyValue("--master-scroll-thumb-height")) || 46;
+  const scrollPerPixel = maxScroll / Math.max(1, trackHeight - thumbHeight);
+
+  const handlePointerMove = (moveEvent) => {
+    pane.scrollTop = clamp(startScroll + (moveEvent.clientY - startY) * scrollPerPixel, 0, maxScroll);
+    syncMasterScrollIndicator();
+  };
+
+  const stopDragging = (upEvent) => {
+    thumb.releasePointerCapture?.(upEvent.pointerId);
+    pane.classList.remove("is-master-scroll-dragging");
+    els.masterScrollIndicator?.classList.remove("is-master-scroll-dragging");
+    window.removeEventListener("pointermove", handlePointerMove);
+    window.removeEventListener("pointerup", stopDragging);
+    window.removeEventListener("pointercancel", stopDragging);
+  };
+
+  window.addEventListener("pointermove", handlePointerMove);
+  window.addEventListener("pointerup", stopDragging);
+  window.addEventListener("pointercancel", stopDragging);
+}
+
+function pageScrollMetrics() {
+  const root = document.documentElement;
+  const scrollHeight = Math.max(root.scrollHeight, document.body?.scrollHeight || 0);
+  const viewportHeight = window.innerHeight || root.clientHeight || 1;
+  const maxScroll = Math.max(0, scrollHeight - viewportHeight);
+  return {
+    root,
+    scrollHeight,
+    viewportHeight,
+    maxScroll,
+    scrollTop: clamp(window.scrollY || root.scrollTop || 0, 0, maxScroll),
+  };
+}
+
+function pageScrollTrackGeometry(metrics = pageScrollMetrics()) {
+  const trackTop = 0;
+  const trackHeight = Math.max(1, Math.round(metrics.viewportHeight));
+  return { trackTop, trackHeight };
+}
+
+function syncPageScrollIndicator() {
+  const indicator = els.pageScrollIndicator;
+  if (!indicator) return;
+  const metrics = pageScrollMetrics();
+  const { trackTop, trackHeight } = pageScrollTrackGeometry(metrics);
+  const visibleRatio = metrics.scrollHeight ? metrics.viewportHeight / metrics.scrollHeight : 1;
+  const thumbHeight = clamp(trackHeight * visibleRatio, 38, Math.min(trackHeight, 118));
+  const thumbTop = metrics.maxScroll ? (metrics.scrollTop / metrics.maxScroll) * (trackHeight - thumbHeight) : 0;
+  indicator.hidden = metrics.maxScroll <= 1;
+  indicator.style.setProperty("--page-scroll-track-top", `${trackTop}px`);
+  indicator.style.setProperty("--page-scroll-track-height", `${trackHeight}px`);
+  indicator.style.setProperty("--page-scroll-thumb-height", `${thumbHeight}px`);
+  indicator.style.setProperty("--page-scroll-thumb-top", `${thumbTop}px`);
+}
+
+function hidePageScrollIndicator() {
+  if (document.body.classList.contains("is-page-scroll-dragging")) return;
+  document.body.classList.remove("is-page-scroll-active");
+}
+
+function queuePageScrollIndicatorHide(delay = 900) {
+  window.clearTimeout(pageScrollHideTimer);
+  pageScrollHideTimer = window.setTimeout(hidePageScrollIndicator, delay);
+}
+
+function showPageScrollIndicator(options = {}) {
+  syncPageScrollIndicator();
+  if (els.pageScrollIndicator?.hidden) return;
+  document.body.classList.add("is-page-scroll-active");
+  if (!options.persist) queuePageScrollIndicatorHide(options.delay ?? 900);
+}
+
+function isNestedScrollTarget(target) {
+  const element = target instanceof Element ? target : null;
+  const scroller = element?.closest(".master-controls-pane, .palette-picker-list, .effects-stack, select[size]");
+  if (!scroller) return false;
+  const maxScroll = Math.max(0, scroller.scrollHeight - scroller.clientHeight);
+  return maxScroll > 1;
+}
+
+function handlePageScrollIntent(event) {
+  if (isNestedScrollTarget(event.target)) return;
+  showPageScrollIndicator();
+}
+
+function dragPageScrollIndicator(event) {
+  const thumb = els.pageScrollThumb;
+  if (!thumb) return;
+  const metrics = pageScrollMetrics();
+  if (!metrics.maxScroll) return;
+  event.preventDefault();
+  window.clearTimeout(pageScrollHideTimer);
+  thumb.setPointerCapture?.(event.pointerId);
+  document.body.classList.add("is-page-scroll-active", "is-page-scroll-dragging");
+
+  const startY = event.clientY;
+  const startScroll = metrics.scrollTop;
+  const { trackHeight } = pageScrollTrackGeometry(metrics);
+  const thumbHeight = Number.parseFloat(els.pageScrollIndicator?.style.getPropertyValue("--page-scroll-thumb-height")) || 46;
+  const scrollPerPixel = metrics.maxScroll / Math.max(1, trackHeight - thumbHeight);
+
+  const handlePointerMove = (moveEvent) => {
+    const nextScroll = clamp(startScroll + (moveEvent.clientY - startY) * scrollPerPixel, 0, metrics.maxScroll);
+    window.scrollTo({ top: nextScroll });
+    syncPageScrollIndicator();
+  };
+
+  const stopDragging = (upEvent) => {
+    thumb.releasePointerCapture?.(upEvent.pointerId);
+    document.body.classList.remove("is-page-scroll-dragging");
+    queuePageScrollIndicatorHide();
+    window.removeEventListener("pointermove", handlePointerMove);
+    window.removeEventListener("pointerup", stopDragging);
+    window.removeEventListener("pointercancel", stopDragging);
+  };
+
+  window.addEventListener("pointermove", handlePointerMove);
+  window.addEventListener("pointerup", stopDragging);
+  window.addEventListener("pointercancel", stopDragging);
+}
+
+function syncLeftScrollIndicators() {
+  syncPaletteScrollIndicator();
+  syncEffectsStackScrollIndicator();
+  syncMasterScrollIndicator();
+  syncPageScrollIndicator();
 }
 
 function selectPalette(id, options = {}) {
@@ -3350,6 +3972,8 @@ function renderEffects() {
     empty.textContent = "No effects in stack";
     els.effectsStack.appendChild(empty);
     syncDitherTextSurfaces(els.effectsStack);
+    requestAnimationFrame(syncEffectsStackScrollIndicator);
+    requestAnimationFrame(syncMasterScrollIndicator);
     return;
   }
   state.effects.forEach((effect, index) => {
@@ -3410,6 +4034,8 @@ function renderEffects() {
     els.effectsStack.appendChild(item);
   });
   syncDitherTextSurfaces(els.effectsStack);
+  requestAnimationFrame(syncEffectsStackScrollIndicator);
+  requestAnimationFrame(syncMasterScrollIndicator);
 }
 
 function effectButton(text, label, handler) {
@@ -3644,6 +4270,7 @@ function drawWizardSignal(seed = Math.floor(Math.random() * 0xffffffff)) {
 
   state.sourceType = "image";
   state.sourceName = `wizard-${name}-${seedCode.toLowerCase()}`;
+  state.randomSourceVisibilityGuard = true;
   state.duration = 4;
   state.time = 0;
   estimateSourceBytesFromCanvas(`${state.sourceName}.png`, "PNG");
@@ -3702,6 +4329,7 @@ function drawSample() {
 
   state.sourceType = "image";
   state.sourceName = "procedural";
+  state.randomSourceVisibilityGuard = false;
   state.duration = 4;
   state.time = 0;
   estimateSourceBytesFromCanvas("procedural.png", "PNG");
@@ -3769,6 +4397,7 @@ function clearObjectUrlSource() {
 function prepareRandomSourceLoad(asset, options = {}) {
   clearObjectUrlSource();
   state.sourceName = asset.label || asset.filename.replace(/\.[^.]+$/, "");
+  state.randomSourceVisibilityGuard = options.visibilityGuard !== false;
   setExportSource({
     name: asset.filename,
     bytes: asset.bytes,
@@ -3845,6 +4474,7 @@ async function loadFile(file, options = {}) {
   if (objectUrl) URL.revokeObjectURL(objectUrl);
   objectUrl = URL.createObjectURL(file);
   state.sourceName = file.name;
+  state.randomSourceVisibilityGuard = Boolean(options.visibilityGuard);
   setExportSource({
     name: file.name,
     bytes: file.size,
@@ -4695,6 +5325,7 @@ function renderBatchList() {
     empty.textContent = "No queued image files";
     els.batchList.appendChild(empty);
     syncDitherTextSurfaces(els.batchList);
+    requestAnimationFrame(syncMasterScrollIndicator);
     return;
   }
   state.batchFiles.forEach((file, index) => {
@@ -4709,6 +5340,7 @@ function renderBatchList() {
     els.batchList.appendChild(item);
   });
   syncDitherTextSurfaces(els.batchList);
+  requestAnimationFrame(syncMasterScrollIndicator);
 }
 
 async function processBatch() {
@@ -4771,6 +5403,7 @@ function randomizeLook() {
   updateStatus();
   updateDitherTextTexture();
   scheduleEditRender();
+  pulseDiceButton(els.randomizePresetButton);
 }
 
 function applyRandomSourceClarityLook(options = {}) {
@@ -4828,12 +5461,16 @@ function applyRandomSourceClarityLook(options = {}) {
 async function summonWizardSignal() {
   if (state.isExporting || state.isRecording) return;
   els.wizardSignalButton?.classList.add("is-casting");
-  const loaded = await loadRandomLibrarySource({ seedFromOutput: true });
+  els.randomSourceButton?.classList.add("is-casting");
+  const loaded = await loadRandomLibrarySource({ seedFromOutput: true, visibilityGuard: true });
   if (!loaded) drawWizardSignal();
   applyRandomSourceClarityLook();
   setCanvasView("processed");
   setExportPreview("gif");
-  window.setTimeout(() => els.wizardSignalButton?.classList.remove("is-casting"), 700);
+  window.setTimeout(() => {
+    els.wizardSignalButton?.classList.remove("is-casting");
+    els.randomSourceButton?.classList.remove("is-casting");
+  }, 700);
 }
 
 function savePreset() {
@@ -4847,6 +5484,7 @@ function savePreset() {
   };
   PRESETS.push(preset);
   renderPresets();
+  requestAnimationFrame(syncMasterScrollIndicator);
 }
 
 function bindEvents() {
@@ -4856,7 +5494,7 @@ function bindEvents() {
     loadFile(file);
     els.fileInput.value = "";
   });
-  els.resetSampleButton.addEventListener("click", loadDefaultSample);
+  els.resetSampleButton?.addEventListener("click", loadDefaultSample);
 
   ["dragenter", "dragover"].forEach((eventName) => {
     els.dropZone.addEventListener(eventName, (event) => {
@@ -4880,6 +5518,7 @@ function bindEvents() {
   });
 
   els.paletteSelect.addEventListener("change", () => selectPalette(els.paletteSelect.value, { reveal: true }));
+  els.randomizePresetButton?.addEventListener("click", randomizeLook);
   els.randomizePaletteButton?.addEventListener("click", randomizePaletteSource);
   els.randomizeAlgorithmButton?.addEventListener("click", randomizeAlgorithm);
   els.palettePickerList?.addEventListener("click", (event) => {
@@ -4889,7 +5528,14 @@ function bindEvents() {
     selectPalette(option.dataset.paletteOption, { reveal: true });
   });
   els.palettePickerList?.addEventListener("scroll", syncPaletteScrollIndicator, { passive: true });
-  window.addEventListener("resize", syncPaletteScrollIndicator);
+  els.effectsStack?.addEventListener("scroll", syncEffectsStackScrollIndicator, { passive: true });
+  els.masterControlsPane?.addEventListener("scroll", syncLeftScrollIndicators, { passive: true });
+  els.masterScrollThumb?.addEventListener("pointerdown", dragMasterScrollIndicator);
+  els.pageScrollThumb?.addEventListener("pointerdown", dragPageScrollIndicator);
+  document.addEventListener("wheel", handlePageScrollIntent, { passive: true, capture: true });
+  document.addEventListener("touchmove", handlePageScrollIntent, { passive: true, capture: true });
+  window.addEventListener("scroll", () => showPageScrollIndicator(), { passive: true });
+  window.addEventListener("resize", syncLeftScrollIndicators);
   els.extractPaletteButton.addEventListener("click", extractPalette);
   els.exportPaletteButton.addEventListener("click", exportPalette);
   els.importPaletteButton.addEventListener("click", () => els.paletteInput.click());
@@ -4941,6 +5587,7 @@ function bindEvents() {
     if (event.key === EXPORT_COUNT_KEY) syncExportEntitlement();
   });
   els.wizardSignalButton?.addEventListener("click", summonWizardSignal);
+  els.randomSourceButton?.addEventListener("click", summonWizardSignal);
   [
     els.exportIconButton,
     els.downloadGifButton,
@@ -4972,6 +5619,9 @@ function bindEvents() {
   window.addEventListener("resize", () => scheduleRender());
   document.addEventListener("keydown", (event) => {
     if (event.target instanceof HTMLInputElement || event.target instanceof HTMLSelectElement) return;
+    if (["ArrowUp", "ArrowDown", "PageUp", "PageDown", "Home", "End"].includes(event.key)) {
+      showPageScrollIndicator();
+    }
     if (event.key === " ") {
       event.preventDefault();
       setPlaying(!state.playing);
@@ -5009,6 +5659,7 @@ async function init() {
   bindEvents();
   await loadStartupSource();
   renderNow();
+  syncLeftScrollIndicators();
 }
 
 init();

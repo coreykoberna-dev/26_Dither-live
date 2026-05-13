@@ -79,7 +79,7 @@
       "logotypeToolMatchedCutout": "The outlined Dither Wizard logotype samples assets/video/dither-magic.mp4 into a 229 x 54 canvas, clips that processed source through the full lockup, uses the active tool stack on the homepage, uses a shared site-header renderer on documentation, account, contact, and lab pages, derives shared-page fill colors from page accents instead of text color, and renders with logo-only visibility guards that keep contrast below -20, Bias at or above -25, Epsilon Glow above 50, and a subtle extracted or page-primary source tone over the fill."
     },
     "roles": {
-      "displayLarge": { "size": "120px", "lineHeight": "124px", "family": "GT Standard Mono", "tracking": "0.015em", "case": "uppercase", "usage": "system title" },
+      "displayLarge": { "size": "120px", "lineHeight": "124px", "family": "GT Standard", "weight": "700", "tracking": "0", "case": "uppercase", "usage": "design-system hero title" },
       "displayExtended": { "size": "46px", "lineHeight": "47px", "family": "GT Standard Mono", "tracking": "0.11em", "case": "uppercase", "scaleX": "1.08", "usage": "rare extended all-caps signal statements" },
       "displayMedium": { "size": "72px", "lineHeight": "76px", "family": "GT Standard Mono", "tracking": "0.01em", "case": "uppercase", "usage": "major documentation heading" },
       "displaySmall": { "size": "52px", "lineHeight": "60px", "family": "GT Standard Mono", "tracking": "0.012em", "case": "uppercase", "usage": "system section heading" },
@@ -91,6 +91,7 @@
       "labelLarge": { "size": "15px", "lineHeight": "20px", "family": "GT Standard Mono", "tracking": "0.04em", "case": "uppercase", "usage": "navigation and command labels" },
       "labelMedium": { "size": "13px", "lineHeight": "20px", "family": "GT Standard Mono", "tracking": "0.035em", "case": "uppercase", "usage": "captions and token details" },
       "labelSmall": { "size": "12px", "lineHeight": "16px", "family": "GT Standard Mono", "tracking": "0.08em", "case": "uppercase", "usage": "algorithm IDs and status tags" },
+      "topbarRouteLabel": { "size": "10px", "lineHeight": "13px", "family": "GT Standard Mono", "tracking": "0.08em", "case": "uppercase", "usage": "shared header primary route labels" },
       "sectionLabel": { "size": "11px", "lineHeight": "16px", "family": "GT Standard Mono", "tracking": "0.095em", "case": "uppercase", "scaleX": "1.045", "usage": "pane headings, timeline headings, compact section titles" },
       "controlLabel": { "size": "10px", "lineHeight": "14px", "family": "GT Standard Mono", "tracking": "0.065em", "case": "uppercase", "usage": "field labels, slider labels, compact row labels" },
       "commandLabel": { "size": "12px", "lineHeight": "16px", "family": "GT Standard Mono", "tracking": "0.055em", "case": "uppercase", "usage": "buttons, segmented tabs, command controls" },
@@ -115,16 +116,12 @@
       "feedback": "Hover, focus, and pressed states respond immediately and resolve within roughly 80-150ms.",
       "signature": "Longer motion is reserved for local scan, lock, compile, and cast feedback.",
       "navigation": "The design-system documentation rail uses Bare Index as production: dechromed rule index, single-select active containment, and transform/opacity Trace Fold motion.",
-      "heroSizzle": "The design-system hero sizzle is a full-width automatic slideshow with the Wizardly Design System title embedded as the fixed lead object inside an open quiet field. The title field is an exclusion zone for readable labels, plotted paths, component panels, and state strips. Background texture is tertiary, midground structure carries sparse grids and token/type/state maps, and five visual options reveal real design-system or product primitives: Token Reactor, Component Sequencer, Commerce Flow, Workbench Signal, and Governance Radar.",
+      "heroSizzle": "The design-system hero is a full-width Vitruvian motion field with the Wizardly Design System title embedded as the fixed lead object inside an open quiet field. The title uses proportional GT Standard Bold styling. The title field is an exclusion zone for readable labels, plotted paths, and instrumentation. Background texture is tertiary and dynamically themed from active surface, primary, secondary, and tertiary roles instead of black. Midground structure carries sparse measurement grids, and the dithered Vitruvian Man motion piece is centered inside the circular instrument as the foreground artwork. The external motion canvas is the only Vitruvian figure; SVG/CSS vector overlays carry active theme color for surrounding orbit dots, ellipses, and axes. A transparent CRT layer can sit above the full hero box as scanline, subpixel, and micro-dot texture only, without a tonal opacity wash.",
       "performance": "Animated preview may pace heavy frames so controls and navigation remain responsive.",
       "accessibility": "Reduced motion disables nonessential loops and scan sweeps."
     },
     "sizzleSections": {
-      "tokenReactor": ["palette roles", "type specimen", "state stack", "motion curve"],
-      "componentSequencer": ["button states", "text inputs", "data table", "documentation rail"],
-      "commerceFlow": ["sign-in form", "account settings", "store product card", "billing recovery"],
-      "workbenchSignal": ["dropzone", "preview canvas", "timeline transport", "export meter"],
-      "governanceRadar": ["source files", "access gates", "qa gates", "handoff"]
+      "vitruvianMotion": ["dither motion canvas", "star fallback", "vector geometric orbit", "measurement readout"]
     }
   },
   "states": {
@@ -142,6 +139,14 @@
       "disclosure": ["family tabs", "open specimen board", "quiet deep links", "normalized hairline rhythm", "full-row complex specimens", "accessible state and variant metadata"],
       "dataTableVariants": ["invoice ledger", "session list", "plan comparison", "entitlement cards", "team seats", "payment methods", "activity log", "order history", "usage meters", "refund queue"],
       "platformCoverage": ["button state matrix", "toolbar", "menu button", "command palette", "context menu", "menu bar", "popover", "split view", "collection grid", "inspector panel", "scroll area", "key-value list", "notification center", "permission prompt", "coach mark", "error boundary", "toggle button group", "color picker", "tree and outline view", "transfer list", "bulk selection bar", "tokenized input", "inline edit field", "address form", "form field group", "masked input"]
+    },
+    "sharedHeader": {
+      "brandMark": "45px x 53px",
+      "brandLogotypeWidth": "166px",
+      "brandLockupWidth": "230px",
+      "routeLabelRole": "topbarRouteLabel",
+      "utilitySlot": "24px",
+      "utilityGlyph": "13px"
     },
     "forms": {
       "fieldHeight": "34px",
